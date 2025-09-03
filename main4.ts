@@ -156,6 +156,10 @@ class UserManager<L extends Library> {
     // reasently repeated but failed
     // repeated but not often enough
 
+    const getInFocus = (aspect: Aspect) : boolean => {
+      throw "not implemented";
+    }
+    
     const getLastRepetition = (
       aspect: Aspect
     ): "long" | "middle" | "short" => {
