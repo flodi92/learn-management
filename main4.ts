@@ -9,6 +9,7 @@ type AspectsResult = Map<Aspect, ResultValue>;
 type AspectsResults = Map<Aspect, AspectResults>;
 
 type LearnedCondition = unknown;
+type Priority = 1 | 2 | 3 | 4 | 5;
 
 // examples // https://www.geeksforgeeks.org/dsa/write-regular-expressions/
 const literals: SimpleAspect = { id: "literals", example: "hello" };
@@ -156,13 +157,11 @@ class UserManager<L extends Library> {
     // reasently repeated but failed
     // repeated but not often enough
 
-    const getInFocus = (aspect: Aspect) : boolean => {
+    const getInFocus = (aspect: Aspect): boolean => {
       throw "not implemented";
-    }
-    
-    const getLastRepetition = (
-      aspect: Aspect
-    ): "long" | "middle" | "short" => {
+    };
+
+    const getLastRepetition = (aspect: Aspect): "long" | "middle" | "short" => {
       throw "not implemented";
     };
 
@@ -172,13 +171,45 @@ class UserManager<L extends Library> {
 
     const getPositiveRepetitions = (
       aspect: AspectResults
-    ): "often" | "fewTimes" | "seldom" => {
+    ): "often" | "fewTimes" | "seldom" | "never" => {
       throw "not implemented";
     };
 
-    const getPriority = (aspect: Aspect): 1 | 2 | 3 | 4 | 5 => {
+    const getPriority = (aspect: Aspect): Priority => {
       // uses getLastRepetition, getLastResult, getPositiveRepetitions
       throw "not implemented";
+    };
+
+    const selectAspectsByPriority = (
+      aspectWithPriority: [Aspect, Priority][],
+      numberOfTasks: number
+    ) => {
+      const sortedAspectsPriority: Map<Priority, Aspect[]> =
+        aspectWithPriority.reduce(
+          (acc, [aspect, priority]) => ({
+            ...acc,
+            [priority]: [...(acc[priority] ?? [aspect])],
+            priority,
+          }),
+          new Map<Priority, Aspect[]>() // TODO fix
+        );
+
+      const buffer: Aspect[] = [];
+
+      for (let i: Priority = 1; i <= 5; i++) {
+        const aspects = sortedAspectsPriority.get(i as Priority) ?? [];
+        const remainingNumber = numberOfTasks - buffer.length;
+        const rest =
+          i === 5
+            ? 0
+            : Math.max(
+                remainingNumber - aspects.length,
+                Math.ceil(remainingNumber * 0.5)
+              );
+        const countOfPriority = aspects.length - rest;
+
+        buffer.push(...aspects.slice(0, countOfPriority)); // TODO shuffle
+      }
     };
 
     // go throw all aspects priority take all of 1 and a certain percentage of others
