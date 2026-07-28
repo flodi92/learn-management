@@ -12,43 +12,43 @@ type LearnedCondition = unknown;
 type Priority = 1 | 2 | 3 | 4 | 5;
 
 // examples // https://www.geeksforgeeks.org/dsa/write-regular-expressions/
-const literals: SimpleAspect = { id: "literals", example: "hello" };
+const literals: SimpleAspect = { id: 'literals', example: 'hello' };
 const characterClass: SimpleAspect = {
-  id: "characterClass",
-  example: "[a-zA-Z0-9]",
+  id: 'characterClass',
+  example: '[a-zA-Z0-9]',
 };
 const repeaters: SimpleAspect = {
-  id: "repeaters",
-  example: "ab*cd+e{4,5}f{8,}",
+  id: 'repeaters',
+  example: 'ab*cd+e{4,5}f{8,}',
 };
 const wildCard: SimpleAspect = {
-  id: "wildCard",
-  example: "My favorit character is .",
+  id: 'wildCard',
+  example: 'My favorit character is .',
 };
-const optional: SimpleAspect = { id: "optional" };
+const optional: SimpleAspect = { id: 'optional' };
 
 const wildCardRepeaters: ComplexAspect = {
-  id: "wildCardRepeaters",
-  example: "My name is .*",
+  id: 'wildCardRepeaters',
+  example: 'My name is .*',
   children: [wildCard, repeaters],
 };
 const literalsOptional: ComplexAspect = {
-  id: "literalsOptional",
-  example: "This is (not)? good.",
+  id: 'literalsOptional',
+  example: 'This is (not)? good.',
   children: [optional, repeaters],
 };
 
 const basic: ComplexAspect = {
-  id: "basic",
+  id: 'basic',
   children: [literals, characterClass, repeaters, wildCard, optional],
 };
 // -----------------------
 
 const isComplexAspect = (aspect: Aspect): aspect is ComplexAspect =>
-  "children" in aspect;
+  'children' in aspect;
 
 const isSimpleAspect = (aspect: Aspect): aspect is SimpleAspect =>
-  !("children" in aspect);
+  !('children' in aspect);
 
 const compareAspects = (aspectA: Aspect, aspectB: Aspect) => {
   if (aspectA.id !== undefined && aspectA.id === aspectB.id) {
@@ -59,7 +59,7 @@ const compareAspects = (aspectA: Aspect, aspectB: Aspect) => {
     isComplexAspect(aspectB) &&
     aspectA.children.length === aspectB.children.length &&
     aspectA.children.every((childA) =>
-      aspectB.children.some((childB) => compareAspects(childA, childB))
+      aspectB.children.some((childB) => compareAspects(childA, childB)),
     )
   ) {
     return true;
@@ -72,7 +72,7 @@ const isAspectPrecondition = (aspect: Aspect, ofAspect: Aspect) => {
     if (isComplexAspect(aspect)) {
       aspect.children.reduce((acc: Set<string>, curr) => {
         Array.from(getSimpleAspects(curr).values()).forEach((value) =>
-          acc.add(value)
+          acc.add(value),
         );
         return acc;
       }, new Set<string>());
@@ -93,10 +93,10 @@ const isAspectPrecondition = (aspect: Aspect, ofAspect: Aspect) => {
 
 class TaskGenerator {
   generateTask(aspect: Aspect): unknown | undefined {
-    throw "not implemented";
+    throw 'not implemented';
   }
   hasTask(aspect: Aspect): boolean {
-    throw "not implemented";
+    throw 'not implemented';
   }
 }
 
@@ -104,10 +104,10 @@ class Library {
   allAspects: Aspect[] = [];
 
   getPreconditionAspects(aspect: Aspect): Aspect[] {
-    throw "not implemented";
+    throw 'not implemented';
   }
   getFollowUpAspects(aspect: Aspect): Aspect[] {
-    throw "not implemented";
+    throw 'not implemented';
   }
 }
 
@@ -121,11 +121,11 @@ class UserManager<L extends Library> {
 
   getAspectsResult(): AspectsResult {
     // const aspects = L.allAspects
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   getUnlockedAspectsToLearn(): Aspect[] {
-    throw "not implemented";
+    throw 'not implemented';
   }
   setFocusedAspects(aspects: Aspect[]) {
     // assert in UnlockedAspectsToLearn
@@ -141,15 +141,15 @@ class UserManager<L extends Library> {
   }
 
   getFocusedAspectsResults(): AspectsResults {
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   getDecombinedFocusedAspectsForRepetition(): Aspect[] {
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   getAspectsRepetitionState(): unknown {
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   getSuggestedAspectsForRepetition(): Aspect[] {
@@ -158,31 +158,31 @@ class UserManager<L extends Library> {
     // repeated but not often enough
 
     const getInFocus = (aspect: Aspect): boolean => {
-      throw "not implemented";
+      throw 'not implemented';
     };
 
-    const getLastRepetition = (aspect: Aspect): "long" | "middle" | "short" => {
-      throw "not implemented";
+    const getLastRepetition = (aspect: Aspect): 'long' | 'middle' | 'short' => {
+      throw 'not implemented';
     };
 
     const getLastResult = (aspect: AspectResults): ResultValue => {
-      throw "not implemented";
+      throw 'not implemented';
     };
 
     const getPositiveRepetitions = (
-      aspect: AspectResults
-    ): "often" | "fewTimes" | "seldom" | "never" => {
-      throw "not implemented";
+      aspect: AspectResults,
+    ): 'often' | 'fewTimes' | 'seldom' | 'never' => {
+      throw 'not implemented';
     };
 
     const getPriority = (aspect: Aspect): Priority => {
       // uses getLastRepetition, getLastResult, getPositiveRepetitions
-      throw "not implemented";
+      throw 'not implemented';
     };
 
     const selectAspectsByPriority = (
       aspectWithPriority: [Aspect, Priority][],
-      numberOfTasks: number
+      numberOfTasks: number,
     ) => {
       const sortedAspectsPriority: Map<Priority, Aspect[]> =
         aspectWithPriority.reduce(
@@ -191,7 +191,7 @@ class UserManager<L extends Library> {
             [priority]: [...(acc[priority] ?? [aspect])],
             priority,
           }),
-          new Map<Priority, Aspect[]>() // TODO fix
+          new Map<Priority, Aspect[]>(), // TODO fix
         );
 
       const buffer: Aspect[] = [];
@@ -204,7 +204,7 @@ class UserManager<L extends Library> {
             ? 0
             : Math.max(
                 remainingNumber - aspects.length,
-                Math.ceil(remainingNumber * 0.5)
+                Math.ceil(remainingNumber * 0.5),
               );
         const countOfPriority = aspects.length - rest;
 
@@ -214,7 +214,7 @@ class UserManager<L extends Library> {
 
     // go throw all aspects priority take all of 1 and a certain percentage of others
 
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   // some getter for state if many aspects underrated
@@ -230,7 +230,7 @@ class UserManager<L extends Library> {
   finishSequenceWithResult(result: AspectsResult) {}
 
   getAspectsWithFailedResultInCurrentSequence(): AspectsResult[] {
-    throw "not implemented";
+    throw 'not implemented';
   }
 
   finishRepeatFailedAspects(result: AspectsResult) {}

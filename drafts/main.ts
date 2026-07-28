@@ -17,8 +17,6 @@
 //   description: TaskDescriptionT
 // ) => TaskT;
 
-
-
 // export type AbilityConfiguration =
 //   | SimpleAbilityConfiguration
 //   | ConnectedAbilityConfiguration;
@@ -33,7 +31,6 @@
 //   abilityConfigurations: AbilityConfiguration;
 //   difficulties: Difficulty[];
 // }
-
 
 // export type LearningState =
 // | "new"
@@ -52,7 +49,7 @@
 //     [state in LearningState]: AbilityConfiguration[];
 // };
 
-// export type Result = 
+// export type Result =
 //     | "good"
 //     | "middle"
 //     | "bad";
@@ -67,7 +64,6 @@
 // export type AbilitySimplifier = (sessions: Session[]) => Ability;
 
 // // example
-
 
 // type Exact<T, Shape> =
 // T extends Shape

@@ -18,7 +18,7 @@
 //   // user interactions
 //   addAspectToSession(aspect: Aspect) {
 //     const findFittingSequence = () => 42;
-    
+
 //     this.currentSession[findFittingSequence()].push(aspect);
 //   }
 //   removeAspectFromSession() {}

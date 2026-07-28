@@ -8,23 +8,21 @@
 // // 6. Sitzung planen anhand verfügbarer Zeit, Anteil Wiederholungsaufgaben, Anteil Neuaufgaben
 // // 7. Langfristige Planung
 
-
-
 // // Generisch
 // // ---------
 
 // export interface AbstractAbility<I extends string>  {
 //     id: I;
-// } 
+// }
 
 // export interface SimpleAbility<N extends string, V extends string[] = []> extends AbstractAbility<N> {
 //     values: V;
-// } 
+// }
 
 // export interface ComplexAbility<N extends string, As extends Ability[]> extends AbstractAbility<N> {
 //     mix: 'inTask' | 'inSequence' | 'inTaskAndSequence'
 //     children: As;
-// } 
+// }
 
 // export type Ability = SimpleAbility<string> | AbstractAbility<string>;
 // export type Result = unknown;
@@ -37,7 +35,7 @@
 //   | "noSuccessInRepetition"
 //   | "inLongtermRepetition";
 
-//   export type Focus = 
+//   export type Focus =
 //   "inCurrentFocus"
 //   | "notInCurrentFocus"
 
@@ -59,7 +57,7 @@
 // type Sequence = {
 //  ability: Ability;
 //  numberOfTasks: number;
-//  timeLinit: number;   
+//  timeLinit: number;
 // }
 
 // type LearnSequence = {
@@ -85,7 +83,6 @@
 // export type Operator = SimpleAbility<'operator', [OperatorValues]>;
 // export type Compute = ComplexAbility<'compute', [OperandsRange, Operator]>
 
-
 // // Helper
 // const isAbilityLearned = (requestedAbility: Ability, results: {ability: Ability, mistakes: number, time: number}): boolean => {
 //     throw 'not implemented';
@@ -105,7 +102,7 @@
 //     throw 'not implemented';
 // };
 
-// // getAbilityLearningState = () => 
+// // getAbilityLearningState = () =>
 
 // // suggestNextTasksToLearn
 
@@ -117,4 +114,4 @@
 
 // // Task analysis
 // //
-// // - 
+// // -
