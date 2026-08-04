@@ -9,7 +9,7 @@ const keepDays = converge1(10);
 const keepRepetitions = converge1(3);
 interface Result {beforeDays: number, correctness: number /* [0, 1] */ }
 
-const consciousness = ( orderedResults: Result[]) => 
+export const getConsciousness = ( orderedResults: Result[]) => 
 
     keepRepetitions(orderedResults.reduce((sum, {beforeDays, correctness}, idx, arr) => 
         sum +
@@ -34,7 +34,7 @@ const prioritize = (results: {date: Date, aspect: string, correctness: number /*
                 .map( result => ({beforeDays: getBeforeDays(result.date), correctness: result.correctness}))
                 .sort((a, b) => a.beforeDays - b.beforeDays )
             })     
-        ).reduce((acc, {aspect, orderedResults}) =>({...acc, [aspect]: consciousness(orderedResults)}), {} as Record<string, number>);
+        ).reduce((acc, {aspect, orderedResults}) =>({...acc, [aspect]: getConsciousness(orderedResults)}), {} as Record<string, number>);
    
         
         return {
@@ -46,5 +46,3 @@ const prioritize = (results: {date: Date, aspect: string, correctness: number /*
         
    
     }
-
-const 
