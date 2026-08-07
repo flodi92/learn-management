@@ -1,0 +1,4 @@
+- ordnen
+- suggestTestableSkills implementieren, dabei Optimierungen Zeigen
+- mit unit-Test Sitzung simulieren
+- Console-Tool bauen
