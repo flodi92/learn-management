@@ -1,5 +1,4 @@
 import { getConsciousness } from './suggestTestableSkills';
-// import {it, describe expect} from "test"
 
 describe('getConsciousness', () => {
   it('forget', () => {
