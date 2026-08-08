@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prettify": "prettier . --write",
-    "test": "jest"
+    "test": "jest --watch"
   },
   "devDependencies": {
     "@jest/globals": "^30.4.1",
