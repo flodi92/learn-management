@@ -10,20 +10,21 @@ interface Result {
   correctness: number; /* [0, 1] */
 }
 
-export const getConsciousness = (orderedResults: Result[]) =>
+export const getConsciousness = (results: Result[]) =>
   keepRepetitions(
-    orderedResults.reduce(
-      (sum, { beforeDays, correctness }, idx, arr) =>
-        sum + idx === 0
-          ? correctness * forgetDays(beforeDays)
-          : correctness *
-              forgetDays(beforeDays) *
-              keepDays(arr[idx - 1].beforeDays - beforeDays) *
-              arr[idx - 1].correctness *
-              2 -
-            1,
-      0,
-    ),
+    results
+      .sort((a, b) => a.beforeDays - b.beforeDays)
+      .reduce(
+        (sum, { beforeDays, correctness }, idx, arr) =>
+          idx === 0
+            ? correctness * forgetDays(beforeDays)
+            : sum +
+              forgetDays(arr[idx - 1].beforeDays) *
+                keepDays(beforeDays - arr[idx - 1].beforeDays) *
+                correctness *
+                arr[idx - 1].correctness,
+        0,
+      ),
   );
 
 const getBeforeDays = (date: Date) => undefined as unknown as number;
