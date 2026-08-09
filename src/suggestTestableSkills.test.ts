@@ -158,7 +158,7 @@ describe('getConsciousness', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 2', () => {
+    it('case 3', () => {
       const a = getConsciousness([
         { beforeDays: 1, correctness: 0.3 },
         { beforeDays: 2, correctness: 0.3 },
@@ -171,7 +171,7 @@ describe('getConsciousness', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 3', () => {
+    it('case 4', () => {
       const a = getConsciousness([
         { beforeDays: 1, correctness: 0.9 },
         { beforeDays: 2, correctness: 0.8 },
@@ -184,7 +184,7 @@ describe('getConsciousness', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 4', () => {
+    it('case 5', () => {
       const a = getConsciousness([
         { beforeDays: 1, correctness: 0.6 },
         { beforeDays: 5, correctness: 1 },

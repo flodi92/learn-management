@@ -10,22 +10,50 @@ interface Result {
   correctness: number; /* [0, 1] */
 }
 
-export const getConsciousness = (results: Result[]) =>
-  keepRepetitions(
-    results
-      .sort((a, b) => a.beforeDays - b.beforeDays)
-      .reduce(
-        (sum, { beforeDays, correctness }, idx, arr) =>
-          idx === 0
-            ? correctness * forgetDays(beforeDays)
-            : sum +
-              forgetDays(arr[idx - 1].beforeDays) *
-                keepDays(beforeDays - arr[idx - 1].beforeDays) *
-                correctness *
-                arr[idx - 1].correctness,
-        0,
-      ),
-  );
+export const getConsciousness = (results: Result[]) => {
+  results.forEach((result) => {
+    if (result.correctness < 0 || result.correctness > 1) {
+      {
+        throw new Error(
+          `correctness of result ${JSON.stringify(result)} should be in range between 0 and 1 inclusive`,
+        );
+      }
+    }
+  });
+
+  const summedRepetitionsConsciousnesses = results
+    .sort((a, b) => a.beforeDays - b.beforeDays)
+    .map(({ beforeDays, correctness }, idx, arr) => {
+      const nextEarlier = arr[idx + 1];
+      const keptOverTimeOfThisRepetition = forgetDays(beforeDays) * correctness;
+
+      if (!nextEarlier) {
+        return keptOverTimeOfThisRepetition * 0.5;
+      }
+
+      const rewardForKeepingBetweenRepetitions =
+        keepDays(nextEarlier.beforeDays - beforeDays) *
+        0.5 *
+        (correctness * 2 - nextEarlier.correctness);
+
+      return (
+        (rewardForKeepingBetweenRepetitions + keptOverTimeOfThisRepetition) / 2
+      );
+    })
+    .map((current) => {
+      if (current < -1 || current > 1) {
+        throw new Error('value for repetition should be in range -1 to 1');
+      }
+      return current;
+    });
+
+  // console.log(summedRepetitionsConsciousnesses);
+
+  const summedRepetitionsConsciousness =
+    summedRepetitionsConsciousnesses.reduce((sum, current) => sum + current, 0);
+
+  return keepRepetitions(Math.max(summedRepetitionsConsciousness, 0));
+};
 
 const getBeforeDays = (date: Date) => undefined as unknown as number;
 
