@@ -1,16 +1,27 @@
 import { getConsciousness } from './suggestTestableSkills';
 
 describe('getConsciousness', () => {
+  const checkValuesForNormalizedRange = (values: Record<string, number>) => {
+    Object.entries(values).forEach(([name, value]) => {
+      if (value < 0 || value > 1) {
+        throw Error(
+          `The value ${name} is expected to be value < 0 || value > 1 but is ${value}`,
+        );
+      }
+    });
+  };
   describe('consciousness decreases with increasing time of last repetition', () => {
     it('case 0', () => {
       const a = getConsciousness([{ beforeDays: 1, correctness: 1 }]);
       const b = getConsciousness([{ beforeDays: 2, correctness: 1 }]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 1', () => {
       const a = getConsciousness([{ beforeDays: 1, correctness: 0.5 }]);
       const b = getConsciousness([{ beforeDays: 2, correctness: 0.5 }]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -22,6 +33,7 @@ describe('getConsciousness', () => {
         { beforeDays: 7, correctness: 1 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 3', () => {
       const a = getConsciousness([
@@ -33,6 +45,7 @@ describe('getConsciousness', () => {
         { beforeDays: 7, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 4', () => {
       const a = getConsciousness([
@@ -46,6 +59,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.6 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
   describe('consciousness is considered less when the level of correctness is lower', () => {
@@ -53,6 +67,7 @@ describe('getConsciousness', () => {
       const a = getConsciousness([{ beforeDays: 1, correctness: 1 }]);
       const b = getConsciousness([{ beforeDays: 1, correctness: 0.5 }]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 1', () => {
       const a = getConsciousness([
@@ -64,6 +79,7 @@ describe('getConsciousness', () => {
         { beforeDays: 5, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -77,6 +93,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 3', () => {
       const a = getConsciousness([
@@ -90,6 +107,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.3 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 4', () => {
       const a = getConsciousness([
@@ -103,6 +121,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.8 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
 
@@ -124,6 +143,7 @@ describe('getConsciousness', () => {
         { beforeDays: 2, correctness: 1 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -136,6 +156,7 @@ describe('getConsciousness', () => {
         { beforeDays: 2, correctness: 0.3 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -148,6 +169,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 0.3 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 3', () => {
       const a = getConsciousness([
@@ -160,6 +182,7 @@ describe('getConsciousness', () => {
         { beforeDays: 2, correctness: 0.8 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 4', () => {
       const a = getConsciousness([
@@ -172,6 +195,7 @@ describe('getConsciousness', () => {
         { beforeDays: 5, correctness: 1 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
 
@@ -188,6 +212,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 1 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -201,6 +226,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 0.6 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 3', () => {
       const a = getConsciousness([
@@ -214,6 +240,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 0.3 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
   describe('consciousness is considered more when correctness in past repetitions was higher', () => {
@@ -229,6 +256,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.3 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
   describe('consciousness is considered more when the correectness has not fallen during past repetition', () => {
@@ -242,6 +270,7 @@ describe('getConsciousness', () => {
         { beforeDays: 2, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 1', () => {
       const a = getConsciousness([
@@ -255,6 +284,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -268,6 +298,7 @@ describe('getConsciousness', () => {
         { beforeDays: 10, correctness: 0.5 },
       ]);
       expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
   describe('consciousness is considered less when the level of correctness has fallen during past repetitions', () => {
@@ -281,6 +312,7 @@ describe('getConsciousness', () => {
         { beforeDays: 2, correctness: 1 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 1', () => {
       const a = getConsciousness([
@@ -294,6 +326,7 @@ describe('getConsciousness', () => {
         { beforeDays: 9, correctness: 1 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -307,6 +340,7 @@ describe('getConsciousness', () => {
         { beforeDays: 42, correctness: 0.6 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 3', () => {
       const a = getConsciousness([
@@ -320,6 +354,7 @@ describe('getConsciousness', () => {
         { beforeDays: 9, correctness: 0.4 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
 
@@ -336,6 +371,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 1 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
     it('case 2', () => {
       const a = getConsciousness([
@@ -349,6 +385,7 @@ describe('getConsciousness', () => {
         { beforeDays: 6, correctness: 0.4 },
       ]);
       expect(a).toBeLessThan(b);
+      checkValuesForNormalizedRange({ a, b });
     });
   });
 
@@ -359,6 +396,7 @@ describe('getConsciousness', () => {
       const c = getConsciousness([{ beforeDays: 9, correctness: 1 }]);
       const d = getConsciousness([{ beforeDays: 10, correctness: 1 }]);
       expect(a - b).toBeGreaterThan(c - d);
+      checkValuesForNormalizedRange({ a, b, c, d });
     });
   });
 });
