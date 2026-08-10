@@ -1,4 +1,4 @@
-import { getConsciousness } from './suggestTestableSkills';
+import { getConsciousness } from './getConsciousness';
 
 describe('getConsciousness', () => {
   const checkValuesForNormalizedRange = (values: Record<string, number>) => {
