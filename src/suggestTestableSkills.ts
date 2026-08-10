@@ -21,23 +21,28 @@ export const getConsciousness = (results: Result[]) => {
     }
   });
 
+  const sqrt = (val: number) => Math.sign(val) * Math.sqrt(Math.abs(val));
+
   const summedRepetitionsConsciousnesses = results
     .sort((a, b) => a.beforeDays - b.beforeDays)
     .map(({ beforeDays, correctness }, idx, arr) => {
       const nextEarlier = arr[idx + 1];
-      const keptOverTimeOfThisRepetition = forgetDays(beforeDays) * correctness;
+      const keptOverTimeOfThisRepetition = Math.sqrt(
+        forgetDays(beforeDays) * correctness,
+      );
 
       if (!nextEarlier) {
-        return keptOverTimeOfThisRepetition * 0.5;
+        return keptOverTimeOfThisRepetition * 0.25;
+        // return 0;
       }
 
-      const rewardForKeepingBetweenRepetitions =
+      const rewardForKeepingBetweenRepetitions = sqrt(
         keepDays(nextEarlier.beforeDays - beforeDays) *
-        0.5 *
-        (correctness * 2 - nextEarlier.correctness);
+          (0.25 * nextEarlier.correctness + 0.75 * correctness),
+      );
 
-      return (
-        (rewardForKeepingBetweenRepetitions + keptOverTimeOfThisRepetition) / 2
+      return sqrt(
+        keptOverTimeOfThisRepetition * rewardForKeepingBetweenRepetitions,
       );
     })
     .map((current) => {
