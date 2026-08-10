@@ -27,22 +27,25 @@ export const getConsciousness = (results: Result[]) => {
     .sort((a, b) => a.beforeDays - b.beforeDays)
     .map(({ beforeDays, correctness }, idx, arr) => {
       const nextEarlier = arr[idx + 1];
-      const keptOverTimeOfThisRepetition = Math.sqrt(
-        forgetDays(beforeDays) * correctness,
-      );
+      const factor1 = 0.5;
+      const factor2 = 1 - factor1;
+      const keptOverTimeOfThisRepetition =
+        factor1 * Math.sqrt(forgetDays(beforeDays) * correctness);
 
       if (!nextEarlier) {
-        return keptOverTimeOfThisRepetition * 0.25;
+        return keptOverTimeOfThisRepetition;
         // return 0;
       }
 
-      const rewardForKeepingBetweenRepetitions = sqrt(
-        keepDays(nextEarlier.beforeDays - beforeDays) *
-          (0.25 * nextEarlier.correctness + 0.75 * correctness),
-      );
+      const rewardForKeepingBetweenRepetitions =
+        factor2 *
+        sqrt(
+          keepDays(nextEarlier.beforeDays - beforeDays) *
+            (0.5 * nextEarlier.correctness + 1.5 * correctness - 1),
+        );
 
       return sqrt(
-        keptOverTimeOfThisRepetition * rewardForKeepingBetweenRepetitions,
+        keptOverTimeOfThisRepetition + rewardForKeepingBetweenRepetitions,
       );
     })
     .map((current) => {
