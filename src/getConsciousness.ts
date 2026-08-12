@@ -10,6 +10,8 @@ interface Result {
   correctness: number; /* [0, 1] */
 }
 
+const sqrtKeepSign = (val: number) => Math.sign(val) * Math.sqrt(Math.abs(val));
+
 export const getConsciousness = (results: Result[]) => {
   results.forEach((result) => {
     if (result.correctness < 0 || result.correctness > 1) {
@@ -20,8 +22,6 @@ export const getConsciousness = (results: Result[]) => {
       }
     }
   });
-
-  const sqrt = (val: number) => Math.sign(val) * Math.sqrt(Math.abs(val));
 
   const summedRepetitionsConsciousnesses = results
     .sort((a, b) => a.beforeDays - b.beforeDays)
@@ -39,12 +39,12 @@ export const getConsciousness = (results: Result[]) => {
 
       const rewardForKeepingBetweenRepetitions =
         factor2 *
-        sqrt(
+        sqrtKeepSign(
           keepDays(nextEarlier.beforeDays - beforeDays) *
             (0.5 * nextEarlier.correctness + 1.5 * correctness - 1),
         );
 
-      return sqrt(
+      return sqrtKeepSign(
         keptOverTimeOfThisRepetition + rewardForKeepingBetweenRepetitions,
       );
     })
