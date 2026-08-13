@@ -5,7 +5,7 @@ const forgetDays = converge0(10 /* days until half forgotten */);
 const keepDays = converge1(10);
 
 const keepRepetitions = converge1(3);
-interface Result {
+export interface Result {
   beforeDays: number;
   correctness: number; /* [0, 1] */
 }

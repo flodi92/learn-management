@@ -106,7 +106,7 @@ describe('LearnScheduler', () => {
       (time, index, consciousnesses, session) => {
         expect(checkForNextSession.every((task) => session.includes(task)));
         checkForNextSession = session.filter(
-          (task) => consciousnesses[task] > 0.1 && consciousnesses[task] < 0.8,
+          (task) => consciousnesses[task] > 0.1 && consciousnesses[task] < 0.4,
         );
       },
       () => {},
