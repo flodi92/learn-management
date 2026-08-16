@@ -112,4 +112,42 @@ describe('LearnScheduler', () => {
       () => {},
     );
   });
+
+  it('avoids unnecessary repetitions', () => {
+    let lastRepetition: Record<
+      string,
+      { time: number; consciousness: number }
+    > = {};
+    LearnSchedulerTestWrapper(
+      learningTimes,
+
+      subjects,
+
+      (time, index, session) =>
+        Object.fromEntries(session.map((task) => [task, 0.5])),
+
+      (time, index, consciousnesses, session) => {
+        expect(
+          session.every(
+            (task) =>
+              !(
+                consciousnesses[task] > 0.8 &&
+                lastRepetition[task].consciousness > 0.8
+              ) || time - lastRepetition[task].time > 3,
+          ),
+        );
+
+        lastRepetition = {
+          ...lastRepetition,
+          ...Object.fromEntries(
+            session.map((task) => [
+              task,
+              { time, consciousness: consciousnesses[task] },
+            ]),
+          ),
+        };
+      },
+      () => {},
+    );
+  });
 });
