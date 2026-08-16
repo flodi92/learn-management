@@ -87,6 +87,12 @@ const LearnSchedulerTestWrapper = ({
   doFinal?.(scheduler);
 };
 
+const learningInProgressConsciousnessMin = 0.1;
+const learningInProgressConsciousnessMax = 0.8;
+const intensiveLearningInProgressConsciousnessMin = 0.1;
+const intensiveLearningInProgressConsciousnessMax = 0.4;
+const minTimeForRepetition = 3;
+
 describe('LearnScheduler', () => {
   const subjects = Array.from({ length: 100 }).map((_, i) => `${i}`);
 
@@ -114,7 +120,9 @@ describe('LearnScheduler', () => {
           expect(Object.values(consciousnesses).length).toEqual(100);
           expect(
             Object.values(consciousnesses).filter(
-              (value) => value > 0.1 && value < 0.8,
+              (value) =>
+                value > learningInProgressConsciousnessMin &&
+                value < learningInProgressConsciousnessMax,
             ).length,
           ).toBeLessThan(10);
         },
@@ -137,7 +145,10 @@ describe('LearnScheduler', () => {
           expect(checkForNextSession.every((task) => session.includes(task)));
           checkForNextSession = session.filter(
             (task) =>
-              consciousnesses[task] > 0.1 && consciousnesses[task] < 0.4,
+              consciousnesses[task] >
+                intensiveLearningInProgressConsciousnessMin &&
+              consciousnesses[task] <
+                intensiveLearningInProgressConsciousnessMax,
           );
         },
       });
@@ -163,9 +174,10 @@ describe('LearnScheduler', () => {
             session.every(
               (task) =>
                 !(
-                  consciousnesses[task] > 0.8 &&
-                  lastRepetition[task].consciousness > 0.8
-                ) || time - lastRepetition[task].time > 3,
+                  consciousnesses[task] > learningInProgressConsciousnessMax &&
+                  lastRepetition[task].consciousness >
+                    learningInProgressConsciousnessMax
+                ) || time - lastRepetition[task].time > minTimeForRepetition,
             ),
           );
 
