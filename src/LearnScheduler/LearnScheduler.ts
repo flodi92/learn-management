@@ -9,7 +9,7 @@ export class LearnScheduler {
     throw 'not implemented';
   }
 
-  get consciousness(): Record<string, number> {
+  get mastery(): Record<string, number> {
     throw 'not implemented';
   }
 }

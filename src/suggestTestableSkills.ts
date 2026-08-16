@@ -1,4 +1,4 @@
-import { getConsciousness } from './LearnScheduler/LearnScheduler.utils/getConsciousness';
+import { getMastery } from './LearnScheduler/LearnScheduler.utils/getMastery';
 
 const getBeforeDays = (date: Date) => undefined as unknown as number;
 
@@ -9,7 +9,7 @@ const prioritize = (
   results: { date: Date; aspect: string; correctness: number /* [0, 1] */ }[],
 ) => {
   const aspects = Array.from(new Set(results.map((result) => result.aspect)));
-  const consciousnessOfAspects = aspects
+  const masteryOfAspects = aspects
     .map((aspect) => ({
       aspect,
       orderedResults: results
@@ -23,23 +23,19 @@ const prioritize = (
     .reduce(
       (acc, { aspect, orderedResults }) => ({
         ...acc,
-        [aspect]: getConsciousness(orderedResults),
+        [aspect]: getMastery(orderedResults),
       }),
       {} as Record<string, number>,
     );
 
   return {
-    1: Object.entries(consciousnessOfAspects).filter(
-      ([_, consciousness]) => consciousness < 0.2,
+    1: Object.entries(masteryOfAspects).filter(([_, mastery]) => mastery < 0.2),
+    2: Object.entries(masteryOfAspects).filter(
+      ([_, mastery]) => mastery >= 0.2 && mastery < 0.5,
     ),
-    2: Object.entries(consciousnessOfAspects).filter(
-      ([_, consciousness]) => consciousness >= 0.2 && consciousness < 0.5,
+    3: Object.entries(masteryOfAspects).filter(
+      ([_, mastery]) => mastery >= 0.5 && mastery < 0.8,
     ),
-    3: Object.entries(consciousnessOfAspects).filter(
-      ([_, consciousness]) => consciousness >= 0.5 && consciousness < 0.8,
-    ),
-    4: Object.entries(consciousnessOfAspects).filter(
-      ([_, consciousness]) => consciousness > 0.8,
-    ),
+    4: Object.entries(masteryOfAspects).filter(([_, mastery]) => mastery > 0.8),
   };
 };

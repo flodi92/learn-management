@@ -1,6 +1,6 @@
-import { getConsciousness } from './getConsciousness';
+import { getMastery } from './getMastery';
 
-export const getConsciousnesses = (
+export const getMasteries = (
   results: { id: string; time: number; correctness: number }[],
   today: number,
 ) => {
@@ -14,7 +14,7 @@ export const getConsciousnesses = (
   return Object.fromEntries(
     ids.map((id) => [
       id,
-      getConsciousness(resultsBeforeDays.filter((result) => result.id === id)),
+      getMastery(resultsBeforeDays.filter((result) => result.id === id)),
     ]),
   );
 };

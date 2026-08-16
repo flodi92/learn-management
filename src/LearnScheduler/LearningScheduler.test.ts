@@ -1,10 +1,10 @@
 import { LearnScheduler } from './LearnScheduler';
-import { getConsciousnesses } from './LearnScheduler.utils/getConsciousnesses';
+import { getMasteries } from './LearnScheduler.utils/getMasteries';
 import {
-  learningInProgressConsciousnessMin,
-  learningInProgressConsciousnessMax,
-  intensiveLearningInProgressConsciousnessMin,
-  intensiveLearningInProgressConsciousnessMax,
+  learningInProgressMasteryMin,
+  learningInProgressMasteryMax,
+  intensiveLearningInProgressMasteryMin,
+  intensiveLearningInProgressMasteryMax,
   minTimeForRepetition,
 } from './LearningScheduler.constants';
 
@@ -17,7 +17,7 @@ interface DoSessionParams {
 interface CheckSessionParams {
   time: number;
   index: number;
-  consciousnesses: Record<string, number>;
+  masteries: Record<string, number>;
   session: string[];
   results: Record<string, number>;
 }
@@ -59,12 +59,12 @@ const LearnSchedulerTestWrapper = ({
       })),
     );
 
-    const consciousnesses = getConsciousnesses(results, time);
+    const masteries = getMasteries(results, time);
 
     checkSession({
       time,
       index,
-      consciousnesses,
+      masteries,
       session,
       results: sessionResults,
     });
@@ -96,13 +96,13 @@ describe('LearnScheduler', () => {
         subjects,
         tasksPerSession: 10,
         doSession,
-        checkSession: ({ consciousnesses }) => {
-          expect(Object.values(consciousnesses).length).toEqual(100);
+        checkSession: ({ masteries }) => {
+          expect(Object.values(masteries).length).toEqual(100);
           expect(
-            Object.values(consciousnesses).filter(
+            Object.values(masteries).filter(
               (value) =>
-                value > learningInProgressConsciousnessMin &&
-                value < learningInProgressConsciousnessMax,
+                value > learningInProgressMasteryMin &&
+                value < learningInProgressMasteryMax,
             ).length,
           ).toBeLessThan(10);
         },
@@ -121,14 +121,12 @@ describe('LearnScheduler', () => {
         subjects,
         tasksPerSession: 10,
         doSession,
-        checkSession: ({ consciousnesses, session }) => {
+        checkSession: ({ masteries, session }) => {
           expect(checkForNextSession.every((task) => session.includes(task)));
           checkForNextSession = session.filter(
             (task) =>
-              consciousnesses[task] >
-                intensiveLearningInProgressConsciousnessMin &&
-              consciousnesses[task] <
-                intensiveLearningInProgressConsciousnessMax,
+              masteries[task] > intensiveLearningInProgressMasteryMin &&
+              masteries[task] < intensiveLearningInProgressMasteryMax,
           );
         },
       });
@@ -140,23 +138,20 @@ describe('LearnScheduler', () => {
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
     ])('case $#', ({ learningTimes, doSession }) => {
-      let lastRepetition: Record<
-        string,
-        { time: number; consciousness: number }
-      > = {};
+      let lastRepetition: Record<string, { time: number; mastery: number }> =
+        {};
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
         tasksPerSession: 10,
         doSession,
-        checkSession: ({ time, consciousnesses, session }) => {
+        checkSession: ({ time, masteries, session }) => {
           expect(
             session.every(
               (task) =>
                 !(
-                  consciousnesses[task] > learningInProgressConsciousnessMax &&
-                  lastRepetition[task].consciousness >
-                    learningInProgressConsciousnessMax
+                  masteries[task] > learningInProgressMasteryMax &&
+                  lastRepetition[task].mastery > learningInProgressMasteryMax
                 ) || time - lastRepetition[task].time > minTimeForRepetition,
             ),
           );
@@ -164,10 +159,7 @@ describe('LearnScheduler', () => {
           lastRepetition = {
             ...lastRepetition,
             ...Object.fromEntries(
-              session.map((task) => [
-                task,
-                { time, consciousness: consciousnesses[task] },
-              ]),
+              session.map((task) => [task, { time, mastery: masteries[task] }]),
             ),
           };
         },

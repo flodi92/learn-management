@@ -12,7 +12,7 @@ export interface Result {
 
 const sqrtKeepSign = (val: number) => Math.sign(val) * Math.sqrt(Math.abs(val));
 
-export const getConsciousness = (results: Result[]) => {
+export const getMastery = (results: Result[]) => {
   results.forEach((result) => {
     if (result.correctness < 0 || result.correctness > 1) {
       {
@@ -23,7 +23,7 @@ export const getConsciousness = (results: Result[]) => {
     }
   });
 
-  const summedRepetitionsConsciousnesses = results
+  const summedRepetitionsMasteries = results
     .sort((a, b) => a.beforeDays - b.beforeDays)
     .map(({ beforeDays, correctness }, idx, arr) => {
       const nextEarlier = arr[idx + 1];
@@ -55,15 +55,17 @@ export const getConsciousness = (results: Result[]) => {
       return current;
     });
 
-  // console.log(summedRepetitionsConsciousnesses);
+  // console.log(summedRepetitionsMasteries);
 
-  const summedRepetitionsConsciousness =
-    summedRepetitionsConsciousnesses.reduce((sum, current) => sum + current, 0);
+  const summedRepetitionsMastery = summedRepetitionsMasteries.reduce(
+    (sum, current) => sum + current,
+    0,
+  );
 
-  return keepRepetitions(Math.max(summedRepetitionsConsciousness, 0));
+  return keepRepetitions(Math.max(summedRepetitionsMastery, 0));
 };
 
-export const getConsciousness2 = (results: Result[]) => {
+export const getMastery2 = (results: Result[]) => {
   results.forEach((result) => {
     if (result.correctness < 0 || result.correctness > 1) {
       {
