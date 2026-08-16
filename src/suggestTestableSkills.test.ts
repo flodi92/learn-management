@@ -73,81 +73,88 @@ describe('LearnScheduler', () => {
   const learningTimes = Array.from({ length: 10 }).map((_, i) => i);
   const subjects = Array.from({ length: 100 }).map((_, i) => `${i}`);
 
-  it('limits number of learning in progress subjects', () =>
-    LearnSchedulerTestWrapper(
-      learningTimes,
+  describe('limits number of learning in progress subjects', () => {
+    it('case 0', () =>
+      LearnSchedulerTestWrapper(
+        learningTimes,
 
-      subjects,
+        subjects,
 
-      (time, index, session) =>
-        Object.fromEntries(session.map((task) => [task, 0.5])),
+        (time, index, session) =>
+          Object.fromEntries(session.map((task) => [task, 0.5])),
 
-      (time, index, consciousnesses) => {
-        expect(Object.values(consciousnesses).length).toEqual(100);
-        expect(
-          Object.values(consciousnesses).filter(
-            (value) => value > 0.1 && value < 0.8,
-          ).length,
-        ).toBeLessThan(10);
-      },
-      () => {},
-    ));
-
-  it('assures constant repetition of currently learnt tasks', () => {
-    let checkForNextSession: string[] = [];
-    LearnSchedulerTestWrapper(
-      learningTimes,
-
-      subjects,
-
-      (time, index, session) =>
-        Object.fromEntries(session.map((task) => [task, 0.5])),
-
-      (time, index, consciousnesses, session) => {
-        expect(checkForNextSession.every((task) => session.includes(task)));
-        checkForNextSession = session.filter(
-          (task) => consciousnesses[task] > 0.1 && consciousnesses[task] < 0.4,
-        );
-      },
-      () => {},
-    );
+        (time, index, consciousnesses) => {
+          expect(Object.values(consciousnesses).length).toEqual(100);
+          expect(
+            Object.values(consciousnesses).filter(
+              (value) => value > 0.1 && value < 0.8,
+            ).length,
+          ).toBeLessThan(10);
+        },
+        () => {},
+      ));
   });
 
-  it('avoids unnecessary repetitions', () => {
-    let lastRepetition: Record<
-      string,
-      { time: number; consciousness: number }
-    > = {};
-    LearnSchedulerTestWrapper(
-      learningTimes,
+  describe('assures constant repetition of currently learnt tasks', () => {
+    it('case 0', () => {
+      let checkForNextSession: string[] = [];
+      LearnSchedulerTestWrapper(
+        learningTimes,
 
-      subjects,
+        subjects,
 
-      (time, index, session) =>
-        Object.fromEntries(session.map((task) => [task, 0.5])),
+        (time, index, session) =>
+          Object.fromEntries(session.map((task) => [task, 0.5])),
 
-      (time, index, consciousnesses, session) => {
-        expect(
-          session.every(
+        (time, index, consciousnesses, session) => {
+          expect(checkForNextSession.every((task) => session.includes(task)));
+          checkForNextSession = session.filter(
             (task) =>
-              !(
-                consciousnesses[task] > 0.8 &&
-                lastRepetition[task].consciousness > 0.8
-              ) || time - lastRepetition[task].time > 3,
-          ),
-        );
+              consciousnesses[task] > 0.1 && consciousnesses[task] < 0.4,
+          );
+        },
+        () => {},
+      );
+    });
+  });
 
-        lastRepetition = {
-          ...lastRepetition,
-          ...Object.fromEntries(
-            session.map((task) => [
-              task,
-              { time, consciousness: consciousnesses[task] },
-            ]),
-          ),
-        };
-      },
-      () => {},
-    );
+  describe('avoids unnecessary repetitions', () => {
+    it('case 0', () => {
+      let lastRepetition: Record<
+        string,
+        { time: number; consciousness: number }
+      > = {};
+      LearnSchedulerTestWrapper(
+        learningTimes,
+
+        subjects,
+
+        (time, index, session) =>
+          Object.fromEntries(session.map((task) => [task, 0.5])),
+
+        (time, index, consciousnesses, session) => {
+          expect(
+            session.every(
+              (task) =>
+                !(
+                  consciousnesses[task] > 0.8 &&
+                  lastRepetition[task].consciousness > 0.8
+                ) || time - lastRepetition[task].time > 3,
+            ),
+          );
+
+          lastRepetition = {
+            ...lastRepetition,
+            ...Object.fromEntries(
+              session.map((task) => [
+                task,
+                { time, consciousness: consciousnesses[task] },
+              ]),
+            ),
+          };
+        },
+        () => {},
+      );
+    });
   });
 });
