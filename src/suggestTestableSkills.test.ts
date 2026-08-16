@@ -3,6 +3,25 @@ import { LearnScheduler } from './suggestTestableSkills';
 
 const subjects = ['a', 'b', 'c', 'd', 'e'];
 
+const getConsciousnesses = (
+  results: { id: string; time: number; correctness: number }[],
+  today: number,
+) => {
+  const ids = Array.from(new Set(results.map((result) => result.id)));
+
+  const resultsBeforeDays = results.map((result) => ({
+    ...result,
+    beforeDays: today - result.time,
+  }));
+
+  return Object.fromEntries(
+    ids.map((id) => [
+      id,
+      getConsciousness(resultsBeforeDays.filter((result) => result.id === id)),
+    ]),
+  );
+};
+
 const LearnSchedulerTestWrapper = ({
   learningTimes,
   subjects,
@@ -32,39 +51,39 @@ const LearnSchedulerTestWrapper = ({
     index: number;
     consciousnesses: Record<string, number>;
     session: string[];
-    results: Result[];
+    results: Record<string, number>;
   }) => void;
   doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
   const scheduler = new LearnScheduler(subjects);
   const results: { id: string; time: number; correctness: number }[] = [];
   learningTimes.forEach((time, index) => {
+    const session = scheduler.nextSession(10, time);
     const sessionResults = doSession({
       time,
       index,
-      session: scheduler.nextSession(10, time),
+      session,
     });
 
     scheduler.recordResults(sessionResults, time);
 
-    Object.entries(sessionResults).forEach(([id, correctness]) =>
-      results.push({ correctness, id, time }),
+    results.push(
+      ...Object.entries(sessionResults).map(([id, correctness]) => ({
+        id,
+        correctness,
+        time,
+      })),
     );
 
-    Array.from(new Set(results.map((result) => result.id)))
-      .map(
-        (id) =>
-          [
-            id,
-            results
-              .filter((result) => result.id === id)
-              .map(({ correctness, time: _time }) => ({
-                correctness,
-                beforeDays: time - _time,
-              })),
-          ] as const,
-      )
-      .map(([id, results]) => [id, getConsciousness(results)]);
+    const consciousnesses = getConsciousnesses(results, time);
+
+    checkSession({
+      time,
+      index,
+      consciousnesses,
+      session,
+      results: sessionResults,
+    });
   });
 
   doFinal?.(scheduler);
