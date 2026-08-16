@@ -3,31 +3,47 @@ import { LearnScheduler } from './suggestTestableSkills';
 
 const subjects = ['a', 'b', 'c', 'd', 'e'];
 
-const LearnSchedulerTestWrapper = (
-  learningTimes: number[],
-  subjects: string[],
-  doSession: (
-    time: number,
-    index: number,
-    session: ReturnType<LearnScheduler['nextSession']>,
-  ) => Parameters<LearnScheduler['recordResults']>[0],
-  checkSession: (
-    time: number,
-    index: number,
-    consciousnesses: Record<string, number>,
-    session: string[],
-    results: Result[],
-  ) => void,
-  doFinal: (scheduler: LearnScheduler) => void,
-) => {
+const LearnSchedulerTestWrapper = ({
+  learningTimes,
+  subjects,
+  doSession,
+  checkSession,
+  doFinal,
+}: {
+  learningTimes: number[];
+  subjects: string[];
+  doSession: ({
+    time,
+    index,
+    session,
+  }: {
+    time: number;
+    index: number;
+    session: ReturnType<LearnScheduler['nextSession']>;
+  }) => Parameters<LearnScheduler['recordResults']>[0];
+  checkSession: ({
+    time,
+    index,
+    consciousnesses,
+    session,
+    results,
+  }: {
+    time: number;
+    index: number;
+    consciousnesses: Record<string, number>;
+    session: string[];
+    results: Result[];
+  }) => void;
+  doFinal?: (scheduler: LearnScheduler) => void;
+}) => {
   const scheduler = new LearnScheduler(subjects);
   const results: { id: string; time: number; correctness: number }[] = [];
   learningTimes.forEach((time, index) => {
-    const sessionResults = doSession(
+    const sessionResults = doSession({
       time,
       index,
-      scheduler.nextSession(10, time),
-    );
+      session: scheduler.nextSession(10, time),
+    });
 
     scheduler.recordResults(sessionResults, time);
 
@@ -51,7 +67,7 @@ const LearnSchedulerTestWrapper = (
       .map(([id, results]) => [id, getConsciousness(results)]);
   });
 
-  doFinal(scheduler);
+  doFinal?.(scheduler);
 };
 
 describe('LearnScheduler', () => {
@@ -60,15 +76,12 @@ describe('LearnScheduler', () => {
 
   describe('limits number of learning in progress subjects', () => {
     it('case 0', () =>
-      LearnSchedulerTestWrapper(
+      LearnSchedulerTestWrapper({
         learningTimes,
-
         subjects,
-
-        (time, index, session) =>
+        doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
-
-        (time, index, consciousnesses) => {
+        checkSession: ({ consciousnesses }) => {
           expect(Object.values(consciousnesses).length).toEqual(100);
           expect(
             Object.values(consciousnesses).filter(
@@ -76,30 +89,25 @@ describe('LearnScheduler', () => {
             ).length,
           ).toBeLessThan(10);
         },
-        () => {},
-      ));
+      }));
   });
 
   describe('assures constant repetition of currently learnt tasks', () => {
     it('case 0', () => {
       let checkForNextSession: string[] = [];
-      LearnSchedulerTestWrapper(
+      LearnSchedulerTestWrapper({
         learningTimes,
-
         subjects,
-
-        (time, index, session) =>
+        doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
-
-        (time, index, consciousnesses, session) => {
+        checkSession: ({ consciousnesses, session }) => {
           expect(checkForNextSession.every((task) => session.includes(task)));
           checkForNextSession = session.filter(
             (task) =>
               consciousnesses[task] > 0.1 && consciousnesses[task] < 0.4,
           );
         },
-        () => {},
-      );
+      });
     });
   });
 
@@ -109,15 +117,12 @@ describe('LearnScheduler', () => {
         string,
         { time: number; consciousness: number }
       > = {};
-      LearnSchedulerTestWrapper(
+      LearnSchedulerTestWrapper({
         learningTimes,
-
         subjects,
-
-        (time, index, session) =>
+        doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
-
-        (time, index, consciousnesses, session) => {
+        checkSession: ({ time, consciousnesses, session }) => {
           expect(
             session.every(
               (task) =>
@@ -138,8 +143,7 @@ describe('LearnScheduler', () => {
             ),
           };
         },
-        () => {},
-      );
+      });
     });
   });
 });
