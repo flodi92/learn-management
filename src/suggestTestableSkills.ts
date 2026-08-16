@@ -1,4 +1,4 @@
-import { getConsciousness } from './getConsciousness';
+import { getConsciousness } from './LearnScheduler/LearnScheduler.utils/getConsciousness';
 
 const getBeforeDays = (date: Date) => undefined as unknown as number;
 
@@ -43,18 +43,3 @@ const prioritize = (
     ),
   };
 };
-export class LearnScheduler {
-  constructor(subjects: string[]) {}
-
-  nextSession(count: number, time: number): string[] {
-    throw 'not implemented';
-  }
-
-  recordResults(results: Record<string, number>, time: number) {
-    throw 'not implemented';
-  }
-
-  get consciousness(): Record<string, number> {
-    throw 'not implemented';
-  }
-}

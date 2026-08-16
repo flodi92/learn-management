@@ -1,26 +1,12 @@
-import { getConsciousness } from './getConsciousness';
-import { LearnScheduler } from './suggestTestableSkills';
-
-const subjects = ['a', 'b', 'c', 'd', 'e'];
-
-const getConsciousnesses = (
-  results: { id: string; time: number; correctness: number }[],
-  today: number,
-) => {
-  const ids = Array.from(new Set(results.map((result) => result.id)));
-
-  const resultsBeforeDays = results.map((result) => ({
-    ...result,
-    beforeDays: today - result.time,
-  }));
-
-  return Object.fromEntries(
-    ids.map((id) => [
-      id,
-      getConsciousness(resultsBeforeDays.filter((result) => result.id === id)),
-    ]),
-  );
-};
+import { LearnScheduler } from './LearnScheduler';
+import { getConsciousnesses } from './LearnScheduler.utils/getConsciousnesses';
+import {
+  learningInProgressConsciousnessMin,
+  learningInProgressConsciousnessMax,
+  intensiveLearningInProgressConsciousnessMin,
+  intensiveLearningInProgressConsciousnessMax,
+  minTimeForRepetition,
+} from './LearningScheduler.constants';
 
 interface DoSessionParams {
   time: number;
@@ -86,12 +72,6 @@ const LearnSchedulerTestWrapper = ({
 
   doFinal?.(scheduler);
 };
-
-const learningInProgressConsciousnessMin = 0.1;
-const learningInProgressConsciousnessMax = 0.8;
-const intensiveLearningInProgressConsciousnessMin = 0.1;
-const intensiveLearningInProgressConsciousnessMax = 0.4;
-const minTimeForRepetition = 3;
 
 describe('LearnScheduler', () => {
   const subjects = Array.from({ length: 100 }).map((_, i) => `${i}`);
