@@ -110,7 +110,7 @@ describe('LearnScheduler', () => {
     );
   });
 
-  describe('assures constant repetition of currently learnt tasks', () => {
+  describe('assures constant repetition of learning in progress subjects', () => {
     it.each([
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
