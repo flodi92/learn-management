@@ -25,12 +25,14 @@ const getConsciousnesses = (
 const LearnSchedulerTestWrapper = ({
   learningTimes,
   subjects,
+  tasksPerSession,
   doSession,
   checkSession,
   doFinal,
 }: {
   learningTimes: number[];
   subjects: string[];
+  tasksPerSession: number;
   doSession: ({
     time,
     index,
@@ -58,7 +60,7 @@ const LearnSchedulerTestWrapper = ({
   const scheduler = new LearnScheduler(subjects);
   const results: { id: string; time: number; correctness: number }[] = [];
   learningTimes.forEach((time, index) => {
-    const session = scheduler.nextSession(10, time);
+    const session = scheduler.nextSession(tasksPerSession, time);
     const sessionResults = doSession({
       time,
       index,
@@ -98,6 +100,7 @@ describe('LearnScheduler', () => {
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
+        tasksPerSession: 10,
         doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
         checkSession: ({ consciousnesses }) => {
@@ -117,6 +120,7 @@ describe('LearnScheduler', () => {
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
+        tasksPerSession: 10,
         doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
         checkSession: ({ consciousnesses, session }) => {
@@ -139,6 +143,7 @@ describe('LearnScheduler', () => {
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
+        tasksPerSession: 10,
         doSession: ({ session }) =>
           Object.fromEntries(session.map((task) => [task, 0.5])),
         checkSession: ({ time, consciousnesses, session }) => {
