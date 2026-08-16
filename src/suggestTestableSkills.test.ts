@@ -1,4 +1,4 @@
-import { getConsciousness, Result } from './getConsciousness';
+import { getConsciousness } from './getConsciousness';
 import { LearnScheduler } from './suggestTestableSkills';
 
 const subjects = ['a', 'b', 'c', 'd', 'e'];
@@ -22,6 +22,20 @@ const getConsciousnesses = (
   );
 };
 
+interface DoSessionParams {
+  time: number;
+  index: number;
+  session: ReturnType<LearnScheduler['nextSession']>;
+}
+
+interface CheckSessionParams {
+  time: number;
+  index: number;
+  consciousnesses: Record<string, number>;
+  session: string[];
+  results: Record<string, number>;
+}
+
 const LearnSchedulerTestWrapper = ({
   learningTimes,
   subjects,
@@ -33,28 +47,10 @@ const LearnSchedulerTestWrapper = ({
   learningTimes: number[];
   subjects: string[];
   tasksPerSession: number;
-  doSession: ({
-    time,
-    index,
-    session,
-  }: {
-    time: number;
-    index: number;
-    session: ReturnType<LearnScheduler['nextSession']>;
-  }) => Parameters<LearnScheduler['recordResults']>[0];
-  checkSession: ({
-    time,
-    index,
-    consciousnesses,
-    session,
-    results,
-  }: {
-    time: number;
-    index: number;
-    consciousnesses: Record<string, number>;
-    session: string[];
-    results: Record<string, number>;
-  }) => void;
+  doSession: (
+    params: DoSessionParams,
+  ) => Parameters<LearnScheduler['recordResults']>[0];
+  checkSession: (params: CheckSessionParams) => void;
   doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
   const scheduler = new LearnScheduler(subjects);
@@ -92,17 +88,28 @@ const LearnSchedulerTestWrapper = ({
 };
 
 describe('LearnScheduler', () => {
-  const learningTimes = Array.from({ length: 10 }).map((_, i) => i);
   const subjects = Array.from({ length: 100 }).map((_, i) => `${i}`);
 
+  const learningTimes1 = Array.from({ length: 10 }).map((_, i) => i);
+
+  const doSession = ({ session }: DoSessionParams) =>
+    Object.fromEntries(session.map((task) => [task, 0.5]));
+
+  const doSession2 = ({ session, index }: DoSessionParams) =>
+    Object.fromEntries(
+      session.map((task) => [task, index < 2 ? 0 : index < 4 ? 0.5 : 1]),
+    );
+
   describe('limits number of learning in progress subjects', () => {
-    it('case 0', () =>
+    it.each([
+      { learningTimes: learningTimes1, doSession },
+      { learningTimes: learningTimes1, doSession: doSession2 },
+    ])('case $#', ({ learningTimes, doSession }) =>
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
         tasksPerSession: 10,
-        doSession: ({ session }) =>
-          Object.fromEntries(session.map((task) => [task, 0.5])),
+        doSession,
         checkSession: ({ consciousnesses }) => {
           expect(Object.values(consciousnesses).length).toEqual(100);
           expect(
@@ -111,18 +118,21 @@ describe('LearnScheduler', () => {
             ).length,
           ).toBeLessThan(10);
         },
-      }));
+      }),
+    );
   });
 
   describe('assures constant repetition of currently learnt tasks', () => {
-    it('case 0', () => {
+    it.each([
+      { learningTimes: learningTimes1, doSession },
+      { learningTimes: learningTimes1, doSession: doSession2 },
+    ])('case $#', ({ learningTimes, doSession }) => {
       let checkForNextSession: string[] = [];
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
         tasksPerSession: 10,
-        doSession: ({ session }) =>
-          Object.fromEntries(session.map((task) => [task, 0.5])),
+        doSession,
         checkSession: ({ consciousnesses, session }) => {
           expect(checkForNextSession.every((task) => session.includes(task)));
           checkForNextSession = session.filter(
@@ -135,7 +145,10 @@ describe('LearnScheduler', () => {
   });
 
   describe('avoids unnecessary repetitions', () => {
-    it('case 0', () => {
+    it.each([
+      { learningTimes: learningTimes1, doSession },
+      { learningTimes: learningTimes1, doSession: doSession2 },
+    ])('case $#', ({ learningTimes, doSession }) => {
       let lastRepetition: Record<
         string,
         { time: number; consciousness: number }
@@ -144,8 +157,7 @@ describe('LearnScheduler', () => {
         learningTimes,
         subjects,
         tasksPerSession: 10,
-        doSession: ({ session }) =>
-          Object.fromEntries(session.map((task) => [task, 0.5])),
+        doSession,
         checkSession: ({ time, consciousnesses, session }) => {
           expect(
             session.every(
