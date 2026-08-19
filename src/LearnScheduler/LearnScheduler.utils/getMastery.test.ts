@@ -242,6 +242,20 @@ describe('getMastery', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
+    it('case 3.1', () => {
+      const a = getMastery([
+        { beforeDays: 1, correctness: 1 },
+        { beforeDays: 5, correctness: 0.6 },
+        { beforeDays: 10, correctness: 0.5 },
+      ]);
+      const b = getMastery([
+        { beforeDays: 1, correctness: 1 },
+        { beforeDays: 5, correctness: 0.6 },
+        { beforeDays: 6, correctness: 0.5 },
+      ]);
+      expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
+    });
   });
   describe('mastery is considered more when correctness in past repetitions was higher', () => {
     it('case 0', () => {
@@ -277,6 +291,20 @@ describe('getMastery', () => {
         { beforeDays: 1, correctness: 1 },
         { beforeDays: 5, correctness: 0.4 },
         { beforeDays: 10, correctness: 0.4 },
+      ]);
+      const b = getMastery([
+        { beforeDays: 1, correctness: 1 },
+        { beforeDays: 5, correctness: 0.4 },
+        { beforeDays: 10, correctness: 0.5 },
+      ]);
+      expect(a).toBeGreaterThan(b);
+      checkValuesForNormalizedRange({ a, b });
+    });
+    it('case 1.0', () => {
+      const a = getMastery([
+        { beforeDays: 1, correctness: 1 },
+        { beforeDays: 5, correctness: 0.5 },
+        { beforeDays: 10, correctness: 0.5 },
       ]);
       const b = getMastery([
         { beforeDays: 1, correctness: 1 },
