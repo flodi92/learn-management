@@ -11,7 +11,8 @@
 
 ## Probleme
 
-- Zahlen aus Luft gegriffen
+- Zahlen aus Luft gegriffen => Zahlen aus vorherigen Ergebnissen bestimmen
+- Trennung zwei verschiedene Werte geschätzte Lernsicherheit und bewiesene Lernsicherheit
 
 ## weitere Testfälle
 

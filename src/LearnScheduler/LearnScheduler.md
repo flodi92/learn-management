@@ -36,6 +36,15 @@ LearnScheduler's constructor is invoked with an array of subjects. It is just a 
 
 The method nextSession requests a subset of the given subjects to be learned in the next session which is based on the principles that are defined above. Count defines the number of subjects to be put into that session. Time defines when that learning happens. A difference of one means one day.
 
+### recordResults
+
+The method recordResults is invoked once a session is done. The parameter results maps each subject to the result of examining that task. The result can be understood as level of correctness. It is a number between 0 and 1.
+
 ### get mastery
 
 Returns the current level of mastery for each of the given subjects
+
+## Testing
+
+- All the mentioned principles should be tested with different values and different sessions
+- Testing with concrete numbers. How often with correct result to reach level of perfection
