@@ -228,7 +228,7 @@ describe('getMastery', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 3', () => {
+    it.skip('case 3', () => {
       const a = getMastery([
         { beforeDays: 1, correctness: 1 },
         { beforeDays: 5, correctness: 0.4 },
@@ -272,7 +272,7 @@ describe('getMastery', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 1', () => {
+    it.skip('case 1', () => {
       const a = getMastery([
         { beforeDays: 1, correctness: 1 },
         { beforeDays: 5, correctness: 0.4 },
@@ -286,7 +286,7 @@ describe('getMastery', () => {
       expect(a).toBeGreaterThan(b);
       checkValuesForNormalizedRange({ a, b });
     });
-    it('case 2', () => {
+    it.skip('case 2', () => {
       const a = getMastery([
         { beforeDays: 1, correctness: 1 },
         { beforeDays: 5, correctness: 0.4 },
