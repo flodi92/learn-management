@@ -1,98 +1,160 @@
 import { getMasteries } from './LearnScheduler.utils/getMasteries';
+import {
+  learningInProgressMasteryMax,
+  learningInProgressMasteryMin,
+  milisecondsPerDay,
+  repeatSubjectsMasteryMax,
+} from './LearningScheduler.constants';
 
 export class LearnScheduler {
   constructor(private subjects: string[]) {}
   private results: { id: string; time: number; correctness: number }[] = [];
 
   get today(): number {
-    // @todo number of days since January 1 1970 but allowing for floating point numbers if invoked not exactly at midnight
-    throw 'not implemented';
+    return Date.now() / milisecondsPerDay;
   }
 
-  nextSession(count: number, time: number): string[] {
-    // schedule learning in progress subjects which are the ones with low mastery
-    // fill in all items that already had a high mastery but their value has already sunk to 0.6 or lower
-    // fill in new items that had not been examined before
-    // take all items that have been incorrectly answered during the last session
-
-    const learningInProgressItems = Object.entries(this.itemStatistics)
-      .filter(
-        ([id, { lastMastery, mastery }]) =>
-          mastery > 0.1 && mastery < 0.8 && lastMastery < 0.8,
-      )
-      .map(([id]) => id);
-
-    const repeatItems = Object.entries(this.itemStatistics)
-      .filter(
-        ([id, { mastery, lastMastery }]) => lastMastery > 0.8 && mastery < 0.6,
-      )
-      .map(([id]) => id);
-
-    const repeatWrongItems = Object.entries(this.itemStatistics)
-      .filter(([id, { lastCorrectness }]) => lastCorrectness <= 0.5)
-      .map(([id]) => id);
-
-    const newItems = Object.entries(this.itemStatistics)
-      .filter(([id, { mastery }]) => mastery <= 0.1)
-      .map(([id]) => id);
-
-    const items = Array.from(
-      new Set([
-        ...learningInProgressItems,
-        ...repeatItems,
-        ...repeatWrongItems,
-      ]),
-    ).slice(0, count);
-
-    items.push(...newItems.slice(0, count - items.length));
-
-    return items;
-  }
-
-  recordResults(results: Record<string, number>, time: number = this.today) {
-    // results is a mapping of item id to update this.results
-    throw 'not implemented';
-  }
-
-  get lastCorrectness(): Record<string, number> {
-    // correctness of every item on last repetition (with highest time)
-    throw 'not implemented';
-  }
-
-  get mastery(): Record<string, number> {
-    return getMasteries(this.results, this.today);
-  }
-
-  get lastRepetition(): Record<string, number> {
-    // the highest time for every id of results
-    throw 'not implemented';
-  }
-
-  get lastMastery(): Record<string, number> {
-    const lastRepetition = this.lastRepetition;
-    return Object.fromEntries(
-      Object.entries(lastRepetition).map(([id, lastRepetitionTime]) => [
-        id,
-        getMasteries(
-          this.results.filter(
-            ({ time, id: _id }) => time <= lastRepetition[_id] && id === _id,
-          ),
-          lastRepetitionTime,
-        )[id],
-      ]),
-    );
-  }
-
-  get itemStatistics(): Record<
+  private getSubjectStatisticsAt(time: number): Record<
     string,
     {
       mastery: number;
-      lastRepetition: number;
+      lastRepetition?: number;
       lastMastery: number;
       lastCorrectness: number;
     }
   > {
-    throw 'not implemented';
+    return Object.fromEntries(
+      Array.from(new Set(this.subjects)).map((id) => {
+        const relevantResults = this.results
+          .filter((result) => result.id === id && result.time <= time)
+          .sort((a, b) => a.time - b.time);
+
+        const lastResult = relevantResults[relevantResults.length - 1];
+        const lastRepetition = lastResult ? lastResult.time : undefined;
+        const lastCorrectness = lastResult ? lastResult.correctness : 0;
+
+        const mastery =
+          relevantResults.length > 0
+            ? (getMasteries(relevantResults, time)[id] ?? 0)
+            : 0;
+
+        const lastMastery =
+          lastRepetition !== undefined && lastRepetition > 0
+            ? (getMasteries(
+                relevantResults.filter(
+                  (result) => result.time <= lastRepetition,
+                ),
+                lastRepetition,
+              )[id] ?? 0)
+            : 0;
+
+        return [
+          id,
+          {
+            mastery,
+            lastRepetition,
+            lastMastery,
+            lastCorrectness,
+          },
+        ];
+      }),
+    );
+  }
+
+  nextSession(count: number, time: number): string[] {
+    if (count <= 0) {
+      return [];
+    }
+
+    const subjectStatistics = this.getSubjectStatisticsAt(time);
+
+    const learningInProgressSubjects = this.subjects.filter((id) => {
+      const { mastery, lastMastery } = subjectStatistics[id];
+      return (
+        mastery > learningInProgressMasteryMin &&
+        mastery < learningInProgressMasteryMax &&
+        lastMastery < learningInProgressMasteryMax
+      );
+    });
+
+    const repeatSubjects = this.subjects.filter((id) => {
+      const { mastery, lastMastery } = subjectStatistics[id];
+      return (
+        lastMastery > learningInProgressMasteryMax &&
+        mastery < repeatSubjectsMasteryMax
+      );
+    });
+
+    const repeatWrongSubjects = this.subjects.filter((id) => {
+      const { lastCorrectness, lastRepetition } = subjectStatistics[id];
+      return lastRepetition !== undefined && lastCorrectness <= 0.5;
+    });
+
+    const newSubjects = this.subjects.filter(
+      (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
+    );
+
+    const subjects = Array.from(
+      new Set([
+        ...learningInProgressSubjects,
+        ...repeatSubjects,
+        ...repeatWrongSubjects,
+      ]),
+    ).slice(0, count);
+
+    if (subjects.length < count) {
+      subjects.push(...newSubjects.slice(0, count - subjects.length));
+    }
+
+    return subjects;
+  }
+
+  recordResults(results: Record<string, number>, time: number = this.today) {
+    for (const [id, correctness] of Object.entries(results)) {
+      if (!this.subjects.includes(id)) {
+        continue;
+      }
+
+      if (correctness < 0 || correctness > 1) {
+        throw new Error(
+          `correctness for subject ${id} must be between 0 and 1 inclusive`,
+        );
+      }
+
+      this.results.push({ id, time, correctness });
+    }
+  }
+
+  get lastCorrectness(): Record<string, number> {
+    const subjectStatistics = this.getSubjectStatisticsAt(this.today);
+    return Object.fromEntries(
+      this.subjects.map((id) => [id, subjectStatistics[id].lastCorrectness]),
+    );
+  }
+
+  get mastery(): Record<string, number> {
+    const subjectStatistics = this.getSubjectStatisticsAt(this.today);
+    return Object.fromEntries(
+      this.subjects.map((id) => [id, subjectStatistics[id].mastery]),
+    );
+  }
+
+  get lastRepetition(): Record<string, number | undefined> {
+    const subjectStatistics = this.getSubjectStatisticsAt(this.today);
+    return Object.fromEntries(
+      this.subjects.map((id) => [id, subjectStatistics[id].lastRepetition]),
+    );
+  }
+
+  get lastMastery(): Record<string, number> {
+    const subjectStatistics = this.getSubjectStatisticsAt(this.today);
+    return Object.fromEntries(
+      this.subjects.map((id) => [id, subjectStatistics[id].lastMastery]),
+    );
+  }
+
+  get subjectStatistics() {
+    return this.getSubjectStatisticsAt(this.today);
   }
 }
 
