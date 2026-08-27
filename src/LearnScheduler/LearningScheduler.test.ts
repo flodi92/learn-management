@@ -86,6 +86,46 @@ describe('LearnScheduler', () => {
       session.map((task) => [task, index < 2 ? 0 : index < 4 ? 0.5 : 1]),
     );
 
+  describe('creates valid sessions', () => {
+    it('returns the requested number of distinct known subjects', () => {
+      const scheduler = new LearnScheduler(subjects);
+
+      const session = scheduler.nextSession(10, 0);
+
+      expect(session).toHaveLength(10);
+      expect(new Set(session).size).toBe(session.length);
+      expect(session.every((subject) => subjects.includes(subject))).toBe(true);
+    });
+
+    it('returns an empty session when no subjects are requested', () => {
+      const scheduler = new LearnScheduler(subjects);
+
+      expect(scheduler.nextSession(0, 0)).toEqual([]);
+    });
+  });
+
+  describe('repeats learned subjects', () => {
+    it('keeps a mastered subject available for later repetition', () => {
+      const scheduler = new LearnScheduler(['subject']);
+
+      const firstSession = scheduler.nextSession(1, 0);
+      scheduler.recordResults({ subject: 1 }, 0);
+
+      expect(firstSession).toEqual(['subject']);
+      expect(scheduler.nextSession(1, 1)).toEqual(['subject']);
+      expect(scheduler.nextSession(1, 10)).toEqual(['subject']);
+    });
+
+    it('uses a failed repetition to make the subject available again', () => {
+      const scheduler = new LearnScheduler(['subject']);
+
+      expect(scheduler.nextSession(1, 0)).toEqual(['subject']);
+      scheduler.recordResults({ subject: 0 }, 0);
+
+      expect(scheduler.nextSession(1, 1)).toContain('subject');
+    });
+  });
+
   describe('limits number of learning in progress subjects', () => {
     it.each([
       { learningTimes: learningTimes1, doSession },
