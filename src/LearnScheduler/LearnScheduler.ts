@@ -50,18 +50,12 @@ export class LearnScheduler {
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
-    throw 'not implemented';
-  }
-
-  get masteryOnLastRepetition(): Record<string, number> {
+    // results is a mapping of item id to update this.results
     throw 'not implemented';
   }
 
   get lastCorrectness(): Record<string, number> {
-    throw 'not implemented';
-  }
-
-  get untestedSubjects(): string[] {
+    // correctness of every item on last repetition (with highest time)
     throw 'not implemented';
   }
 
