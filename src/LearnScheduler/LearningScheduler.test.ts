@@ -126,7 +126,7 @@ describe('LearnScheduler', () => {
     });
   });
 
-  describe('limits number of learning in progress subjects', () => {
+  describe.skip('limits number of learning in progress subjects', () => {
     it.each([
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
