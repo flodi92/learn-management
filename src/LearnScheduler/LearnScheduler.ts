@@ -7,11 +7,36 @@ import {
 } from './LearningScheduler.constants';
 
 export class LearnScheduler {
-  constructor(private subjects: string[]) {}
   private results: { id: string; time: number; correctness: number }[] = [];
+
+  constructor(
+    private subjectsWithParentsOrWithoutParents:
+      Record<string, string[] | undefined> | string[],
+  ) {}
+
+  private get subjects(): string[] {
+    return Array.isArray(this.subjectsWithParentsOrWithoutParents)
+      ? this.subjectsWithParentsOrWithoutParents
+      : Object.keys(this.subjectsWithParentsOrWithoutParents);
+  }
+
+  private get subjectsWithParents(): Record<string, string[] | undefined> {
+    return Array.isArray(this.subjectsWithParentsOrWithoutParents)
+      ? Object.fromEntries(
+          this.subjectsWithParentsOrWithoutParents.map((subject) => [
+            subject,
+            undefined,
+          ]),
+        )
+      : this.subjectsWithParentsOrWithoutParents;
+  }
 
   get today(): number {
     return Date.now() / milisecondsPerDay;
+  }
+
+  private isChildSubjectOf(childId: string, parentId: string) {
+    return this.subjectsWithParents[childId]?.includes(parentId);
   }
 
   private getSubjectStatisticsAt(time: number): Record<
@@ -26,7 +51,10 @@ export class LearnScheduler {
     return Object.fromEntries(
       Array.from(new Set(this.subjects)).map((id) => {
         const relevantResults = this.results
-          .filter((result) => result.id === id && result.time <= time)
+          .filter(
+            (result) =>
+              this.isChildSubjectOf(result.id, id) && result.time <= time,
+          )
           .sort((a, b) => a.time - b.time);
 
         const lastResult = relevantResults[relevantResults.length - 1];
