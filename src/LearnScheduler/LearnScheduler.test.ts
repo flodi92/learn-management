@@ -6,7 +6,7 @@ import {
   intensiveLearningInProgressMasteryMin,
   intensiveLearningInProgressMasteryMax,
   minTimeForRepetition,
-} from './LearningScheduler.constants';
+} from './LearnScheduler.constants';
 
 interface DoSessionParams {
   time: number;

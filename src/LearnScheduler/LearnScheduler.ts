@@ -4,7 +4,7 @@ import {
   learningInProgressMasteryMin,
   milisecondsPerDay,
   repeatSubjectsMasteryMax,
-} from './LearningScheduler.constants';
+} from './LearnScheduler.constants';
 
 export class LearnScheduler {
   private results: { id: string; time: number; correctness: number }[] = [];
