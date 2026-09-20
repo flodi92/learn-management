@@ -16,12 +16,12 @@ export const tasks: RegexTask[] = [
   {
     expression: /^a$/,
     positiveExamples: ['a'],
-    negativeExamples: ['b', 'A', 'aa', ''],
+    negativeExamples: ['b', 'A', 'aa', '', '\t', 'aaa'],
   },
   {
     expression: /^\s$/,
     positiveExamples: [' ', '\n', '\t'],
-    negativeExamples: ['a', '1', '!'],
+    negativeExamples: ['a', '1', '!', '0', '5'],
   },
   {
     expression: /^\d$/,
@@ -31,7 +31,7 @@ export const tasks: RegexTask[] = [
   {
     expression: /^\w$/,
     positiveExamples: ['a', '7', '_'],
-    negativeExamples: ['!', '-', ' '],
+    negativeExamples: ['!', '-', ' ', '%'],
     nots: [/^.$/],
   },
   {
@@ -42,7 +42,7 @@ export const tasks: RegexTask[] = [
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
-    negativeExamples: ['', 'b', 'aaab'],
+    negativeExamples: ['', 'b', 'aaab', 'abc', 'abcabc'],
   },
   {
     expression: /^(abc)+$/,

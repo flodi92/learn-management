@@ -4,6 +4,7 @@ import { tasks } from './regex';
 
 describe('regex tasks', () => {
   describe.each(tasks)('$expression', (task) => {
+    const otherTasks = tasks.filter((otherTask) => otherTask !== task);
     it('matches all positive examples and rejects all negative examples', () => {
       const { expression, positiveExamples = [], negativeExamples = [] } = task;
       positiveExamples.forEach((example) => {
@@ -20,9 +21,17 @@ describe('regex tasks', () => {
         ).toBe(false);
       });
     });
+    it('has another task reject each positive example', () => {
+      task.positiveExamples?.forEach((example) => {
+        expect(
+          otherTasks.some((otherTask) =>
+            otherTask.negativeExamples?.includes(example),
+          ),
+          `no other task rejects ${JSON.stringify(example)}`,
+        ).toBe(true);
+      });
+    });
     it('keeps its examples distinct from the examples of other tasks', () => {
-      const otherTasks = tasks.filter((otherTask) => otherTask !== task);
-
       const otherMatches = otherTasks.filter(
         (otherTask) =>
           (otherTask.positiveExamples ?? []).every((positiveExample) =>
