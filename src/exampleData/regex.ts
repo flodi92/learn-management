@@ -7,7 +7,7 @@ type RegexTask = {
   nots?: RegExp[];
 };
 
-export const Tasks: RegexTask[] = [
+export const tasks: RegexTask[] = [
   {
     expression: /^.$/,
     positiveExamples: ['a', '1', '!'],
