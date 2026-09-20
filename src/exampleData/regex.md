@@ -8,7 +8,7 @@
 
 ## tasks
 
-The following aspects should be provided in at least one task. If one aspect varies in usage there can be several tasks for each aspect.
+The following aspects should be provided in at least one task. If one aspect varies in usage there can be several tasks for each aspect. For those tasks there there are examples provided in the section ###examples as a starting point but they should not be adopted directly.
 
 Side note: All tasks' expressions will use by default the start assertion ^ and the end assertion $. This is not counted as an own aspect. An exception are only those tasks that explicitly illustrate the usage of $ and ^ and leave out one or both.
 
