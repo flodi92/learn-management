@@ -10,54 +10,53 @@ type RegexTask = {
 export const Tasks: RegexTask[] = [
   {
     expression: /^.$/,
-    positiveExamples: ['a', '1'],
-    negativeExamples: ['aa', '', '\n'],
+    positiveExamples: ['a', '1', '!'],
+    negativeExamples: ['', 'aa', '\n'],
   },
   {
     expression: /^a$/,
     positiveExamples: ['a'],
-    negativeExamples: ['b', 'A', 'aa'],
+    negativeExamples: ['b', 'A', 'aa', ''],
   },
   {
     expression: /^\s$/,
     positiveExamples: [' ', '\n', '\t'],
-    negativeExamples: ['a', '123'],
+    negativeExamples: ['a', '1', '!'],
   },
   {
     expression: /^\d$/,
-    positiveExamples: ['1', '5'],
-    negativeExamples: ['a', 's'],
+    positiveExamples: ['0', '1', '5'],
+    negativeExamples: ['a', ' ', '_'],
   },
   {
     expression: /^\w$/,
-    positiveExamples: ['a', '7'],
-    negativeExamples: ['!', '-'],
+    positiveExamples: ['a', '7', '_'],
+    negativeExamples: ['!', '-', ' '],
     nots: [/^.$/],
   },
   {
     expression: /^\W$/,
     positiveExamples: ['!', '%', '\n'],
-    negativeExamples: ['a', '7'],
-    nots: [/^\s$/],
+    negativeExamples: ['a', '7', '_'],
   },
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
-    negativeExamples: ['', 'b'],
+    negativeExamples: ['', 'b', 'aaab'],
   },
   {
     expression: /^(abc)+$/,
     positiveExamples: ['abc', 'abcabc'],
-    negativeExamples: ['', 'ab', 'ac'],
+    negativeExamples: ['', 'ab', 'cba', 'abcab'],
   },
   {
     expression: /^a*$/,
     positiveExamples: ['', 'a', 'aaa'],
-    negativeExamples: ['b'],
+    negativeExamples: ['b', 'aaab'],
   },
   {
     expression: /^(abc)*$/,
-    positiveExamples: ['', 'abcabc'],
-    negativeExamples: ['ab', 'cba'],
+    positiveExamples: ['', 'abc', 'abcabc'],
+    negativeExamples: ['ab', 'cba', 'abcab'],
   },
 ];
