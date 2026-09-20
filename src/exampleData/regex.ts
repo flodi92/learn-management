@@ -7,7 +7,7 @@ type RegexTask = {
   nots?: RegExp[];
 };
 
-export const tasks: RegexTask[] = [
+const simpleExpressionsCharacterClasses: RegexTask[] = [
   {
     expression: /^.$/,
     positiveExamples: ['a', '1', '!'],
@@ -39,6 +39,9 @@ export const tasks: RegexTask[] = [
     positiveExamples: ['!', '%', '\n'],
     negativeExamples: ['a', '7', '_'],
   },
+];
+
+const simpleExpressionsQuantifiers: RegexTask[] = [
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
@@ -59,4 +62,9 @@ export const tasks: RegexTask[] = [
     positiveExamples: ['', 'abc', 'abcabc'],
     negativeExamples: ['ab', 'cba', 'abcab'],
   },
+];
+
+export const tasks: RegexTask[] = [
+  ...simpleExpressionsCharacterClasses,
+  ...simpleExpressionsQuantifiers,
 ];
