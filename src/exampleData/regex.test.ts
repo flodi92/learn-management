@@ -31,6 +31,16 @@ describe('regex tasks', () => {
         ).toBe(true);
       });
     });
+    it('has at least one positive example in common with other task', () => {
+      expect(
+        task.positiveExamples?.some((example) =>
+          otherTasks.some((otherTask) =>
+            otherTask.positiveExamples?.includes(example),
+          ),
+        ),
+        '',
+      );
+    });
     it('keeps its examples distinct from the examples of other tasks', () => {
       const otherMatches = otherTasks.filter(
         (otherTask) =>
