@@ -4,7 +4,7 @@ import { Tasks } from './regex';
 
 describe('regex tasks', () => {
   describe.each(Tasks)('$expression', (task) => {
-    it('matches positive and negative examples', () => {
+    it('matches all positive examples and rejects all negative examples', () => {
       const { expression, positiveExamples = [], negativeExamples = [] } = task;
       positiveExamples.forEach((example) => {
         expect(
@@ -20,7 +20,7 @@ describe('regex tasks', () => {
         ).toBe(false);
       });
     });
-    it('does not match exactly to positive and negative examples of another task', () => {
+    it('keeps its examples distinct from the examples of other tasks', () => {
       const otherTasks = Tasks.filter((otherTask) => otherTask !== task);
 
       const otherMatches = otherTasks.filter(
