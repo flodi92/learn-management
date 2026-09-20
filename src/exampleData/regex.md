@@ -48,3 +48,96 @@ Side note: All tasks' expressions will use by default the start assertion ^ and 
 ### examples
 
 The following examples should be used as a hint that illustrates the variety of expressions that might be used in a task. Those examples should not be adopted exactly for a task but changed slightly. The tasks that are derived from those examples might appear in any of the groups defined in "structure of tasks". Do not limit to the tasks directly derived from those examples but use all kinds of combinations or variations.
+
+- /[Jj]avascript/
+- /javascript/i
+- /b+/
+- /b\+/
+- /skript|programm/
+- /Gefunden in (suchmaschine|browser|portal)/
+- /skript!?/
+- /Ja*va/
+- /Ja+va/
+- /Progr{3}mm/
+- /Progr{2,3}mm/
+- /[aeiou]{3,}/
+- /<li.*>/g
+- /<li.*?>/
+- /Einen (.*) Eintrag/
+- /(Herr|Frau)\s+(\w+)/
+- /(?:Herr|Frau)\s+(\w+)/
+- /^Programm/
+- /Programm$/
+- /\bSkript\b/
+- /\BSkript\b/
+- /Java(?=Skript)/
+- /JavaSkript(?!!)/
+- /(\w.+)\s(\w.+)/
+- /xy+c/
+- /xyz/
+- /xy*c/
+- /Abschnitt (\d+)\.\d*/
+- /x\*y/
+- /x[*]y/
+- /\/beispiel\/[a-z]+/i
+- /[A-Z]:\\/
+- /e(c+)e/g
+- /\w+\s/g
+- /\p{L}*/u
+- /^(?:\d{3}|\(\d{3}\))([-/.])\d{3}\1\d{4}$/
+- /begrüßung/
+- /begrüßung/i
+- /begrüßung/g
+- /b.grüßung/
+- /b.*g/
+- /^begrüßung/
+- /abschied!$/
+- /\bbegrüßung\b/
+- /[a-zA-Z]/
+- /\d{4}/
+- /b.+g/
+- /begrüßung|abschied/
+- /(beispiel) (text)/
+- /(?:beispiel) (text)/
+- /begrüßung(?= text)/
+- /begrüßung(?! text)/
+- /(?<=sage )begrüßung/
+- /(?<!sage )begrüßung/
+- /bergland/gi
+- /\(\d{3}\) \d{3}-\d{4}/g
+- /begrüßung/gi
+- /^begrüßung/gm
+- /hello.world/s
+- /[^\p{L}\p{N}]+/u
+- /analysi[sz]e/g
+- /kalend[ea]r/g
+- /[^vwy]et/g
+- /[2-6]00/g
+- /[a-h]010290/g
+- /\w+@\w+\.\w+/g
+- /\d{3}-\d{2}-\d{4}/
+- /b*/
+- /b+/g
+- /b{2,4}/g
+- /the.+?on/
+- /(cd)+/g
+- /b.{3,5}c/g
+- /b(c|d)e/g
+- /\w+\+/g
+- /^The/
+- /\.$/
+- /\b katze/gi
+- /tion\b/gi
+- /unternehmen|organisation/gi
+- /(schnell|ruhig) (braun|grau) (fuchs|hund)/
+- /(\d{2})\/(\d{2})\/(\d{4})/
+- /\b(\w+)\b\s+\1/g
+- /(?<first>\w+)\s(?<last>\w+)/
+- /\w+(?=\sis)/g
+- /(?<=the\s)\w+/gi
+- /f\u00e9/u
+- /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+- /schnell/g
+- /https?:\/\/\S+/g
+- /[^a-zA-Z0-9]/g
+- /\/kunden\/(\d+)/
