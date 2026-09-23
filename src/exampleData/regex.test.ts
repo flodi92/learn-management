@@ -21,6 +21,10 @@ describe('regex tasks', () => {
         ).toBe(false);
       });
     });
+    it('has no more than 10 examples of either kind', () => {
+      expect(task.positiveExamples?.length ?? 0).toBeLessThanOrEqual(10);
+      expect(task.negativeExamples?.length ?? 0).toBeLessThanOrEqual(10);
+    });
     it('has another task reject each positive example', () => {
       task.positiveExamples?.forEach((example) => {
         expect(
