@@ -18,13 +18,13 @@ const simpleExpressionsCharacterClasses: RegexTask[] = [
     expression: /^[^xyz]$/,
     positiveExamples: ['a', '0'],
     negativeExamples: ['x', 'z', ''],
+  },
+  {
+    expression: /^.$/,
+    positiveExamples: ['a', '1', '!', '\b', '\0', '\x01', '\v', '\f'],
+    negativeExamples: ['', 'aa', '\n'],
     nots: [/^\ba\b$/],
   },
-  //   {
-  //     expression: /^.$/,
-  //     positiveExamples: ['a', '1', '!', '\b', '\0', '\x01', '\v', '\f'],
-  //     negativeExamples: ['', 'aa', '\n'],
-  //   },
   {
     expression: /^a$/,
     positiveExamples: ['a'],
