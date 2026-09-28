@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { setParentIds } from './regex.parentIds';
-import { RegexTask } from './regex.model';
+import { RegexTask } from '../regex.model';
 
 type TaskWithElements = Omit<RegexTask, 'parentIds'>;
 

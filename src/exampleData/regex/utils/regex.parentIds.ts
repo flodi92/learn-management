@@ -1,4 +1,4 @@
-import { RegexTask } from './regex.model';
+import { RegexTask } from '../regex.model';
 
 type TaskWithElements = Omit<RegexTask, 'parentIds'>;
 

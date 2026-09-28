@@ -1,5 +1,5 @@
+import { InitialRegexTask, RegexTask } from '../regex.model';
 import { setRegExpElements } from './regex.elements';
-import { InitialRegexTask, RegexTask } from './regex.model';
 import { setParentIds } from './regex.parentIds';
 
 const setIds = (
