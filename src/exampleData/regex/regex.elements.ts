@@ -247,5 +247,15 @@ export const getRegExpElements = (expression: RegExp): RegExpElement[] => {
     }
   });
 
+  const hasStart = elements.has('^');
+  const hasEnd = elements.has('$');
+  if (hasStart && hasEnd) {
+    // an expression anchored on both ends says nothing about matching anywhere
+    elements.delete('^');
+    elements.delete('$');
+  } else if (!hasStart && !hasEnd) {
+    elements.add('anywhere');
+  }
+
   return Array.from(elements);
 };

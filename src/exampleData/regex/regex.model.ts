@@ -37,13 +37,13 @@ type CharacterClasses =
 type Assertions =
   | '^'
   | '$'
+  | 'anywhere' // expression without '^' and '$'
   | '\\b'
   | '\\B'
   | 'x(?=y)'
   | 'x(?!y)'
   | '(?<=y)x'
-  | '(?<!y)x'
-  | 'expression without ^ or $ or without both';
+  | '(?<!y)x';
 
 type GroupsAndBackreferences =
   '(x)' | '(?<Name>x)' | '(?:x)' | '\\n' | '\\k<Name>';
