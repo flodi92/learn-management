@@ -1,6 +1,6 @@
-import { RegexTask } from './regex.model';
+import { InitialRegexTask } from './regex.model';
 
-const simpleExpressionsCharacterClasses: RegexTask[] = [
+const simpleExpressionsCharacterClasses: InitialRegexTask[] = [
   {
     expression: /^[xyz]$/,
     positiveExamples: ['x', 'z'],
@@ -142,7 +142,7 @@ const simpleExpressionsCharacterClasses: RegexTask[] = [
   },
 ];
 
-const simpleExpressionsAssertions: RegexTask[] = [
+const simpleExpressionsAssertions: InitialRegexTask[] = [
   {
     expression: /^a/,
     positiveExamples: ['abc', 'a'],
@@ -189,7 +189,7 @@ const simpleExpressionsAssertions: RegexTask[] = [
   },
 ];
 
-const simpleExpressionsGroups: RegexTask[] = [
+const simpleExpressionsGroups: InitialRegexTask[] = [
   {
     expression: /^(a)$/,
     positiveExamples: ['a'],
@@ -230,7 +230,7 @@ const simpleExpressionsGroups: RegexTask[] = [
   },
 ];
 
-const simpleExpressionsQuantifiers: RegexTask[] = [
+const simpleExpressionsQuantifiers: InitialRegexTask[] = [
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
@@ -278,7 +278,7 @@ const simpleExpressionsQuantifiers: RegexTask[] = [
   },
 ];
 
-const simpleExpressionsModifiers: RegexTask[] = [
+const simpleExpressionsModifiers: InitialRegexTask[] = [
   {
     expression: /^abc$/i,
     positiveExamples: ['ABC', 'abc'],
@@ -359,7 +359,7 @@ const simpleExpressionsModifiers: RegexTask[] = [
   },
 ];
 
-const simpleExpressionsTestContract: RegexTask[] = [
+const simpleExpressionsTestContract: InitialRegexTask[] = [
   {
     expression: /^[\s\S]*$/,
     positiveExamples: ['x', 'A', '\n', '0'],
@@ -371,7 +371,7 @@ const simpleExpressionsTestContract: RegexTask[] = [
   },
 ];
 
-export const simpleExpressions: RegexTask[] = [
+export const simpleExpressions: InitialRegexTask[] = [
   ...simpleExpressionsCharacterClasses,
   ...simpleExpressionsAssertions,
   ...simpleExpressionsGroups,

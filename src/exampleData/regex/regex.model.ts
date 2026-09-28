@@ -1,11 +1,15 @@
-export type RegexTask = {
-  id?: string;
-  parentIds?: string;
+export type InitialRegexTask = {
   expression: RegExp;
   positiveExamples?: string[];
   negativeExamples?: string[];
   nots?: RegExp[];
 };
+
+export interface RegexTask extends InitialRegexTask {
+  id?: string;
+  parentIds?: string;
+  elements?: RegExpElements[];
+}
 
 type CharacterClasses =
   | '[xyz]'
