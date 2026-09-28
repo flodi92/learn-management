@@ -1,6 +1,11 @@
 import { RegexTask } from './regex.model';
 
 type RegExpElement = RegexTask['elements'][number];
+type TaskWithoutParentIdsAndElements = Omit<
+  RegexTask,
+  'parentIds' | 'elements'
+>;
+type TaskWithoutParentIds = Omit<RegexTask, 'parentIds'>;
 
 const MODIFIER_FLAGS: RegExpElement[] = [
   'd',
@@ -259,3 +264,11 @@ export const getRegExpElements = (expression: RegExp): RegExpElement[] => {
 
   return Array.from(elements);
 };
+
+export const setRegExpElements = (
+  tasksWithIds: TaskWithoutParentIdsAndElements[],
+): TaskWithoutParentIds[] =>
+  tasksWithIds.map((task) => ({
+    ...task,
+    elements: getRegExpElements(task.expression),
+  }));

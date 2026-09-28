@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getRegExpElements } from './regex.elements';
+import { getRegExpElements, setRegExpElements } from './regex.elements';
 
 describe('getRegExpElements', () => {
   it.each([
@@ -69,5 +69,24 @@ describe('getRegExpElements', () => {
 
   it("adds 'anywhere' when neither ^ nor $ is present", () => {
     expect(getRegExpElements(/abc/)).toEqual(['anywhere']);
+  });
+});
+
+describe('setRegExpElements', () => {
+  it('preserves task fields and computes elements per task', () => {
+    const result = setRegExpElements([
+      { id: '0', expression: /^a$/ },
+      { id: '1', expression: /^\d+$/, positiveExamples: ['1', '22'] },
+    ]);
+
+    expect(result).toEqual([
+      { id: '0', expression: /^a$/, elements: [] },
+      {
+        id: '1',
+        expression: /^\d+$/,
+        positiveExamples: ['1', '22'],
+        elements: ['\\d', 'x+'],
+      },
+    ]);
   });
 });
