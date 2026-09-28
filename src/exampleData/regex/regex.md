@@ -1,24 +1,43 @@
 ## guide lines
 
 - try to find good examples that illustrate what the expression matches and what it does not match
-- the examples should be chosen in a way that they pass the tests in regex.test.ts
+- the examples should be chosen in a way that they pass the tests in index.test.ts and regex.simpleExpressions.test.ts
 - only add nots if it cannot be distinguished by positive and negative examples
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
-- define the task structure in regex.model.ts
+- define the task structure in regex.model.ts; author only the fields of InitialRegexTask
 - do not use logic in index.ts, regex.simpleExpressions.ts, or regex.simpleCombinations.ts; only use nested objects, arrays, RegExp, string, and number values
 
 ## file structure
 
-- index.ts is the index file. It imports the `simpleExpressions` array from regex.simpleExpressions.ts and the `simpleCombinations` array from regex.simpleCombinations.ts and concatenates them into the exported `tasks` array
-- regex.simpleExpressions.ts contains all tasks for aspect group 1 (simple expressions), concatenated into the exported `simpleExpressions` array
-- regex.simpleCombinations.ts contains all tasks for aspect groups 2 and 3 (simple combinations and complex combinations), concatenated into the exported `simpleCombinations` array
+- regex.model.ts defines `InitialRegexTask` (the authored task data) and `RegexTask` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
+- regex.simpleExpressions.ts contains the simple-expression `InitialRegexTask` arrays, concatenated into `simpleExpressions`
+- regex.simpleCombinations.ts contains the simple- and complex-combination `InitialRegexTask` arrays, concatenated into `simpleCombinations`
+- index.ts combines both source arrays as `initialTasks` and exports `tasks` after adding the derived attributes
+- utils/regex.utils.ts coordinates enrichment; utils/regex.elements.ts derives expression elements, and utils/regex.parentIds.ts derives the direct parent relationships
+- keep parsing and enrichment logic in `utils/`; the task definition files should remain declarative
+
+### task data and derived attributes
+
+- An `InitialRegexTask` supplies an `expression` and optional `positiveExamples`, `negativeExamples`, and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
+- `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTasks` array, derives its `elements` from the regular expression, then derives its `parentIds`.
+- `elements` is a unique list of recognized regex aspects: syntax such as character classes, assertions, groups, quantifiers, and alternation, together with modifier flags. Repeated occurrences of the same aspect are listed once.
+- Anchoring is treated as the default: when both `^` and `$` are present they are omitted from `elements`; when just one is present that assertion is included; when neither is present, `anywhere` is included. Write exceptions intentionally when a task teaches anchor behavior or unanchored matching.
+- A task is a parent only when its element set is a proper subset of the other task's element set. `parentIds` contains only the nearest (direct) parents; incomparable direct parents may both be included, while equal element sets do not create a parent relationship.
+- The element list is a teaching classification, not a second regex engine: the `expression` remains the source of matching behavior.
+
+### tests
+
+- index.test.ts checks authored positive and negative examples against each expression, limits either example list to 10 entries, and checks that each positive example is rejected by another task.
+- regex.simpleExpressions.test.ts checks that simple-expression examples distinguish their tasks according to the test's matching criteria.
+- Keep examples compatible with the flags on each `RegExp`. In particular, `g` and `y` make `RegExp.prototype.test()` stateful through `lastIndex`, so avoid relying on repeated tests of the same expression without accounting for that behavior.
+- `nots` is optional supporting data for cases that need additional distinctions; prefer positive and negative examples whenever those are sufficient.
 
 ## tasks
 
 The following aspects should be provided in at least one task. If one aspect varies in usage there can be several tasks for each aspect. For those tasks there there are examples provided in the section ###examples as a starting point but they should not be adopted directly.
 
-Side note: All tasks' expressions will use by default the start assertion ^ and the end assertion $. This is not counted as an own aspect. An exception are only those tasks that explicitly illustrate the usage of $ and ^ and leave out one or both.
+Side note: Prefer expressions anchored with both `^` and `$`; those default anchors are not counted as separate aspects. Leave one or both out when the task intentionally illustrates anchor behavior or matching within a larger string.
 
 1. Simple expressions that illustrate only one aspect (regex.simpleExpressions.ts)
 
