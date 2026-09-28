@@ -6,9 +6,9 @@ export type InitialRegexTask = {
 };
 
 export interface RegexTask extends InitialRegexTask {
-  id?: string;
-  parentIds?: string;
-  elements?: RegExpElements[];
+  id: string;
+  parentIds: string[];
+  elements: RegExpElements[];
 }
 
 type CharacterClasses =

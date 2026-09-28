@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest';
-import { tasks } from '.';
+import { initialTasks } from '.';
 
 describe('regex tasks', () => {
-  describe.each(tasks)('$expression', (task) => {
-    const otherTasks = tasks.filter((otherTask) => otherTask !== task);
+  describe.each(initialTasks)('$expression', (task) => {
+    const otherTasks = initialTasks.filter((otherTask) => otherTask !== task);
     it('matches all positive examples and rejects all negative examples', () => {
       const { expression, positiveExamples = [], negativeExamples = [] } = task;
       positiveExamples.forEach((example) => {
