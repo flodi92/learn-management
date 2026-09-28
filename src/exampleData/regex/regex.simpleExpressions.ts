@@ -168,7 +168,7 @@ const simpleExpressionsAssertions: RegexTask[] = [
   {
     expression: /^a(?=b)\w$/,
     positiveExamples: ['ab'],
-    negativeExamples: ['ac', 'a', 'ba'],
+    negativeExamples: ['ac', 'a', 'ba', 'aab'],
   },
   {
     expression: /^a(?!b).$/,

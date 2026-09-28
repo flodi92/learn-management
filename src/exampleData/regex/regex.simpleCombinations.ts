@@ -215,7 +215,7 @@ const simpleCombinationsAssertionsAndCharacterClasses: RegexTask[] = [
     positiveExamples: ['204', '999'],
     negativeExamples: [
       'ID:204',
-      '1204',
+      'ID:999',
       'Berlin',
       'site.io',
       'site.test',
@@ -228,7 +228,7 @@ const simpleCombinationsAssertionsAndCharacterClasses: RegexTask[] = [
   {
     expression: /^\b[A-Z][a-z]+\b$/,
     positiveExamples: ['Berlin', 'Paris'],
-    negativeExamples: ['berlin', 'BERLIN', '_Berlin_', '_word_'],
+    negativeExamples: ['berlin', 'BERLIN', '_Berlin_', '_word_', 'J.doe'],
   },
   {
     expression: /^_\B[a-z]+\B_$/,
@@ -242,8 +242,8 @@ const simpleCombinationsAssertionsAndCharacterClasses: RegexTask[] = [
   },
   {
     expression: /^\S+(?!\.)$/,
-    positiveExamples: ['file', 'report'],
-    negativeExamples: ['file.', 'two words', '', '12-34'],
+    positiveExamples: ['file', 'report', 'file.'],
+    negativeExamples: ['two words', ''],
   },
   {
     expression: /^(?<!-)\d{2}-\d{2}$/,
@@ -281,7 +281,7 @@ const simpleCombinationsGroupsAndQuantifiers: RegexTask[] = [
   {
     expression: /^(red|blue)+$/,
     positiveExamples: ['redblue', 'blueredred'],
-    negativeExamples: ['red', 'bluegreen', 'red blue', '12-34-56'],
+    negativeExamples: ['green', 'bluegreen', 'red blue', '12-34-56'],
   },
   {
     expression: /^(\d{2}-){2}\d{2}$/,
@@ -348,7 +348,7 @@ const simpleCombinationsGroupsAndCharacterClasses: RegexTask[] = [
   },
   {
     expression: /^(?<initial>[A-Z])\.[a-z]+$/,
-    positiveExamples: ['J.Doe', 'A.smith'],
+    positiveExamples: ['J.doe', 'A.smith'],
     negativeExamples: ['JDoe', 'j.Doe', 'J.DOE', 'mon 09:30'],
   },
   {
@@ -391,7 +391,7 @@ const simpleCombinationsQuantifiersAndModifiers: RegexTask[] = [
   },
   {
     expression: /^(?:go\s*)+$/m,
-    positiveExamples: ['go', 'go\ngo', '\ngo'],
+    positiveExamples: ['go', 'go\ngo', 'go go'],
     negativeExamples: ['go no', 'gone', 'go no', 'cafe'],
   },
   {
@@ -421,12 +421,12 @@ const simpleCombinationsQuantifiersAndModifiers: RegexTask[] = [
   },
   {
     expression: /^(?:ab?)+$/u,
-    positiveExamples: ['a', 'aabb'],
+    positiveExamples: ['a', 'aab'],
     negativeExamples: ['', 'b', 'abaac', 'abc'],
   },
   {
     expression: /^\w{2,5}$/y,
-    positiveExamples: ['ab', 'abc'],
+    positiveExamples: ['ab'],
     negativeExamples: ['a', 'abcdef', 'a-b', 'Pass7!'],
   },
 ];
@@ -443,14 +443,14 @@ const simpleCombinationsAssertionsAndQuantifiers: RegexTask[] = [
     negativeExamples: ['ab', 'a', 'accb', '#tag'],
   },
   {
-    expression: /^(?<=#)\w+$/,
+    expression: /(?<=#)\w+$/,
     positiveExamples: ['#tag', '#todo_1'],
     negativeExamples: ['tag', '#two words', '#', 'word'],
   },
   {
-    expression: /^(?<!#)\w+$/,
-    positiveExamples: ['tag', 'word', '0'],
-    negativeExamples: ['#tag', 'two words', 'tag!', '_word_'],
+    expression: /(?<!#)\b\w+$/,
+    positiveExamples: ['tag', 'word', '0', '_word_'],
+    negativeExamples: ['#tag', 'tag!', '#todo_1'],
   },
   {
     expression: /^\b[a-z]+\b$/,
@@ -463,7 +463,7 @@ const simpleCombinationsAssertionsAndQuantifiers: RegexTask[] = [
     negativeExamples: ['word', '_Word_', '_word', '3 items'],
   },
   {
-    expression: /^\d+(?=\sitems?)$/,
+    expression: /^\d+(?=\sitems?)/,
     positiveExamples: ['3 item', '12 items'],
     negativeExamples: ['items', '3 boxes', '3items', 'clean'],
   },
@@ -585,8 +585,8 @@ const simpleCombinationsAssertionsAndModifiers: RegexTask[] = [
   },
   {
     expression: /^\S+(?=\.)\.$/i,
-    positiveExamples: ['name.', 'FILE.'],
-    negativeExamples: ['name', 'two words.', 'name..', 'name: value'],
+    positiveExamples: ['name.', 'FILE.', 'name..'],
+    negativeExamples: ['name', 'two words.', 'name: value'],
   },
 ];
 
@@ -677,7 +677,14 @@ const simpleCombinationsSeveralQuantifiers: RegexTask[] = [
   {
     expression: /^\w+\.\w{2,4}$/,
     positiveExamples: ['site.io', 'site.test'],
-    negativeExamples: ['site.c', 'site.abcde', 'site-name.io', '01:02:03'],
+    negativeExamples: [
+      'site.c',
+      'site.abcde',
+      'site-name.io',
+      '01:02:03',
+      'file.',
+      'name..',
+    ],
   },
   {
     expression: /^(?:\d{1,2}:){2}\d{2}$/,
