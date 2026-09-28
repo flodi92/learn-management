@@ -1,0 +1,179 @@
+import chalk from 'chalk';
+import readline from 'node:readline';
+import { tasks } from '../index';
+import { RegexTask } from '../regex.model';
+
+type Example = {
+  text: string;
+  isPositive: boolean;
+  answer?: 'positive' | 'negative';
+};
+
+const shuffle = <T>(items: T[]): T[] => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+const pickRandomTasks = (allTasks: RegexTask[], count: number): RegexTask[] =>
+  shuffle(allTasks).slice(0, count);
+
+const buildExamples = (task: RegexTask): Example[] =>
+  shuffle([
+    ...(task.positiveExamples ?? []).map((text) => ({
+      text,
+      isPositive: true,
+    })),
+    ...(task.negativeExamples ?? []).map((text) => ({
+      text,
+      isPositive: false,
+    })),
+  ]);
+
+const isAnsweredCorrectly = (example: Example): boolean =>
+  (example.answer === 'positive') === example.isPositive;
+
+class TaskPresenter {
+  private readonly selectedTasks: RegexTask[];
+  private currentTaskIndex = 0;
+  private examples: Example[] = [];
+  private cursor = 0;
+  private checked = false;
+  private summary = { correct: 0, incorrect: 0 };
+
+  constructor(allTasks: RegexTask[], taskCount = 10) {
+    this.selectedTasks = pickRandomTasks(allTasks, taskCount);
+  }
+
+  start() {
+    if (this.selectedTasks.length === 0) {
+      console.log('No tasks available.');
+      return;
+    }
+    this.loadTask();
+    this.render();
+    this.listen();
+  }
+
+  private get currentTask(): RegexTask {
+    return this.selectedTasks[this.currentTaskIndex];
+  }
+
+  private loadTask() {
+    this.examples = buildExamples(this.currentTask);
+    this.cursor = 0;
+    this.checked = false;
+  }
+
+  private render() {
+    console.clear();
+    console.log(
+      chalk.bold(
+        `Task ${this.currentTaskIndex + 1}/${this.selectedTasks.length}: `,
+      ) + chalk.cyan(this.currentTask.expression.toString()),
+    );
+    console.log(
+      chalk.dim(
+        'Press "p" for positive, "n" for negative, then Enter to check.',
+      ),
+    );
+    console.log();
+
+    this.examples.forEach((example, idx) => {
+      const pointer =
+        !this.checked && idx === this.cursor ? chalk.yellow('> ') : '  ';
+      const label = example.answer ? ` (${example.answer})` : '';
+      const line = `${pointer}${example.text}${label}`;
+
+      console.log(
+        this.checked
+          ? isAnsweredCorrectly(example)
+            ? chalk.green(line)
+            : chalk.red(line)
+          : line,
+      );
+    });
+
+    console.log();
+    if (this.checked) {
+      const allCorrect = this.examples.every(isAnsweredCorrectly);
+      console.log(
+        allCorrect
+          ? chalk.green('All correct.')
+          : chalk.red('Some answers were wrong.'),
+      );
+      console.log(chalk.dim('Press Enter to continue.'));
+    }
+  }
+
+  private listen() {
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) process.stdin.setRawMode(true);
+    process.stdin.on('keypress', (str: string, key: readline.Key) =>
+      this.onKeypress(str, key),
+    );
+    process.stdin.resume();
+  }
+
+  private onKeypress(str: string, key: readline.Key) {
+    if (key.ctrl && key.name === 'c') {
+      this.exit();
+      return;
+    }
+
+    if (!this.checked && (str === 'p' || str === 'n')) {
+      this.examples[this.cursor].answer = str === 'p' ? 'positive' : 'negative';
+      this.cursor = (this.cursor + 1) % this.examples.length;
+      this.render();
+      return;
+    }
+
+    if (key.name === 'return') {
+      if (!this.checked) {
+        this.checked = true;
+        this.updateSummary();
+      } else {
+        this.nextTask();
+        return;
+      }
+      this.render();
+    }
+  }
+
+  private updateSummary() {
+    if (this.examples.every(isAnsweredCorrectly)) {
+      this.summary.correct += 1;
+    } else {
+      this.summary.incorrect += 1;
+    }
+  }
+
+  private nextTask() {
+    this.currentTaskIndex += 1;
+    if (this.currentTaskIndex >= this.selectedTasks.length) {
+      this.finish();
+      return;
+    }
+    this.loadTask();
+    this.render();
+  }
+
+  private finish() {
+    console.clear();
+    console.log(chalk.bold('Summary'));
+    console.log(chalk.green(`Correct: ${this.summary.correct}`));
+    console.log(chalk.red(`Incorrect: ${this.summary.incorrect}`));
+    this.exit();
+  }
+
+  private exit() {
+    if (process.stdin.isTTY) process.stdin.setRawMode(false);
+    process.stdin.pause();
+    process.exit(0);
+  }
+}
+
+new TaskPresenter(tasks).start();
