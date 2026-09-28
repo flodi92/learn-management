@@ -362,7 +362,7 @@ const simpleExpressionsModifiers: RegexTask[] = [
 const simpleExpressionsTestContract: RegexTask[] = [
   {
     expression: /^[\s\S]*$/,
-    positiveExamples: ['x', 'A', '\n'],
+    positiveExamples: ['x', 'A', '\n', '0'],
   },
   {
     expression: /^__regex_task_rejector__$/,
