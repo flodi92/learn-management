@@ -1,3 +1,4 @@
+import { getRegExpElements } from './regex.elements';
 import { InitialRegexTask, RegexTask } from './regex.model';
 
 const setIds = (
@@ -10,5 +11,9 @@ export const addMissingRegExpAttributes = (
 ): RegexTask[] => {
   const tasksWithIds = setIds(initialTasks);
 
-  return tasksWithIds.map((task) => ({ ...task, parentIds: [], elements: [] }));
+  return tasksWithIds.map((task) => ({
+    ...task,
+    parentIds: [],
+    elements: getRegExpElements(task.expression),
+  }));
 };
