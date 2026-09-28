@@ -1,11 +1,4 @@
-type RegexTask = {
-  id?: string;
-  parentIds?: string;
-  expression: RegExp;
-  positiveExamples?: string[];
-  negativeExamples?: string[];
-  nots?: RegExp[];
-};
+import { RegexTask } from './regex.model';
 
 const simpleExpressionsCharacterClasses: RegexTask[] = [
   {

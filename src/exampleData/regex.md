@@ -5,7 +5,8 @@
 - only add nots if it cannot be distinguished by positive and negative examples
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
-- do not use logic in regex.ts file only use types with netsting objects, arrays, RegExp, string and number
+- define the task structure in regex.model.ts
+- do not use logic in regex.ts; only use nested objects, arrays, RegExp, string, and number values
 
 ## tasks
 
