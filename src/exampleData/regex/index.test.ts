@@ -1,6 +1,5 @@
 import { expect, it } from 'vitest';
-
-import { tasks } from './regex';
+import { tasks } from '.';
 
 describe('regex tasks', () => {
   describe.each(tasks)('$expression', (task) => {

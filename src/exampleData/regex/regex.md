@@ -6,7 +6,13 @@
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
 - define the task structure in regex.model.ts
-- do not use logic in regex.ts; only use nested objects, arrays, RegExp, string, and number values
+- do not use logic in index.ts, regex.simpleExpressions.ts, or regex.simpleCombinations.ts; only use nested objects, arrays, RegExp, string, and number values
+
+## file structure
+
+- index.ts is the index file. It imports the `simpleExpressions` array from regex.simpleExpressions.ts and the `simpleCombinations` array from regex.simpleCombinations.ts and concatenates them into the exported `tasks` array
+- regex.simpleExpressions.ts contains all tasks for aspect group 1 (simple expressions), concatenated into the exported `simpleExpressions` array
+- regex.simpleCombinations.ts contains all tasks for aspect groups 2 and 3 (simple combinations and complex combinations), concatenated into the exported `simpleCombinations` array
 
 ## tasks
 
@@ -14,7 +20,7 @@ The following aspects should be provided in at least one task. If one aspect var
 
 Side note: All tasks' expressions will use by default the start assertion ^ and the end assertion $. This is not counted as an own aspect. An exception are only those tasks that explicitly illustrate the usage of $ and ^ and leave out one or both.
 
-1. Simple expressions that illustrate only one aspect
+1. Simple expressions that illustrate only one aspect (regex.simpleExpressions.ts)
 
 - character classes
   - [xyz], [^xyz], ., \d, \D, \w, \W, \s, \S, \t, \r, \n, \v, \f, [\b], \0, \cX, \xHH, \uHHHH, \u{H…H}, x|y
@@ -27,7 +33,7 @@ Side note: All tasks' expressions will use by default the start assertion ^ and 
 - modifier
   - d, g, i, m, s u, v, y
 
-2. Simple Combinations. Try to find typical cases for the following combinations. Try to cover the whole bunch of varieties that might be possible.
+2. Simple Combinations (regex.simpleCombinations.ts). Try to find typical cases for the following combinations. Try to cover the whole bunch of varieties that might be possible.
 
 - several quantifiers in one expression that are nested in various ways
 - various character classes concated after each other
@@ -40,7 +46,7 @@ Side note: All tasks' expressions will use by default the start assertion ^ and 
   - quantifier
   - modifier
 
-3. Complex Combinations. Try to find complex combinations and nestings that build on aspects that are mentioned in 1. Focus on typical combinations that might be a use case. If necessary use words rather than sign combinations.
+3. Complex Combinations (regex.simpleCombinations.ts). Try to find complex combinations and nestings that build on aspects that are mentioned in 1. Focus on typical combinations that might be a use case. If necessary use words rather than sign combinations.
 
 ### structure of tasks
 
