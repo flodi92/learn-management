@@ -6,7 +6,7 @@
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
 - define the task structure in regex.model.ts; author only the fields of InitialRegexTask
-- do not use logic in index.ts, regex.simpleExpressions.ts, or regex.simpleCombinations.ts; only use nested objects, arrays, RegExp, string, and number values
+- do not use logic in index.ts, regex.simpleExpressions.ts, or regex.simpleCombinations.ts apart from invoking an imported function; only use nested objects, arrays, RegExp, string, and number values
 
 ## file structure
 
