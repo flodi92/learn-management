@@ -44,6 +44,17 @@ class TaskPresenter {
   private checked = false;
   private summary = { correct: 0, incorrect: 0 };
 
+  private onAnswered: (result: { id: string; isCorrect: boolean }) => void;
+  private onFinished: () => void;
+
+  constructor(options: {
+    onAnswered: (result: { id: string; isCorrect: boolean }) => void;
+    onFinished: () => void;
+  }) {
+    this.onAnswered = options.onAnswered;
+    this.onFinished = options.onFinished;
+  }
+
   start(tasks: RegexTask[]) {
     this.tasks = tasks;
 
@@ -131,21 +142,23 @@ class TaskPresenter {
     if (key.name === 'return') {
       if (!this.checked) {
         this.checked = true;
+        this.render();
         this.updateSummary();
       } else {
         this.nextTask();
         return;
       }
-      this.render();
     }
   }
 
   private updateSummary() {
-    if (this.examples.every(isAnsweredCorrectly)) {
+    const isCorrect = this.examples.every(isAnsweredCorrectly);
+    if (isCorrect) {
       this.summary.correct += 1;
     } else {
       this.summary.incorrect += 1;
     }
+    this.onAnswered({ id: this.currentTask.id, isCorrect });
   }
 
   private nextTask() {
@@ -163,6 +176,7 @@ class TaskPresenter {
     console.log(chalk.bold('Summary'));
     console.log(chalk.green(`Correct: ${this.summary.correct}`));
     console.log(chalk.red(`Incorrect: ${this.summary.incorrect}`));
+    this.onFinished();
     this.exit();
   }
 
@@ -173,5 +187,8 @@ class TaskPresenter {
   }
 }
 
-const presenter = new TaskPresenter();
+const presenter = new TaskPresenter({
+  onAnswered: (result) => console.log('Answered:', result),
+  onFinished: () => console.log('Finished all tasks.'),
+});
 presenter.start(pickRandomTasks(regExpTasks, 10));
