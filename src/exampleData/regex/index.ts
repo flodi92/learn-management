@@ -8,4 +8,4 @@ export const initialTasks: InitialRegexTask[] = [
   ...simpleCombinations,
 ];
 
-export const tasks = addMissingRegExpAttributes(initialTasks);
+export const regExpTasks = addMissingRegExpAttributes(initialTasks);

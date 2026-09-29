@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { tasks } from '../index';
+import { regExpTasks } from '../index';
 import { RegexTask } from '../regex.model';
 
 type Example = {
@@ -37,19 +37,17 @@ const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
 class TaskPresenter {
-  private readonly selectedTasks: RegexTask[];
+  private tasks: RegexTask[] = [];
   private currentTaskIndex = 0;
   private examples: Example[] = [];
   private cursor = 0;
   private checked = false;
   private summary = { correct: 0, incorrect: 0 };
 
-  constructor(allTasks: RegexTask[], taskCount = 10) {
-    this.selectedTasks = pickRandomTasks(allTasks, taskCount);
-  }
+  start(tasks: RegexTask[]) {
+    this.tasks = tasks;
 
-  start() {
-    if (this.selectedTasks.length === 0) {
+    if (this.tasks.length === 0) {
       console.log('No tasks available.');
       return;
     }
@@ -59,7 +57,7 @@ class TaskPresenter {
   }
 
   private get currentTask(): RegexTask {
-    return this.selectedTasks[this.currentTaskIndex];
+    return this.tasks[this.currentTaskIndex];
   }
 
   private loadTask() {
@@ -71,9 +69,8 @@ class TaskPresenter {
   private render() {
     console.clear();
     console.log(
-      chalk.bold(
-        `Task ${this.currentTaskIndex + 1}/${this.selectedTasks.length}: `,
-      ) + chalk.cyan(this.currentTask.expression.toString()),
+      chalk.bold(`Task ${this.currentTaskIndex + 1}/${this.tasks.length}: `) +
+        chalk.cyan(this.currentTask.expression.toString()),
     );
     console.log(
       chalk.dim(
@@ -153,7 +150,7 @@ class TaskPresenter {
 
   private nextTask() {
     this.currentTaskIndex += 1;
-    if (this.currentTaskIndex >= this.selectedTasks.length) {
+    if (this.currentTaskIndex >= this.tasks.length) {
       this.finish();
       return;
     }
@@ -176,4 +173,5 @@ class TaskPresenter {
   }
 }
 
-new TaskPresenter(tasks).start();
+const presenter = new TaskPresenter();
+presenter.start(pickRandomTasks(regExpTasks, 10));
