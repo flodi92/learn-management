@@ -36,7 +36,7 @@ const buildExamples = (task: RegexTask): Example[] =>
 const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
-class TaskPresenter {
+class RegExpTaskPresenter {
   private tasks: RegexTask[] = [];
   private currentTaskIndex = 0;
   private examples: Example[] = [];
@@ -214,7 +214,7 @@ class TaskPresenter {
   }
 }
 
-const presenter = new TaskPresenter({
+const presenter = new RegExpTaskPresenter({
   onAnswered: (result) => console.log('Answered:', result),
   onFinished: () => console.log('Finished all tasks.'),
 });
