@@ -186,29 +186,18 @@ export class LearnSchedulerForIds {
   }
 }
 
-export class LearnScheduler<T extends { id: string }> {
+export class LearnScheduler<T extends { id: string; parentIds?: string[] }> {
   private scheduler: LearnSchedulerForIds;
 
   private idTaskMapping: Record<string, T>;
 
-  constructor(
-    subjectsWithParentsOrWithoutParents: [T, string[] | undefined][] | T[],
-  ) {
-    const entries: [T, string[] | undefined][] =
-      subjectsWithParentsOrWithoutParents.length > 0 &&
-      !Array.isArray(subjectsWithParentsOrWithoutParents[0])
-        ? (subjectsWithParentsOrWithoutParents as T[]).map((task) => [
-            task,
-            undefined,
-          ])
-        : (subjectsWithParentsOrWithoutParents as [T, string[] | undefined][]);
-
+  constructor(tasks: T[]) {
     this.idTaskMapping = Object.fromEntries(
-      entries.map(([task]) => [task.id, task]),
+      tasks.map((task) => [task.id, task]),
     );
 
     const subjectsWithParents = Object.fromEntries(
-      entries.map(([task, parents]) => [task.id, parents]),
+      tasks.map((task) => [task.id, task.parentIds]),
     );
 
     this.scheduler = new LearnSchedulerForIds(subjectsWithParents);
