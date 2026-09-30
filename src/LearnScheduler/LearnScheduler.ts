@@ -89,7 +89,7 @@ export class LearnSchedulerForIds {
     );
   }
 
-  nextSession(count: number, time: number): string[] {
+  nextSession(count: number, time: number = this.today): string[] {
     if (count <= 0) {
       return [];
     }
@@ -214,9 +214,9 @@ export class LearnScheduler<T extends { id: string }> {
     this.scheduler = new LearnSchedulerForIds(subjectsWithParents);
   }
 
-  nextSession(count: number, time: number): T[] {
+  nextSession(count: number): T[] {
     return this.scheduler
-      .nextSession(count, time)
+      .nextSession(count)
       .map((id) => this.idTaskMapping[id]);
   }
 
