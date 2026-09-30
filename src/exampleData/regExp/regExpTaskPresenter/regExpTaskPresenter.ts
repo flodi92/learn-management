@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import readline from 'node:readline';
 import { regExpTasks } from '../index';
 import { RegExpTask } from '../regExp.model';
-import { Result } from '../../../LearnScheduler/LearnScheduler';
+import { Result } from '../../../model';
 
 type Example = {
   text: string;

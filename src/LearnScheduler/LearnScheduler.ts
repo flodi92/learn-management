@@ -5,16 +5,7 @@ import {
   milisecondsPerDay,
   repeatSubjectsMasteryMax,
 } from './LearnScheduler.constants';
-
-export interface Result {
-  id: string;
-  correctness: number;
-}
-export interface TimedResult extends Result {
-  time: number;
-}
-
-export type SaveData = TimedResult[];
+import { SaveData, Task, TimedResult } from '../model';
 
 export class LearnSchedulerForIds {
   private results: TimedResult[] = [];
@@ -204,7 +195,7 @@ export class LearnSchedulerForIds {
   }
 }
 
-export class LearnScheduler<T extends { id: string; parentIds?: string[] }> {
+export class LearnScheduler<T extends Task> {
   private scheduler: LearnSchedulerForIds;
 
   private idTaskMapping: Record<string, T>;

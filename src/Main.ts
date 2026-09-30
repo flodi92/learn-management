@@ -1,19 +1,6 @@
 import { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
-import {
-  LearnScheduler,
-  Result,
-  SaveData,
-} from './LearnScheduler/LearnScheduler';
-
-export interface Task {
-  id: string;
-  parentIds?: string[];
-}
-
-export interface SaveDataBase {
-  loadSaveData(): SaveData;
-  saveData(saveData: SaveData): void;
-}
+import { LearnScheduler } from './LearnScheduler/LearnScheduler';
+import { Result, SaveDataBase, Task } from './model';
 
 export class Main<T extends Task> {
   private scheduler;
