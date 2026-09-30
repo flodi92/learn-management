@@ -1,11 +1,16 @@
-import { regExpTasks } from './exampleData/regExp';
+import { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
 import {
-  RegExpTaskPresenter,
-  TaskPresenter,
-} from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
-import { LearnScheduler, SaveData } from './LearnScheduler/LearnScheduler';
+  LearnScheduler,
+  Result,
+  SaveData,
+} from './LearnScheduler/LearnScheduler';
 
-export class Main<T extends { id: string; parentIds?: string[] }> {
+export interface Task {
+  id: string;
+  parentIds?: string[];
+}
+
+export class Main<T extends Task> {
   private scheduler;
   private presenter;
 
@@ -23,8 +28,8 @@ export class Main<T extends { id: string; parentIds?: string[] }> {
     this.presenter.start(session);
   }
 
-  onAnswered({ id, isCorrect }: { id: string; isCorrect: boolean }) {
-    this.scheduler.recordResults({ [id]: isCorrect ? 1 : 0 });
+  onAnswered({ id, correctness }: Result) {
+    this.scheduler.recordResults({ [id]: correctness });
   }
 
   onFinished() {

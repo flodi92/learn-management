@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import readline from 'node:readline';
 import { regExpTasks } from '../index';
 import { RegExpTask } from '../regExp.model';
+import { Result } from '../../../LearnScheduler/LearnScheduler';
 
 type Example = {
   text: string;
@@ -39,9 +40,7 @@ const isAnsweredCorrectly = (example: Example): boolean =>
 export abstract class TaskPresenter<
   T extends { id: string; parentIds?: string[] },
 > {
-  abstract set onAnswered(
-    handler: (result: { id: string; isCorrect: boolean }) => void,
-  );
+  abstract set onAnswered(handler: (result: Result) => void);
   abstract set onFinished(handler: () => void);
 
   abstract start(tasks: T[]): void;
@@ -55,12 +54,10 @@ export class RegExpTaskPresenter {
   private checked = false;
   private summary = { correct: 0, incorrect: 0 };
 
-  private _onAnswered?: (result: { id: string; isCorrect: boolean }) => void;
+  private _onAnswered?: (result: Result) => void;
   private _onFinished?: () => void;
 
-  set onAnswered(
-    handler: (result: { id: string; isCorrect: boolean }) => void,
-  ) {
+  set onAnswered(handler: (result: Result) => void) {
     this._onAnswered = handler;
   }
 
@@ -198,7 +195,10 @@ export class RegExpTaskPresenter {
     } else {
       this.summary.incorrect += 1;
     }
-    this._onAnswered?.({ id: this.currentTask.id, isCorrect });
+    this._onAnswered?.({
+      id: this.currentTask.id,
+      correctness: isCorrect ? 1 : 0,
+    });
   }
 
   private nextTask() {

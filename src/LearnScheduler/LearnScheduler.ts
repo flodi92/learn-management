@@ -8,13 +8,16 @@ import {
 
 export interface Result {
   id: string;
-  time: number;
   correctness: number;
 }
-export type SaveData = Result[];
+export interface TimedResult extends Result {
+  time: number;
+}
+
+export type SaveData = TimedResult[];
 
 export class LearnSchedulerForIds {
-  private results: Result[] = [];
+  private results: TimedResult[] = [];
 
   constructor(
     private subjectsWithParentsOrWithoutParents:
