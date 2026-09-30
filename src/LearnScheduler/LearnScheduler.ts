@@ -186,6 +186,46 @@ export class LearnScheduler {
   }
 }
 
+export class LearnSchedulerWithTask<T extends { id: string }> {
+  private scheduler: LearnScheduler;
+
+  private idTaskMapping: Record<string, T>;
+
+  constructor(
+    private subjectsWithParentsOrWithoutParents:
+      [T, string[] | undefined][] | T[],
+  ) {
+    const entries: [T, string[] | undefined][] =
+      subjectsWithParentsOrWithoutParents.length > 0 &&
+      !Array.isArray(subjectsWithParentsOrWithoutParents[0])
+        ? (subjectsWithParentsOrWithoutParents as T[]).map((task) => [
+            task,
+            undefined,
+          ])
+        : (subjectsWithParentsOrWithoutParents as [T, string[] | undefined][]);
+
+    this.idTaskMapping = Object.fromEntries(
+      entries.map(([task]) => [task.id, task]),
+    );
+
+    const subjectsWithParents = Object.fromEntries(
+      entries.map(([task, parents]) => [task.id, parents]),
+    );
+
+    this.scheduler = new LearnScheduler(subjectsWithParents);
+  }
+
+  nextSession(count: number, time: number): T[] {
+    return this.scheduler
+      .nextSession(count, time)
+      .map((id) => this.idTaskMapping[id]);
+  }
+
+  recordResults(results: Record<string, number>) {
+    return this.scheduler.recordResults(results);
+  }
+}
+
 export class LearnSchedulerPattern {
   constructor(subjects: string[]) {}
 
