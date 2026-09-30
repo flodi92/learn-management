@@ -159,6 +159,15 @@ class TaskPresenter {
 
     if (key.name === 'return') {
       if (!this.checked) {
+        const allExamplesClassified = this.examples.every(
+          (example) => example.answer !== undefined,
+        );
+        if (!allExamplesClassified) {
+          console.log(
+            'Please first classify all examples as positive or negative',
+          );
+          return;
+        }
         this.checked = true;
         this.render();
         this.updateSummary();
