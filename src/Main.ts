@@ -10,16 +10,25 @@ export interface Task {
   parentIds?: string[];
 }
 
+export interface SaveDataBase {
+  loadSaveData(): SaveData;
+  saveData(saveData: SaveData): void;
+}
+
 export class Main<T extends Task> {
   private scheduler;
   private presenter;
 
-  constructor(presenter: TaskPresenter<T>, tasks: T[]) {
+  constructor(
+    presenter: TaskPresenter<T>,
+    tasks: T[],
+    private saveDataBase: SaveDataBase,
+  ) {
     this.scheduler = new LearnScheduler(tasks);
     this.presenter = presenter;
     this.presenter.onAnswered = this.onAnswered;
     this.presenter.onFinished = this.onFinished;
-    // @todo saving
+    this.restoreFromSaveData();
   }
 
   start() {
@@ -28,19 +37,20 @@ export class Main<T extends Task> {
     this.presenter.start(session);
   }
 
-  onAnswered({ id, correctness }: Result) {
+  private onAnswered({ id, correctness }: Result) {
     this.scheduler.recordResults({ [id]: correctness });
+    this.saveData();
   }
 
-  onFinished() {
+  private onFinished() {
     /* @todo ask for next session */
   }
 
-  getSaveData(): SaveData {
-    return this.scheduler.getSaveData();
+  private saveData() {
+    this.saveDataBase.saveData(this.scheduler.getSaveData());
   }
 
-  restoreFromSaveData(saveData: SaveData) {
-    this.scheduler.restoreFromSaveData(saveData);
+  private restoreFromSaveData() {
+    this.scheduler.restoreFromSaveData(this.saveDataBase.loadSaveData());
   }
 }
