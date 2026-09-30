@@ -36,7 +36,18 @@ const buildExamples = (task: RegExpTask): Example[] =>
 const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
-class RegExpTaskPresenter {
+export abstract class TaskPresenter<
+  T extends { id: string; parentIds?: string[] },
+> {
+  abstract set onAnswered(
+    handler: (result: { id: string; isCorrect: boolean }) => void,
+  );
+  abstract set onFinished(handler: () => void);
+
+  abstract start(tasks: T[]): void;
+}
+
+export class RegExpTaskPresenter {
   private tasks: RegExpTask[] = [];
   private currentTaskIndex = 0;
   private examples: Example[] = [];
@@ -44,15 +55,17 @@ class RegExpTaskPresenter {
   private checked = false;
   private summary = { correct: 0, incorrect: 0 };
 
-  private onAnswered: (result: { id: string; isCorrect: boolean }) => void;
-  private onFinished: () => void;
+  private _onAnswered?: (result: { id: string; isCorrect: boolean }) => void;
+  private _onFinished?: () => void;
 
-  constructor(options: {
-    onAnswered: (result: { id: string; isCorrect: boolean }) => void;
-    onFinished: () => void;
-  }) {
-    this.onAnswered = options.onAnswered;
-    this.onFinished = options.onFinished;
+  set onAnswered(
+    handler: (result: { id: string; isCorrect: boolean }) => void,
+  ) {
+    this._onAnswered = handler;
+  }
+
+  set onFinished(handler: () => void) {
+    this._onFinished = handler;
   }
 
   start(tasks: RegExpTask[]) {
@@ -185,7 +198,7 @@ class RegExpTaskPresenter {
     } else {
       this.summary.incorrect += 1;
     }
-    this.onAnswered({ id: this.currentTask.id, isCorrect });
+    this._onAnswered?.({ id: this.currentTask.id, isCorrect });
   }
 
   private nextTask() {
@@ -203,7 +216,7 @@ class RegExpTaskPresenter {
     console.log(chalk.bold('Summary'));
     console.log(chalk.green(`Correct: ${this.summary.correct}`));
     console.log(chalk.red(`Incorrect: ${this.summary.incorrect}`));
-    this.onFinished();
+    this._onFinished?.();
     this.exit();
   }
 
@@ -214,8 +227,8 @@ class RegExpTaskPresenter {
   }
 }
 
-const presenter = new RegExpTaskPresenter({
-  onAnswered: (result) => console.log('Answered:', result),
-  onFinished: () => console.log('Finished all tasks.'),
-});
+const presenter = new RegExpTaskPresenter();
+presenter.onAnswered = (result) => console.log('Answered:', result);
+presenter.onFinished = () => console.log('Finished all tasks.');
+
 presenter.start(pickRandomTasks(regExpTasks, 10));

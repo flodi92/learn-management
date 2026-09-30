@@ -6,8 +6,15 @@ import {
   repeatSubjectsMasteryMax,
 } from './LearnScheduler.constants';
 
+export interface Result {
+  id: string;
+  time: number;
+  correctness: number;
+}
+export type SaveData = Result[];
+
 export class LearnSchedulerForIds {
-  private results: { id: string; time: number; correctness: number }[] = [];
+  private results: Result[] = [];
 
   constructor(
     private subjectsWithParentsOrWithoutParents:
@@ -184,6 +191,14 @@ export class LearnSchedulerForIds {
   get subjectStatistics() {
     return this.getSubjectStatisticsAt(this.today);
   }
+
+  getSaveData(): SaveData {
+    return this.results;
+  }
+
+  restoreFromSaveData(saveData: SaveData) {
+    this.results = saveData;
+  }
 }
 
 export class LearnScheduler<T extends { id: string; parentIds?: string[] }> {
@@ -211,5 +226,13 @@ export class LearnScheduler<T extends { id: string; parentIds?: string[] }> {
 
   recordResults(results: Record<string, number>) {
     return this.scheduler.recordResults(results);
+  }
+
+  getSaveData(): SaveData {
+    return this.scheduler.getSaveData();
+  }
+
+  restoreFromSaveData(saveData: SaveData) {
+    this.scheduler.restoreFromSaveData(saveData);
   }
 }

@@ -1,17 +1,19 @@
 import { regExpTasks } from './exampleData/regExp';
-import { RegExpTaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
-import { LearnScheduler } from './LearnScheduler/LearnScheduler';
+import {
+  RegExpTaskPresenter,
+  TaskPresenter,
+} from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
+import { LearnScheduler, SaveData } from './LearnScheduler/LearnScheduler';
 
-export class Main {
+export class Main<T extends { id: string; parentIds?: string[] }> {
   private scheduler;
   private presenter;
 
-  constructor() {
-    this.scheduler = new LearnScheduler(regExpTasks);
-    this.presenter = new RegExpTaskPresenter({
-      onAnswered: this.onAnswered,
-      onFinished: this.onFinished,
-    });
+  constructor(presenter: TaskPresenter<T>, tasks: T[]) {
+    this.scheduler = new LearnScheduler(tasks);
+    this.presenter = presenter;
+    this.presenter.onAnswered = this.onAnswered;
+    this.presenter.onFinished = this.onFinished;
     // @todo saving
   }
 
@@ -27,5 +29,13 @@ export class Main {
 
   onFinished() {
     /* @todo ask for next session */
+  }
+
+  getSaveData(): SaveData {
+    return this.scheduler.getSaveData();
+  }
+
+  restoreFromSaveData(saveData: SaveData) {
+    this.scheduler.restoreFromSaveData(saveData);
   }
 }
