@@ -2,7 +2,7 @@
 
 The TaskPresenter is a console tool that is invoked with all the tasks in [[../index.ts]].
 
-It can be started with npm start-regex.
+It can be started with npm start-regExp.
 
 Now, the console tool processes the 10 randomly chosen examples in the following way.
 

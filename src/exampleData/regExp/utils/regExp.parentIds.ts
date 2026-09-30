@@ -1,6 +1,6 @@
-import { RegexTask } from '../regex.model';
+import { RegExpTask } from '../regExp.model';
 
-type TaskWithElements = Omit<RegexTask, 'parentIds'>;
+type TaskWithElements = Omit<RegExpTask, 'parentIds'>;
 
 const isSubset = (
   subsetElements: TaskWithElements['elements'],
@@ -40,7 +40,7 @@ const getDirectParentIds = (
 
 export const setParentIds = (
   tasksWithElements: TaskWithElements[],
-): RegexTask[] =>
+): RegExpTask[] =>
   tasksWithElements.map((task) => ({
     ...task,
     parentIds: getDirectParentIds(task, tasksWithElements),

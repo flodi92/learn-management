@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { setParentIds } from './regex.parentIds';
-import { RegexTask } from '../regex.model';
+import { setParentIds } from './regExp.parentIds';
+import { RegExpTask } from '../regExp.model';
 
-type TaskWithElements = Omit<RegexTask, 'parentIds'>;
+type TaskWithElements = Omit<RegExpTask, 'parentIds'>;
 
 const task = (
   id: string,

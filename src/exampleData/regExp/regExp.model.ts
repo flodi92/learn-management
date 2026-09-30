@@ -1,11 +1,11 @@
-export type InitialRegexTask = {
+export type InitialRegExpTask = {
   expression: RegExp;
   positiveExamples?: string[];
   negativeExamples?: string[];
   nots?: RegExp[];
 };
 
-export interface RegexTask extends InitialRegexTask {
+export interface RegExpTask extends InitialRegExpTask {
   id: string;
   parentIds: string[];
   elements: RegExpElements[];

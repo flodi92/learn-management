@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getRegExpElements, setRegExpElements } from './regex.elements';
+import { getRegExpElements, setRegExpElements } from './regExp.elements';
 
 describe('getRegExpElements', () => {
   it.each([

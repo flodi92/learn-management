@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { simpleExpressions } from './regex.simpleExpressions';
+import { simpleExpressions } from './regExp.simpleExpressions';
 
 describe('regex tasks', () => {
   describe.each(simpleExpressions)('$expression', (task) => {

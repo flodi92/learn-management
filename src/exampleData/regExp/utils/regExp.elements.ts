@@ -1,11 +1,11 @@
-import { RegexTask } from '../regex.model';
+import { RegExpTask } from '../regExp.model';
 
-type RegExpElement = RegexTask['elements'][number];
+type RegExpElement = RegExpTask['elements'][number];
 type TaskWithoutParentIdsAndElements = Omit<
-  RegexTask,
+  RegExpTask,
   'parentIds' | 'elements'
 >;
-type TaskWithoutParentIds = Omit<RegexTask, 'parentIds'>;
+type TaskWithoutParentIds = Omit<RegExpTask, 'parentIds'>;
 
 const MODIFIER_FLAGS: RegExpElement[] = [
   'd',

@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
 import { regExpTasks } from '../index';
-import { RegexTask } from '../regex.model';
+import { RegExpTask } from '../regExp.model';
 
 type Example = {
   text: string;
@@ -18,10 +18,10 @@ const shuffle = <T>(items: T[]): T[] => {
   return copy;
 };
 
-const pickRandomTasks = (allTasks: RegexTask[], count: number): RegexTask[] =>
+const pickRandomTasks = (allTasks: RegExpTask[], count: number): RegExpTask[] =>
   shuffle(allTasks).slice(0, count);
 
-const buildExamples = (task: RegexTask): Example[] =>
+const buildExamples = (task: RegExpTask): Example[] =>
   shuffle([
     ...(task.positiveExamples ?? []).map((text) => ({
       text,
@@ -37,7 +37,7 @@ const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
 class RegExpTaskPresenter {
-  private tasks: RegexTask[] = [];
+  private tasks: RegExpTask[] = [];
   private currentTaskIndex = 0;
   private examples: Example[] = [];
   private cursor = 0;
@@ -55,7 +55,7 @@ class RegExpTaskPresenter {
     this.onFinished = options.onFinished;
   }
 
-  start(tasks: RegexTask[]) {
+  start(tasks: RegExpTask[]) {
     this.tasks = tasks;
 
     if (this.tasks.length === 0) {
@@ -67,7 +67,7 @@ class RegExpTaskPresenter {
     this.listen();
   }
 
-  private get currentTask(): RegexTask {
+  private get currentTask(): RegExpTask {
     return this.tasks[this.currentTaskIndex];
   }
 

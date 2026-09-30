@@ -1,6 +1,6 @@
-import { InitialRegexTask } from './regex.model';
+import { InitialRegExpTask } from './regExp.model';
 
-const simpleCombinationsCharacterClassesAndQuantifiers: InitialRegexTask[] = [
+const simpleCombinationsCharacterClassesAndQuantifiers: InitialRegExpTask[] = [
   {
     expression: /^[a-z]{2}\d$/,
     positiveExamples: ['ab1', 'xy9'],
@@ -161,7 +161,7 @@ const simpleCombinationsCharacterClassesAndQuantifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsAssertionsAndCharacterClasses: InitialRegexTask[] = [
+const simpleCombinationsAssertionsAndCharacterClasses: InitialRegExpTask[] = [
   {
     expression: /^item(?=\d)\d$/,
     positiveExamples: ['item4', 'item9', 'item4', 'item9'],
@@ -257,7 +257,7 @@ const simpleCombinationsAssertionsAndCharacterClasses: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsGroupsAndQuantifiers: InitialRegexTask[] = [
+const simpleCombinationsGroupsAndQuantifiers: InitialRegExpTask[] = [
   {
     expression: /^(ab)+$/,
     positiveExamples: ['ab', 'abab'],
@@ -310,7 +310,7 @@ const simpleCombinationsGroupsAndQuantifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsGroupsAndCharacterClasses: InitialRegexTask[] = [
+const simpleCombinationsGroupsAndCharacterClasses: InitialRegExpTask[] = [
   {
     expression: /^(?<word>[a-z]+)-\d+$/,
     positiveExamples: ['item-7', 'task-42'],
@@ -378,7 +378,7 @@ const simpleCombinationsGroupsAndCharacterClasses: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsQuantifiersAndModifiers: InitialRegexTask[] = [
+const simpleCombinationsQuantifiersAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^ha+$/i,
     positiveExamples: ['ha', 'HaAa'],
@@ -431,7 +431,7 @@ const simpleCombinationsQuantifiersAndModifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsAssertionsAndQuantifiers: InitialRegexTask[] = [
+const simpleCombinationsAssertionsAndQuantifiers: InitialRegExpTask[] = [
   {
     expression: /^a(?=b)b+$/,
     positiveExamples: ['ab', 'abbb'],
@@ -484,7 +484,7 @@ const simpleCombinationsAssertionsAndQuantifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsCharacterClassesAndModifiers: InitialRegexTask[] = [
+const simpleCombinationsCharacterClassesAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^[a-z]+$/i,
     positiveExamples: ['Berlin', 'abc', 'x'],
@@ -537,7 +537,7 @@ const simpleCombinationsCharacterClassesAndModifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsAssertionsAndModifiers: InitialRegexTask[] = [
+const simpleCombinationsAssertionsAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^hello$/i,
     positiveExamples: ['hello', 'HELLO'],
@@ -590,7 +590,7 @@ const simpleCombinationsAssertionsAndModifiers: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsGroupsAndAssertions: InitialRegexTask[] = [
+const simpleCombinationsGroupsAndAssertions: InitialRegExpTask[] = [
   {
     expression: /^(?<key>\w+):(?=\s)/,
     positiveExamples: ['name: value', 'id: 42'],
@@ -653,7 +653,7 @@ const simpleCombinationsGroupsAndAssertions: InitialRegexTask[] = [
   },
 ];
 
-const simpleCombinationsSeveralQuantifiers: InitialRegexTask[] = [
+const simpleCombinationsSeveralQuantifiers: InitialRegExpTask[] = [
   {
     expression: /^a*b+$/,
     positiveExamples: ['b', 'aaabbb'],
@@ -713,7 +713,7 @@ const simpleCombinationsSeveralQuantifiers: InitialRegexTask[] = [
   },
 ];
 
-export const simpleCombinations: InitialRegexTask[] = [
+export const simpleCombinations: InitialRegExpTask[] = [
   ...simpleCombinationsCharacterClassesAndQuantifiers,
   ...simpleCombinationsAssertionsAndCharacterClasses,
   ...simpleCombinationsGroupsAndQuantifiers,

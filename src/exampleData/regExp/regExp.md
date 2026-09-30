@@ -1,25 +1,25 @@
 ## guide lines
 
 - try to find good examples that illustrate what the expression matches and what it does not match
-- the examples should be chosen in a way that they pass the tests in index.test.ts and regex.simpleExpressions.test.ts
+- the examples should be chosen in a way that they pass the tests in index.test.ts and regExp.simpleExpressions.test.ts
 - only add nots if it cannot be distinguished by positive and negative examples
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
-- define the task structure in regex.model.ts; author only the fields of InitialRegexTask
-- do not use logic in index.ts, regex.simpleExpressions.ts, or regex.simpleCombinations.ts apart from invoking an imported function; only use nested objects, arrays, RegExp, string, and number values
+- define the task structure in regExp.model.ts; author only the fields of InitialRegExpTask
+- do not use logic in index.ts, regExp.simpleExpressions.ts, or regExp.simpleCombinations.ts apart from invoking an imported function; only use nested objects, arrays, RegExp, string, and number values
 
 ## file structure
 
-- regex.model.ts defines `InitialRegexTask` (the authored task data) and `RegexTask` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
-- regex.simpleExpressions.ts contains the simple-expression `InitialRegexTask` arrays, concatenated into `simpleExpressions`
-- regex.simpleCombinations.ts contains the simple- and complex-combination `InitialRegexTask` arrays, concatenated into `simpleCombinations`
+- regExp.model.ts defines `InitialRegExpTask` (the authored task data) and `RegExpTask` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
+- regExp.simpleExpressions.ts contains the simple-expression `InitialRegExpTask` arrays, concatenated into `simpleExpressions`
+- regExp.simpleCombinations.ts contains the simple- and complex-combination `InitialRegExpTask` arrays, concatenated into `simpleCombinations`
 - index.ts combines both source arrays as `initialTasks` and exports `tasks` after adding the derived attributes
-- utils/regex.utils.ts coordinates enrichment; utils/regex.elements.ts derives expression elements, and utils/regex.parentIds.ts derives the direct parent relationships
+- utils/regExp.utils.ts coordinates enrichment; utils/regExp.elements.ts derives expression elements, and utils/regExp.parentIds.ts derives the direct parent relationships
 - keep parsing and enrichment logic in `utils/`; the task definition files should remain declarative
 
 ### task data and derived attributes
 
-- An `InitialRegexTask` supplies an `expression` and optional `positiveExamples`, `negativeExamples`, and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
+- An `InitialRegExpTask` supplies an `expression` and optional `positiveExamples`, `negativeExamples`, and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
 - `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTasks` array, derives its `elements` from the regular expression, then derives its `parentIds`.
 - `elements` is a unique list of recognized regex aspects: syntax such as character classes, assertions, groups, quantifiers, and alternation, together with modifier flags. Repeated occurrences of the same aspect are listed once.
 - Anchoring is treated as the default: when both `^` and `$` are present they are omitted from `elements`; when just one is present that assertion is included; when neither is present, `anywhere` is included. Write exceptions intentionally when a task teaches anchor behavior or unanchored matching.
@@ -29,7 +29,7 @@
 ### tests
 
 - index.test.ts checks authored positive and negative examples against each expression, limits either example list to 10 entries, and checks that each positive example is rejected by another task.
-- regex.simpleExpressions.test.ts checks that simple-expression examples distinguish their tasks according to the test's matching criteria.
+- regExp.simpleExpressions.test.ts checks that simple-expression examples distinguish their tasks according to the test's matching criteria.
 - Keep examples compatible with the flags on each `RegExp`. In particular, `g` and `y` make `RegExp.prototype.test()` stateful through `lastIndex`, so avoid relying on repeated tests of the same expression without accounting for that behavior.
 - `nots` is optional supporting data for cases that need additional distinctions; prefer positive and negative examples whenever those are sufficient.
 
@@ -39,7 +39,7 @@ The following aspects should be provided in at least one task. If one aspect var
 
 Side note: Prefer expressions anchored with both `^` and `$`; those default anchors are not counted as separate aspects. Leave one or both out when the task intentionally illustrates anchor behavior or matching within a larger string.
 
-1. Simple expressions that illustrate only one aspect (regex.simpleExpressions.ts)
+1. Simple expressions that illustrate only one aspect (regExp.simpleExpressions.ts)
 
 - character classes
   - [xyz], [^xyz], ., \d, \D, \w, \W, \s, \S, \t, \r, \n, \v, \f, [\b], \0, \cX, \xHH, \uHHHH, \u{H…H}, x|y
@@ -52,7 +52,7 @@ Side note: Prefer expressions anchored with both `^` and `$`; those default anch
 - modifier
   - d, g, i, m, s u, v, y
 
-2. Simple Combinations (regex.simpleCombinations.ts). Try to find typical cases for the following combinations. Try to cover the whole bunch of varieties that might be possible.
+2. Simple Combinations (regExp.simpleCombinations.ts). Try to find typical cases for the following combinations. Try to cover the whole bunch of varieties that might be possible.
 
 - several quantifiers in one expression that are nested in various ways
 - various character classes concated after each other
@@ -65,7 +65,7 @@ Side note: Prefer expressions anchored with both `^` and `$`; those default anch
   - quantifier
   - modifier
 
-3. Complex Combinations (regex.simpleCombinations.ts). Try to find complex combinations and nestings that build on aspects that are mentioned in 1. Focus on typical combinations that might be a use case. If necessary use words rather than sign combinations.
+3. Complex Combinations (regExp.simpleCombinations.ts). Try to find complex combinations and nestings that build on aspects that are mentioned in 1. Focus on typical combinations that might be a use case. If necessary use words rather than sign combinations.
 
 ### structure of tasks
 
