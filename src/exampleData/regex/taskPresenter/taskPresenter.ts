@@ -85,7 +85,7 @@ class TaskPresenter {
     );
     console.log(
       chalk.dim(
-        'Press "p" for positive, "n" for negative, then Enter to check.',
+        'Use ↑/↓ to move, ←/→ to set positive/negative, then Enter to check.',
       ),
     );
     console.log();
@@ -135,6 +135,24 @@ class TaskPresenter {
     if (!this.checked && (str === 'p' || str === 'n')) {
       this.examples[this.cursor].answer = str === 'p' ? 'positive' : 'negative';
       this.cursor = (this.cursor + 1) % this.examples.length;
+      this.render();
+      return;
+    }
+
+    if (!this.checked && (key.name === 'up' || key.name === 'down')) {
+      const delta = key.name === 'up' ? -1 : 1;
+      this.cursor =
+        (this.cursor + delta + this.examples.length) % this.examples.length;
+      this.render();
+      return;
+    }
+
+    if (!this.checked && (key.name === 'left' || key.name === 'right')) {
+      const current = this.examples[this.cursor].answer;
+      const first = key.name === 'left' ? 'positive' : 'negative';
+      const second = key.name === 'left' ? 'negative' : 'positive';
+      this.examples[this.cursor].answer =
+        current === undefined ? first : current === first ? second : first;
       this.render();
       return;
     }
