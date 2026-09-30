@@ -1,4 +1,4 @@
-import { LearnScheduler } from './LearnScheduler';
+import { LearnSchedulerForIds } from './LearnScheduler';
 import { getMasteries } from './LearnScheduler.utils/getMasteries';
 import {
   learningInProgressMasteryMin,
@@ -11,7 +11,7 @@ import {
 interface DoSessionParams {
   time: number;
   index: number;
-  session: ReturnType<LearnScheduler['nextSession']>;
+  session: ReturnType<LearnSchedulerForIds['nextSession']>;
 }
 
 interface CheckSessionParams {
@@ -35,11 +35,11 @@ const LearnSchedulerTestWrapper = ({
   tasksPerSession: number;
   doSession: (
     params: DoSessionParams,
-  ) => Parameters<LearnScheduler['recordResults']>[0];
+  ) => Parameters<LearnSchedulerForIds['recordResults']>[0];
   checkSession: (params: CheckSessionParams) => void;
-  doFinal?: (scheduler: LearnScheduler) => void;
+  doFinal?: (scheduler: LearnSchedulerForIds) => void;
 }) => {
-  const scheduler = new LearnScheduler(subjects);
+  const scheduler = new LearnSchedulerForIds(subjects);
   const results: { id: string; time: number; correctness: number }[] = [];
   learningTimes.forEach((time, index) => {
     const session = scheduler.nextSession(tasksPerSession, time);
@@ -88,7 +88,7 @@ describe('LearnScheduler', () => {
 
   describe('creates valid sessions', () => {
     it('returns the requested number of distinct known subjects', () => {
-      const scheduler = new LearnScheduler(subjects);
+      const scheduler = new LearnSchedulerForIds(subjects);
 
       const session = scheduler.nextSession(10, 0);
 
@@ -98,7 +98,7 @@ describe('LearnScheduler', () => {
     });
 
     it('returns an empty session when no subjects are requested', () => {
-      const scheduler = new LearnScheduler(subjects);
+      const scheduler = new LearnSchedulerForIds(subjects);
 
       expect(scheduler.nextSession(0, 0)).toEqual([]);
     });
@@ -106,7 +106,7 @@ describe('LearnScheduler', () => {
 
   describe('repeats learned subjects', () => {
     it('keeps a mastered subject available for later repetition', () => {
-      const scheduler = new LearnScheduler(['subject']);
+      const scheduler = new LearnSchedulerForIds(['subject']);
 
       const firstSession = scheduler.nextSession(1, 0);
       scheduler.recordResults({ subject: 1 }, 0);
@@ -117,7 +117,7 @@ describe('LearnScheduler', () => {
     });
 
     it('uses a failed repetition to make the subject available again', () => {
-      const scheduler = new LearnScheduler(['subject']);
+      const scheduler = new LearnSchedulerForIds(['subject']);
 
       expect(scheduler.nextSession(1, 0)).toEqual(['subject']);
       scheduler.recordResults({ subject: 0 }, 0);

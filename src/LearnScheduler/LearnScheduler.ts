@@ -6,7 +6,7 @@ import {
   repeatSubjectsMasteryMax,
 } from './LearnScheduler.constants';
 
-export class LearnScheduler {
+export class LearnSchedulerForIds {
   private results: { id: string; time: number; correctness: number }[] = [];
 
   constructor(
@@ -186,14 +186,13 @@ export class LearnScheduler {
   }
 }
 
-export class LearnSchedulerWithTask<T extends { id: string }> {
-  private scheduler: LearnScheduler;
+export class LearnScheduler<T extends { id: string }> {
+  private scheduler: LearnSchedulerForIds;
 
   private idTaskMapping: Record<string, T>;
 
   constructor(
-    private subjectsWithParentsOrWithoutParents:
-      [T, string[] | undefined][] | T[],
+    subjectsWithParentsOrWithoutParents: [T, string[] | undefined][] | T[],
   ) {
     const entries: [T, string[] | undefined][] =
       subjectsWithParentsOrWithoutParents.length > 0 &&
@@ -212,7 +211,7 @@ export class LearnSchedulerWithTask<T extends { id: string }> {
       entries.map(([task, parents]) => [task.id, parents]),
     );
 
-    this.scheduler = new LearnScheduler(subjectsWithParents);
+    this.scheduler = new LearnSchedulerForIds(subjectsWithParents);
   }
 
   nextSession(count: number, time: number): T[] {
@@ -223,21 +222,5 @@ export class LearnSchedulerWithTask<T extends { id: string }> {
 
   recordResults(results: Record<string, number>) {
     return this.scheduler.recordResults(results);
-  }
-}
-
-export class LearnSchedulerPattern {
-  constructor(subjects: string[]) {}
-
-  nextSession(count: number, time: number): string[] {
-    throw 'not implemented';
-  }
-
-  recordResults(results: Record<string, number>, time: number) {
-    throw 'not implemented';
-  }
-
-  get mastery(): Record<string, number> {
-    throw 'not implemented';
   }
 }
