@@ -20,26 +20,10 @@ export class Main<T extends Task> {
     this.restoreFromSaveData();
   }
 
-  start(numberOfTasks: number) {
-    const session = this.scheduler.nextSession(numberOfTasks);
-
-    this.presenter.start(session);
-  }
-
-  private onAnswered({ id, correctness }: Result) {
-    this.scheduler.recordResults({ [id]: correctness });
-    this.saveData();
-  }
-
-  private async onFinished() {
+  async start() {
     const readline = createInterface({ input: stdin, output: stdout });
     let numberOfTasks: number | undefined;
-
     try {
-      await readline.question(
-        'Session finished. Press Enter to start a new session.\n',
-      );
-
       while (numberOfTasks === undefined) {
         const answer = await readline.question(
           'How many questions do you want to examine today? ',
@@ -57,8 +41,30 @@ export class Main<T extends Task> {
     } finally {
       readline.close();
     }
+    const session = this.scheduler.nextSession(numberOfTasks);
 
-    this.start(numberOfTasks);
+    this.presenter.start(session);
+  }
+
+  private onAnswered({ id, correctness }: Result) {
+    this.scheduler.recordResults({ [id]: correctness });
+    this.saveData();
+  }
+
+  private async onFinished() {
+    const readline = createInterface({ input: stdin, output: stdout });
+
+    try {
+      await readline.question(
+        'Session finished. Press Enter to start a new session.\n',
+      );
+    } catch {
+      return;
+    } finally {
+      readline.close();
+    }
+
+    this.start();
   }
 
   private saveData() {
