@@ -1,7 +1,7 @@
-import type { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
 import { LearnScheduler } from './LearnScheduler/LearnScheduler';
 import { Result, SaveDataBase, Task } from './model';
 import { Overview } from './userInterface/Overview';
+import { TaskPresenter } from './userInterface/TaskPresenter';
 
 export class Main<T extends Task> {
   private scheduler;

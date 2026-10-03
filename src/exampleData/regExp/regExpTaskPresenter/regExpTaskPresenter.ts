@@ -3,6 +3,7 @@ import readline from 'node:readline';
 import { regExpTasks } from '../index';
 import { RegExpTask } from '../regExp.model';
 import { Result } from '../../../model';
+import { TaskPresenter } from '../../../userInterface/TaskPresenter';
 
 type Example = {
   text: string;
@@ -37,16 +38,7 @@ const buildExamples = (task: RegExpTask): Example[] =>
 const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
-export abstract class TaskPresenter<
-  T extends { id: string; parentIds?: string[] },
-> {
-  abstract set onAnswered(handler: (result: Result) => void);
-  abstract set onFinished(handler: () => void);
-
-  abstract start(tasks: T[]): void;
-}
-
-export class RegExpTaskPresenter {
+export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
   private tasks: RegExpTask[] = [];
   private currentTaskIndex = 0;
   private examples: Example[] = [];
