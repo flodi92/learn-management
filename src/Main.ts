@@ -1,8 +1,7 @@
-import { createInterface } from 'node:readline/promises';
-import { stdin, stdout } from 'node:process';
 import type { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
 import { LearnScheduler } from './LearnScheduler/LearnScheduler';
 import { Result, SaveDataBase, Task } from './model';
+import { Overview } from './userInterface/Overview';
 
 export class Main<T extends Task> {
   private scheduler;
@@ -12,6 +11,7 @@ export class Main<T extends Task> {
     presenter: TaskPresenter<T>,
     tasks: T[],
     private saveDataBase: SaveDataBase,
+    private overview: Overview,
   ) {
     this.scheduler = new LearnScheduler(tasks);
     this.presenter = presenter;
@@ -21,26 +21,7 @@ export class Main<T extends Task> {
   }
 
   async start() {
-    const readline = createInterface({ input: stdin, output: stdout });
-    let numberOfTasks: number | undefined;
-    try {
-      while (numberOfTasks === undefined) {
-        const answer = await readline.question(
-          'How many questions do you want to examine today? ',
-        );
-        const parsedAnswer = Number(answer);
-
-        if (Number.isInteger(parsedAnswer) && parsedAnswer > 0) {
-          numberOfTasks = parsedAnswer;
-        } else {
-          console.log('Please enter a positive whole number.');
-        }
-      }
-    } catch {
-      return;
-    } finally {
-      readline.close();
-    }
+    const numberOfTasks = await this.overview.askForNumberOfTasks();
     const session = this.scheduler.nextSession(numberOfTasks);
 
     this.presenter.start(session);
@@ -52,17 +33,7 @@ export class Main<T extends Task> {
   }
 
   private async onFinished() {
-    const readline = createInterface({ input: stdin, output: stdout });
-
-    try {
-      await readline.question(
-        'Session finished. Press Enter to start a new session.\n',
-      );
-    } catch {
-      return;
-    } finally {
-      readline.close();
-    }
+    await this.overview.showSessionFinishedView();
 
     this.start();
   }
