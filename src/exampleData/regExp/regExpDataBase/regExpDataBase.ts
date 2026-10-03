@@ -1,11 +1,11 @@
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import { SaveData, SaveDataBase, TimedResult } from '../../../model';
 
 export class RegExpDataBase implements SaveDataBase {
-  private db: DatabaseSync;
+  private db: Database.Database;
 
   constructor(path = 'regExp.sqlite') {
-    this.db = new DatabaseSync(path);
+    this.db = new Database(path);
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS results (
         id TEXT NOT NULL,
