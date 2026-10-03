@@ -55,6 +55,8 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
 
   start(tasks: RegExpTask[]) {
     this.tasks = tasks;
+    this.currentTaskIndex = 0;
+    this.summary = { correct: 0, incorrect: 0 };
 
     if (this.tasks.length === 0) {
       console.log('No tasks available.');
@@ -118,10 +120,17 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
   private listen() {
     readline.emitKeypressEvents(process.stdin);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
-    process.stdin.on('keypress', (str: string, key: readline.Key) =>
-      this.onKeypress(str, key),
-    );
+    process.stdin.on('keypress', this.keypressHandler);
     process.stdin.resume();
+  }
+
+  private keypressHandler = (str: string, key: readline.Key) =>
+    this.onKeypress(str, key);
+
+  private stopListening() {
+    process.stdin.off('keypress', this.keypressHandler);
+    if (process.stdin.isTTY) process.stdin.setRawMode(false);
+    process.stdin.pause();
   }
 
   private onKeypress(str: string, key: readline.Key) {
@@ -204,8 +213,8 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
     console.log(chalk.bold('Summary'));
     console.log(chalk.green(`Correct: ${this.summary.correct}`));
     console.log(chalk.red(`Incorrect: ${this.summary.incorrect}`));
+    this.stopListening();
     this._onFinished?.();
-    this.exit();
   }
 
   private exit() {
