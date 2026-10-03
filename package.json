@@ -2,7 +2,7 @@
   "scripts": {
     "prettify": "prettier . --write",
     "test": "vitest",
-    "start-regExp": "tsx src/exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter.ts"
+    "start-regExp": "tsx src/exampleData/regExp/regExpMain.ts"
   },
   "dependencies": {
     "chalk": "^5.6.2"

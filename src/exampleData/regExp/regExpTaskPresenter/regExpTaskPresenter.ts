@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { regExpTasks } from '../index';
 import { RegExpTask } from '../regExp.model';
 import { Result } from '../../../model';
 import { TaskPresenter } from '../../../userInterface/TaskPresenter';
@@ -19,9 +18,6 @@ const shuffle = <T>(items: T[]): T[] => {
   }
   return copy;
 };
-
-const pickRandomTasks = (allTasks: RegExpTask[], count: number): RegExpTask[] =>
-  shuffle(allTasks).slice(0, count);
 
 const buildExamples = (task: RegExpTask): Example[] =>
   shuffle([
@@ -218,9 +214,3 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
     process.exit(0);
   }
 }
-
-const presenter = new RegExpTaskPresenter();
-presenter.onAnswered = (result) => console.log('Answered:', result);
-presenter.onFinished = () => console.log('Finished all tasks.');
-
-presenter.start(pickRandomTasks(regExpTasks, 10));
