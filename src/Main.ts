@@ -20,11 +20,17 @@ export class Main<T extends Task> {
     this.restoreFromSaveData();
   }
 
-  async start() {
+  private finishSession?: () => void;
+
+  private async runSession() {
     const numberOfTasks = await this.overview.askForNumberOfTasks();
     const session = this.scheduler.nextSession(numberOfTasks);
 
+    const finished = new Promise<void>((resolve) => {
+      this.finishSession = resolve;
+    });
     this.presenter.start(session);
+    await finished;
   }
 
   private onAnswered({ id, correctness }: Result) {
@@ -32,10 +38,15 @@ export class Main<T extends Task> {
     this.saveData();
   }
 
-  private async onFinished() {
-    await this.overview.showSessionFinishedView();
+  private onFinished() {
+    this.finishSession?.();
+  }
 
-    this.start();
+  public async start() {
+    while (true) {
+      await this.runSession();
+      await this.overview.showSessionFinishedView();
+    }
   }
 
   private saveData() {
