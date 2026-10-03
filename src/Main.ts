@@ -1,4 +1,6 @@
-import { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
+import { createInterface } from 'node:readline/promises';
+import { stdin, stdout } from 'node:process';
+import type { TaskPresenter } from './exampleData/regExp/regExpTaskPresenter/regExpTaskPresenter';
 import { LearnScheduler } from './LearnScheduler/LearnScheduler';
 import { Result, SaveDataBase, Task } from './model';
 
@@ -13,13 +15,13 @@ export class Main<T extends Task> {
   ) {
     this.scheduler = new LearnScheduler(tasks);
     this.presenter = presenter;
-    this.presenter.onAnswered = this.onAnswered;
-    this.presenter.onFinished = this.onFinished;
+    this.presenter.onAnswered = this.onAnswered.bind(this);
+    this.presenter.onFinished = this.onFinished.bind(this);
     this.restoreFromSaveData();
   }
 
-  start() {
-    const session = this.scheduler.nextSession(3);
+  start(numberOfTasks: number) {
+    const session = this.scheduler.nextSession(numberOfTasks);
 
     this.presenter.start(session);
   }
@@ -29,8 +31,34 @@ export class Main<T extends Task> {
     this.saveData();
   }
 
-  private onFinished() {
-    /* @todo ask for next session */
+  private async onFinished() {
+    const readline = createInterface({ input: stdin, output: stdout });
+    let numberOfTasks: number | undefined;
+
+    try {
+      await readline.question(
+        'Session finished. Press Enter to start a new session.\n',
+      );
+
+      while (numberOfTasks === undefined) {
+        const answer = await readline.question(
+          'How many questions do you want to examine today? ',
+        );
+        const parsedAnswer = Number(answer);
+
+        if (Number.isInteger(parsedAnswer) && parsedAnswer > 0) {
+          numberOfTasks = parsedAnswer;
+        } else {
+          console.log('Please enter a positive whole number.');
+        }
+      }
+    } catch {
+      return;
+    } finally {
+      readline.close();
+    }
+
+    this.start(numberOfTasks);
   }
 
   private saveData() {
