@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { initialTasks } from '.';
+import { getExampleValue } from './utils/regExp.utils';
 
 describe('regex tasks', () => {
   describe.each(initialTasks)('$expression', (task) => {
@@ -8,15 +9,15 @@ describe('regex tasks', () => {
       const { expression, positiveExamples = [], negativeExamples = [] } = task;
       positiveExamples.forEach((example) => {
         expect(
-          expression.test(example),
-          `${expression} should match ${JSON.stringify(example)}`,
+          expression.test(getExampleValue(example)),
+          `${expression} should match ${JSON.stringify(getExampleValue(example))}`,
         ).toBe(true);
       });
 
       negativeExamples.forEach((example) => {
         expect(
-          expression.test(example),
-          `${expression} should reject ${JSON.stringify(example)}`,
+          expression.test(getExampleValue(example)),
+          `${expression} should reject ${JSON.stringify(getExampleValue(example))}`,
         ).toBe(false);
       });
     });
@@ -28,9 +29,11 @@ describe('regex tasks', () => {
       task.positiveExamples?.forEach((example) => {
         expect(
           otherTasks.some((otherTask) =>
-            otherTask.negativeExamples?.includes(example),
+            otherTask.negativeExamples?.some(
+              (other) => getExampleValue(other) === getExampleValue(example),
+            ),
           ),
-          `no other task rejects ${JSON.stringify(example)}`,
+          `no other task rejects ${JSON.stringify(getExampleValue(example))}`,
         ).toBe(true);
       });
     });
@@ -38,7 +41,9 @@ describe('regex tasks', () => {
       expect(
         task.positiveExamples?.some((example) =>
           otherTasks.some((otherTask) =>
-            otherTask.positiveExamples?.includes(example),
+            otherTask.positiveExamples?.some(
+              (other) => getExampleValue(other) === getExampleValue(example),
+            ),
           ),
         ),
         '',
@@ -48,10 +53,11 @@ describe('regex tasks', () => {
       const otherMatches = otherTasks.filter(
         (otherTask) =>
           (otherTask.positiveExamples ?? []).every((positiveExample) =>
-            task.expression.test(positiveExample),
+            task.expression.test(getExampleValue(positiveExample)),
           ) &&
           (otherTask.negativeExamples ?? []).every(
-            (negativeExample) => !task.expression.test(negativeExample),
+            (negativeExample) =>
+              !task.expression.test(getExampleValue(negativeExample)),
           ) &&
           (task.nots ?? []).every(
             (notExpression) =>

@@ -155,7 +155,7 @@ const simpleCombinationsCharacterClassesAndQuantifiers: InitialRegExpTask[] = [
       'item4',
       'key7',
       '１２３',
-      'x\nitem\ny',
+      { value: 'x\nitem\ny', alternative: 'x<newline>item<newline>y' },
       'end',
     ],
   },
@@ -382,16 +382,33 @@ const simpleCombinationsQuantifiersAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^ha+$/i,
     positiveExamples: ['ha', 'HaAa'],
-    negativeExamples: ['h', 'haa!', 'hb', 'a\nbbb'],
+    negativeExamples: [
+      'h',
+      'haa!',
+      'hb',
+      { value: 'a\nbbb', alternative: 'a<newline>bbb' },
+    ],
   },
   {
     expression: /^a.b+$/s,
-    positiveExamples: ['acb', 'a\nbbb'],
-    negativeExamples: ['ab', 'ac', 'a\nbbb\n', 'go\ngo'],
+    positiveExamples: [
+      'acb',
+      { value: 'a\nbbb', alternative: 'a<newline>bbb' },
+    ],
+    negativeExamples: [
+      'ab',
+      'ac',
+      { value: 'a\nbbb\n', alternative: 'a<newline>bbb<newline>' },
+      { value: 'go\ngo', alternative: 'go<newline>go' },
+    ],
   },
   {
     expression: /^(?:go\s*)+$/m,
-    positiveExamples: ['go', 'go\ngo', 'go go'],
+    positiveExamples: [
+      'go',
+      { value: 'go\ngo', alternative: 'go<newline>go' },
+      'go go',
+    ],
     negativeExamples: ['go no', 'gone', 'go no', 'cafe'],
   },
   {
@@ -412,11 +429,16 @@ const simpleCombinationsQuantifiersAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^\s*[a-z]+\s*$/i,
     positiveExamples: ['Hello', '  Hello  '],
-    negativeExamples: ['Hello7', 'two words', '!', 'a\n!'],
+    negativeExamples: [
+      'Hello7',
+      'two words',
+      '!',
+      { value: 'a\n!', alternative: 'a<newline>!' },
+    ],
   },
   {
     expression: /^.{2,4}$/s,
-    positiveExamples: ['ab', 'a\n!'],
+    positiveExamples: ['ab', { value: 'a\n!', alternative: 'a<newline>!' }],
     negativeExamples: ['a', 'abcde', '', 'aabbc'],
   },
   {
@@ -503,12 +525,24 @@ const simpleCombinationsCharacterClassesAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^[a-z\d_]+$/i,
     positiveExamples: ['User_7', 'abc123'],
-    negativeExamples: ['user-name', 'ä', 'two words', 'line\r'],
+    negativeExamples: [
+      'user-name',
+      'ä',
+      'two words',
+      { value: 'line\r', alternative: 'line<carriage return>' },
+    ],
   },
   {
     expression: /^[^\n]+$/s,
-    positiveExamples: ['line\r', 'ABC123'],
-    negativeExamples: ['line\nnext', '', '\n'],
+    positiveExamples: [
+      { value: 'line\r', alternative: 'line<carriage return>' },
+      'ABC123',
+    ],
+    negativeExamples: [
+      { value: 'line\nnext', alternative: 'line<newline>next' },
+      '',
+      { value: '\n', alternative: 'newline' },
+    ],
   },
   {
     expression: /^[A-Z\d]+$/m,
@@ -541,17 +575,33 @@ const simpleCombinationsAssertionsAndModifiers: InitialRegExpTask[] = [
   {
     expression: /^hello$/i,
     positiveExamples: ['hello', 'HELLO'],
-    negativeExamples: ['hello!', 'say hello', 'hell', 'a\nb'],
+    negativeExamples: [
+      'hello!',
+      'say hello',
+      'hell',
+      { value: 'a\nb', alternative: 'a<newline>b' },
+    ],
   },
   {
     expression: /^.+$/s,
-    positiveExamples: ['a\nb', 'x\nitem\ny'],
+    positiveExamples: [
+      { value: 'a\nb', alternative: 'a<newline>b' },
+      { value: 'x\nitem\ny', alternative: 'x<newline>item<newline>y' },
+    ],
     negativeExamples: [''],
   },
   {
     expression: /^item$/m,
-    positiveExamples: ['item', 'x\nitem\ny', 'item'],
-    negativeExamples: ['items', 'x\nitemized\ny', 'the END'],
+    positiveExamples: [
+      'item',
+      { value: 'x\nitem\ny', alternative: 'x<newline>item<newline>y' },
+      'item',
+    ],
+    negativeExamples: [
+      'items',
+      { value: 'x\nitemized\ny', alternative: 'x<newline>itemized<newline>y' },
+      'the END',
+    ],
   },
   {
     expression: /\bend\b$/i,

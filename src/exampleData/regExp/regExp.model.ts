@@ -1,7 +1,10 @@
+// `alternative` is a readable replacement shown to the learner instead of `value`
+export type RegExpExample = string | { value: string; alternative: string };
+
 export type InitialRegExpTask = {
   expression: RegExp;
-  positiveExamples?: string[];
-  negativeExamples?: string[];
+  positiveExamples?: RegExpExample[];
+  negativeExamples?: RegExpExample[];
   nots?: RegExp[];
 };
 

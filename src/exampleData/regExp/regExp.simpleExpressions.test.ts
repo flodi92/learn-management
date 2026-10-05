@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { simpleExpressions } from './regExp.simpleExpressions';
+import { getExampleValue } from './utils/regExp.utils';
 
 describe('regex tasks', () => {
   describe.each(simpleExpressions)('$expression', (task) => {
@@ -10,10 +11,11 @@ describe('regex tasks', () => {
       const otherMatches = otherTasks.filter(
         (otherTask) =>
           (otherTask.positiveExamples ?? []).every((positiveExample) =>
-            task.expression.test(positiveExample),
+            task.expression.test(getExampleValue(positiveExample)),
           ) &&
           (otherTask.negativeExamples ?? []).every(
-            (negativeExample) => !task.expression.test(negativeExample),
+            (negativeExample) =>
+              !task.expression.test(getExampleValue(negativeExample)),
           ) &&
           (task.nots ?? []).every(
             (notExpression) =>

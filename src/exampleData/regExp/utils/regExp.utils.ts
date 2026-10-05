@@ -1,6 +1,14 @@
-import { InitialRegExpTask, RegExpTask } from '../regExp.model';
+import { InitialRegExpTask, RegExpExample, RegExpTask } from '../regExp.model';
 import { setRegExpElements } from './regExp.elements';
 import { setParentIds } from './regExp.parentIds';
+
+export const getExampleValue = (example: RegExpExample): string =>
+  typeof example === 'string' ? example : example.value;
+
+export const getExampleAlternative = (
+  example: RegExpExample,
+): string | undefined =>
+  typeof example === 'string' ? undefined : example.alternative;
 
 const setIds = (
   initialTasks: InitialRegExpTask[],

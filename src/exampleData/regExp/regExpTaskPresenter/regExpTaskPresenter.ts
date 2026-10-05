@@ -3,9 +3,11 @@ import readline from 'node:readline';
 import { RegExpTask } from '../regExp.model';
 import { Result } from '../../../model';
 import { TaskPresenter } from '../../../userInterface/TaskPresenter';
+import { getExampleAlternative, getExampleValue } from '../utils/regExp.utils';
 
 type Example = {
   text: string;
+  alternative?: string;
   isPositive: boolean;
   answer?: 'positive' | 'negative';
 };
@@ -21,12 +23,14 @@ const shuffle = <T>(items: T[]): T[] => {
 
 const buildExamples = (task: RegExpTask): Example[] =>
   shuffle([
-    ...(task.positiveExamples ?? []).map((text) => ({
-      text,
+    ...(task.positiveExamples ?? []).map((example) => ({
+      text: getExampleValue(example),
+      alternative: getExampleAlternative(example),
       isPositive: true,
     })),
-    ...(task.negativeExamples ?? []).map((text) => ({
-      text,
+    ...(task.negativeExamples ?? []).map((example) => ({
+      text: getExampleValue(example),
+      alternative: getExampleAlternative(example),
       isPositive: false,
     })),
   ]);
@@ -94,7 +98,11 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
       const pointer =
         !this.checked && idx === this.cursor ? chalk.yellow('> ') : '  ';
       const label = example.answer ? ` (${example.answer})` : '';
-      const line = `${pointer}${example.text}${label}`;
+      const shown =
+        example.alternative !== undefined
+          ? chalk.magenta(`<${example.alternative}>`)
+          : example.text;
+      const line = `${pointer}${shown}${label}`;
 
       console.log(
         this.checked

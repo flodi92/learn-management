@@ -14,8 +14,17 @@ const simpleExpressionsCharacterClasses: InitialRegExpTask[] = [
   },
   {
     expression: /^.$/,
-    positiveExamples: ['a', '1', '!', '\b', '\0', '\x01', '\v', '\f'],
-    negativeExamples: ['', 'aa', '\n'],
+    positiveExamples: [
+      'a',
+      '1',
+      '!',
+      { value: '\b', alternative: 'backspace' },
+      { value: '\0', alternative: 'null character' },
+      { value: '\x01', alternative: 'control character U+0001' },
+      { value: '\v', alternative: 'vertical tab' },
+      { value: '\f', alternative: 'form feed' },
+    ],
+    negativeExamples: ['', 'aa', { value: '\n', alternative: 'newline' }],
     nots: [/^\ba\b$/],
   },
   {
@@ -45,13 +54,27 @@ const simpleExpressionsCharacterClasses: InitialRegExpTask[] = [
   },
   {
     expression: /^\s$/,
-    positiveExamples: [' ', '\n', '\t'],
+    positiveExamples: [
+      ' ',
+      { value: '\n', alternative: 'newline' },
+      { value: '\t', alternative: 'tab' },
+    ],
     negativeExamples: ['a', '1', '!'],
   },
   {
     expression: /^\d$/,
     positiveExamples: ['0', '1'],
-    negativeExamples: ['a', ' ', '_', '\b', '\0', '\x01', '\v', '\f', '😀'],
+    negativeExamples: [
+      'a',
+      ' ',
+      '_',
+      { value: '\b', alternative: 'backspace' },
+      { value: '\0', alternative: 'null character' },
+      { value: '\x01', alternative: 'control character U+0001' },
+      { value: '\v', alternative: 'vertical tab' },
+      { value: '\f', alternative: 'form feed' },
+      '😀',
+    ],
   },
   {
     expression: /^\w$/,
@@ -61,61 +84,75 @@ const simpleExpressionsCharacterClasses: InitialRegExpTask[] = [
   },
   {
     expression: /^\W$/,
-    positiveExamples: ['!', '\n'],
+    positiveExamples: ['!', { value: '\n', alternative: 'newline' }],
     negativeExamples: ['a', '7', '_'],
     nots: [/^\0$/],
   },
   {
     expression: /^\D$/,
-    positiveExamples: ['a', '!', '\n'],
+    positiveExamples: ['a', '!', { value: '\n', alternative: 'newline' }],
     negativeExamples: ['0', '5'],
     nots: [/^\0$/, /^\ba\b$/],
   },
   {
     expression: /^\S$/,
     positiveExamples: ['a', '!'],
-    negativeExamples: [' ', '\n', '\t'],
+    negativeExamples: [
+      ' ',
+      { value: '\n', alternative: 'newline' },
+      { value: '\t', alternative: 'tab' },
+    ],
     nots: [/^\ba\b$/],
   },
   {
     expression: /^\t$/,
-    positiveExamples: ['\t'],
-    negativeExamples: [' ', '\n', 't'],
+    positiveExamples: [{ value: '\t', alternative: 'tab' }],
+    negativeExamples: [' ', { value: '\n', alternative: 'newline' }, 't'],
   },
   {
     expression: /^\r$/,
-    positiveExamples: ['\r'],
-    negativeExamples: ['\n', 'r', ' '],
+    positiveExamples: [{ value: '\r', alternative: 'carriage return' }],
+    negativeExamples: [{ value: '\n', alternative: 'newline' }, 'r', ' '],
   },
   {
     expression: /^\n$/,
-    positiveExamples: ['\n'],
-    negativeExamples: ['\r', 'n', ' '],
+    positiveExamples: [{ value: '\n', alternative: 'newline' }],
+    negativeExamples: [
+      { value: '\r', alternative: 'carriage return' },
+      'n',
+      ' ',
+    ],
   },
   {
     expression: /^\v$/,
-    positiveExamples: ['\v'],
-    negativeExamples: ['\n', 'v', ' '],
+    positiveExamples: [{ value: '\v', alternative: 'vertical tab' }],
+    negativeExamples: [{ value: '\n', alternative: 'newline' }, 'v', ' '],
   },
   {
     expression: /^\f$/,
-    positiveExamples: ['\f'],
-    negativeExamples: ['\n', 'f', ' '],
+    positiveExamples: [{ value: '\f', alternative: 'form feed' }],
+    negativeExamples: [{ value: '\n', alternative: 'newline' }, 'f', ' '],
   },
   {
     expression: /^[\b]$/,
-    positiveExamples: ['\b'],
+    positiveExamples: [{ value: '\b', alternative: 'backspace' }],
     negativeExamples: ['b', ' ', ''],
   },
   {
     expression: /^\0$/,
-    positiveExamples: ['\0'],
+    positiveExamples: [{ value: '\0', alternative: 'null character' }],
     negativeExamples: ['0', '\\0', ''],
   },
   {
     expression: /^\cA$/,
-    positiveExamples: ['\x01'],
-    negativeExamples: ['A', '\x02', ''],
+    positiveExamples: [
+      { value: '\x01', alternative: 'control character U+0001' },
+    ],
+    negativeExamples: [
+      'A',
+      { value: '\x02', alternative: 'control character U+0002' },
+      '',
+    ],
   },
   {
     expression: /^\x41$/,
@@ -234,7 +271,14 @@ const simpleExpressionsQuantifiers: InitialRegExpTask[] = [
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
-    negativeExamples: ['', 'b', 'aaab', 'abcabc', 'a\nb', 'x\na\ny'],
+    negativeExamples: [
+      '',
+      'b',
+      'aaab',
+      'abcabc',
+      { value: 'a\nb', alternative: 'a<newline>b' },
+      { value: 'x\na\ny', alternative: 'x<newline>a<newline>y' },
+    ],
     nots: [/^\ba\b$/],
   },
   {
@@ -286,13 +330,23 @@ const simpleExpressionsModifiers: InitialRegExpTask[] = [
   },
   {
     expression: /^a.b$/s,
-    positiveExamples: ['a\nb'],
-    negativeExamples: ['ab', 'a\nb\n', 'ac'],
+    positiveExamples: [{ value: 'a\nb', alternative: 'a<newline>b' }],
+    negativeExamples: [
+      'ab',
+      { value: 'a\nb\n', alternative: 'a<newline>b<newline>' },
+      'ac',
+    ],
   },
   {
     expression: /^a$/m,
-    positiveExamples: ['x\na\ny'],
-    negativeExamples: ['x\nb\ny', 'ba', ''],
+    positiveExamples: [
+      { value: 'x\na\ny', alternative: 'x<newline>a<newline>y' },
+    ],
+    negativeExamples: [
+      { value: 'x\nb\ny', alternative: 'x<newline>b<newline>y' },
+      'ba',
+      '',
+    ],
     nots: [
       /^a$/,
       /^\ba\b$/,
@@ -362,12 +416,23 @@ const simpleExpressionsModifiers: InitialRegExpTask[] = [
 const simpleExpressionsTestContract: InitialRegExpTask[] = [
   {
     expression: /^[\s\S]*$/,
-    positiveExamples: ['x', 'A', '\n', '0'],
+    positiveExamples: ['x', 'A', { value: '\n', alternative: 'newline' }, '0'],
   },
   {
     expression: /^__regex_task_rejector__$/,
     positiveExamples: ['__regex_task_rejector__'],
-    negativeExamples: ['x', 'z', 'y', '%', 'a', '0', '1', '!', '\n', 'A'],
+    negativeExamples: [
+      'x',
+      'z',
+      'y',
+      '%',
+      'a',
+      '0',
+      '1',
+      '!',
+      { value: '\n', alternative: 'newline' },
+      'A',
+    ],
   },
 ];
 
