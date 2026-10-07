@@ -18,6 +18,16 @@
 - utils/regExp.utils.ts coordinates enrichment; utils/regExp.elements.ts derives expression elements, and utils/regExp.parentIds.ts derives the direct parent relationships
 - keep parsing and enrichment logic in `utils/`; the task definition files should remain declarative
 
+### regex elements and priorities
+
+- `regExpObjects` in regExp.model.ts is the single source of truth for all regex elements; `RegExpElements` is derived from the `value` of each object, so adding or renaming an element happens there only.
+- Each object has a `value` (the element notation, e.g. `x{n,m}`), a `category` (`characterClass`, `assertion`, `groupsAndBackreferences`, `quantifier`, `modifier`) and a `priority`.
+- `priority` states when in the learning process the element should appear:
+  - 1: very basic, learn first (e.g. `[xyz]`, `.`, `\d`, `\w`, `\s`, `^`, `$`, `x|y`, `(x)`, `x*`, `x+`, `x?`, `g`, `i`)
+  - 2: intermediate (e.g. negated shorthand classes, `\t`, `\n`, `\r`, `\b`, `(?:x)`, backreference `\n`, `x{n}`, `x{n,}`, `x{n,m}`, `m`, `s`)
+  - 3: expert knowledge once everything else is mastered (e.g. lookarounds, named groups, `\B`, `\v`, `\f`, `\0`, `\cX`, `\xHH`, `\uHHHH`, `\u{H…H}`, `d`, `u`, `v`, `y`)
+- Every element needs an explicit priority; keep the priorities in mind when choosing tasks: a task's difficulty should follow the highest priority among its `elements`, and simple expressions (section 1) of priority 1 should come before those of priority 3.
+
 ### task data and derived attributes
 
 - An `InitialRegExpTask` supplies an `expression` and optional `positiveExamples`, `negativeExamples` (each a `RegExpExample`: string or `{ value, alternative }`), and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
