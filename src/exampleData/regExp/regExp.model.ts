@@ -14,50 +14,70 @@ export interface RegExpTask extends InitialRegExpTask {
   elements: RegExpElements[];
 }
 
-type CharacterClasses =
-  | '[xyz]'
-  | '[^xyz]'
-  | '.'
-  | '\\d'
-  | '\\D'
-  | '\\w'
-  | '\\W'
-  | '\\s'
-  | '\\S'
-  | '\\t'
-  | '\\r'
-  | '\\n'
-  | '\\v'
-  | '\\f'
-  | '[\\b]'
-  | '\\0'
-  | '\\cX'
-  | '\\xHH'
-  | '\\uHHHH'
-  | '\\u{H…H}'
-  | 'x|y';
+interface RegExpObjectInterface {
+  value: string;
+  category:
+    | 'characterClass'
+    | 'assertion'
+    | 'groupsAndBackreferences'
+    | 'quantifier'
+    | 'modifier';
+}
 
-type Assertions =
-  | '^'
-  | '$'
-  | 'anywhere' // expression without '^' and '$'
-  | '\\b'
-  | '\\B'
-  | 'x(?=y)'
-  | 'x(?!y)'
-  | '(?<=y)x'
-  | '(?<!y)x';
+const regExpElementObjects = [
+  { value: '[xyz]', category: 'characterClass' },
+  { value: '[^xyz]', category: 'characterClass' },
+  { value: '.', category: 'characterClass' },
+  { value: '\\d', category: 'characterClass' },
+  { value: '\\D', category: 'characterClass' },
+  { value: '\\w', category: 'characterClass' },
+  { value: '\\W', category: 'characterClass' },
+  { value: '\\s', category: 'characterClass' },
+  { value: '\\S', category: 'characterClass' },
+  { value: '\\t', category: 'characterClass' },
+  { value: '\\r', category: 'characterClass' },
+  { value: '\\n', category: 'characterClass' },
+  { value: '\\v', category: 'characterClass' },
+  { value: '\\f', category: 'characterClass' },
+  { value: '[\\b]', category: 'characterClass' },
+  { value: '\\0', category: 'characterClass' },
+  { value: '\\cX', category: 'characterClass' },
+  { value: '\\xHH', category: 'characterClass' },
+  { value: '\\uHHHH', category: 'characterClass' },
+  { value: '\\u{H…H}', category: 'characterClass' },
+  { value: 'x|y', category: 'groupsAndBackreferences' },
+  { value: '^', category: 'assertion' },
+  { value: '$', category: 'assertion' },
+  { value: 'anywhere', category: 'assertion' },
+  { value: '\\b', category: 'assertion' },
+  { value: '\\B', category: 'assertion' },
+  { value: 'x(?=y)', category: 'assertion' },
+  { value: 'x(?!y)', category: 'assertion' },
+  { value: '(?<=y)x', category: 'assertion' },
+  { value: '(?<!y)x', category: 'assertion' },
+  { value: '(x)', category: 'groupsAndBackreferences' },
+  { value: '(?<Name>x)', category: 'groupsAndBackreferences' },
+  { value: '(?:x)', category: 'groupsAndBackreferences' },
+  { value: '\\n', category: 'groupsAndBackreferences' },
+  { value: '\\k<Name>', category: 'groupsAndBackreferences' },
+  { value: 'x*', category: 'quantifier' },
+  { value: 'x+', category: 'quantifier' },
+  { value: 'x?', category: 'quantifier' },
+  { value: 'x{n}', category: 'quantifier' },
+  { value: 'x{n,}', category: 'quantifier' },
+  { value: 'x{n,m}', category: 'quantifier' },
+  { value: 'd', category: 'modifier' },
+  { value: 'g', category: 'modifier' },
+  { value: 'i', category: 'modifier' },
+  { value: 'm', category: 'modifier' },
+  { value: 's', category: 'modifier' },
+  { value: 'u', category: 'modifier' },
+  { value: 'v', category: 'modifier' },
+  { value: 'y', category: 'modifier' },
+] as const satisfies RegExpObjectInterface[];
 
-type GroupsAndBackreferences =
-  '(x)' | '(?<Name>x)' | '(?:x)' | '\\n' | '\\k<Name>';
+type RegExpObjects = typeof regExpElementObjects;
 
-type Quantifiers = 'x*' | 'x+' | 'x?' | 'x{n}' | 'x{n,}' | 'x{n,m}';
+type RegExpObject = RegExpObjects[number];
 
-type Modifiers = 'd' | 'g' | 'i' | 'm' | 's' | 'u' | 'v' | 'y';
-
-type RegExpElements =
-  | CharacterClasses
-  | Assertions
-  | GroupsAndBackreferences
-  | Quantifiers
-  | Modifiers;
+type RegExpElements = RegExpObject['value'];
