@@ -12,6 +12,8 @@ export interface RegExpTask extends InitialRegExpTask {
   id: string;
   parentIds: string[];
   elements: RegExpElement[];
+  categories: RegExpCategory[];
+  priority: RegExpPriority;
 }
 
 export const regExpCategories = [

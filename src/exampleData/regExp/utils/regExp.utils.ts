@@ -1,4 +1,10 @@
-import { InitialRegExpTask, RegExpExample, RegExpTask } from '../regExp.model';
+import {
+  InitialRegExpTask,
+  RegExpExample,
+  regExpObjects,
+  RegExpPriority,
+  RegExpTask,
+} from '../regExp.model';
 import { setRegExpElements } from './regExp.elements';
 import { setParentIds } from './regExp.parentIds';
 
@@ -15,11 +21,37 @@ const setIds = <T extends InitialRegExpTask>(
 ): (T & { id: RegExpTask['id'] })[] =>
   initialTasks.map((task, idx) => ({ ...task, id: `${idx}` }));
 
+const setCategoriesAndPriority = <
+  T extends InitialRegExpTask & { elements: RegExpTask['elements'] },
+>(
+  initialTasks: T[],
+): (T & {
+  categories: RegExpTask['categories'];
+  priority: RegExpTask['priority'];
+})[] =>
+  initialTasks.map((task, idx) => {
+    const taskRegExpObjects = task.elements.map((value) => ({
+      value,
+      ...regExpObjects[value],
+    }));
+    return {
+      ...task,
+      categories: Array.from(
+        new Set(taskRegExpObjects.map((regExpObject) => regExpObject.category)),
+      ),
+      priority: Math.max(
+        ...taskRegExpObjects.map((regExpObject) => regExpObject.priority),
+      ) as RegExpPriority,
+    };
+  });
+
 export const addMissingRegExpAttributes = (
   initialTasks: InitialRegExpTask[],
 ): RegExpTask[] => {
   const tasksWithIds = setIds(initialTasks);
   const tasksWithElements = setRegExpElements(tasksWithIds);
-
-  return setParentIds(tasksWithElements);
+  const tasksWithParentIds = setParentIds(tasksWithElements);
+  const tasksWithCategoriesAndPriority =
+    setCategoriesAndPriority(tasksWithParentIds);
+  return setParentIds(tasksWithCategoriesAndPriority);
 };
