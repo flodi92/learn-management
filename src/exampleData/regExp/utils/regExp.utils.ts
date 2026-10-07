@@ -10,9 +10,9 @@ export const getExampleAlternative = (
 ): string | undefined =>
   typeof example === 'string' ? undefined : example.alternative;
 
-const setIds = (
-  initialTasks: InitialRegExpTask[],
-): Omit<RegExpTask, 'parentIds' | 'elements'>[] =>
+const setIds = <T extends InitialRegExpTask>(
+  initialTasks: T[],
+): (T & { id: RegExpTask['id'] })[] =>
   initialTasks.map((task, idx) => ({ ...task, id: `${idx}` }));
 
 export const addMissingRegExpAttributes = (
