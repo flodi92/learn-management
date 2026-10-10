@@ -7,29 +7,23 @@ import {
 } from './LearnScheduler.constants';
 import { SaveData, Task, TimedResult } from '../model';
 
-export class LearnSchedulerForIds {
+export class LearnScheduler<T extends Task = Task> {
   private results: TimedResult[] = [];
 
-  constructor(
-    private subjectsWithParentsOrWithoutParents:
-      Record<string, string[] | undefined> | string[],
-  ) {}
+  private idTaskMapping: Record<string, T>;
 
-  private get subjects(): string[] {
-    return Array.isArray(this.subjectsWithParentsOrWithoutParents)
-      ? this.subjectsWithParentsOrWithoutParents
-      : Object.keys(this.subjectsWithParentsOrWithoutParents);
-  }
+  private subjects: string[];
 
-  private get subjectsWithParents(): Record<string, string[] | undefined> {
-    return Array.isArray(this.subjectsWithParentsOrWithoutParents)
-      ? Object.fromEntries(
-          this.subjectsWithParentsOrWithoutParents.map((subject) => [
-            subject,
-            undefined,
-          ]),
-        )
-      : this.subjectsWithParentsOrWithoutParents;
+  private subjectsWithParents: Record<string, string[] | undefined>;
+
+  constructor(tasks: T[]) {
+    this.idTaskMapping = Object.fromEntries(
+      tasks.map((task) => [task.id, task]),
+    );
+    this.subjects = tasks.map((task) => task.id);
+    this.subjectsWithParents = Object.fromEntries(
+      tasks.map((task) => [task.id, task.parentIds]),
+    );
   }
 
   get today(): number {
@@ -90,7 +84,7 @@ export class LearnSchedulerForIds {
     );
   }
 
-  nextSession(count: number, time: number = this.today): string[] {
+  nextSession(count: number, time: number = this.today): T[] {
     if (count <= 0) {
       return [];
     }
@@ -135,7 +129,7 @@ export class LearnSchedulerForIds {
       subjects.push(...newSubjects.slice(0, count - subjects.length));
     }
 
-    return subjects;
+    return subjects.map((id) => this.idTaskMapping[id]);
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
@@ -192,41 +186,5 @@ export class LearnSchedulerForIds {
 
   restoreFromSaveData(saveData: SaveData) {
     this.results = saveData;
-  }
-}
-
-export class LearnScheduler<T extends Task> {
-  private scheduler: LearnSchedulerForIds;
-
-  private idTaskMapping: Record<string, T>;
-
-  constructor(tasks: T[]) {
-    this.idTaskMapping = Object.fromEntries(
-      tasks.map((task) => [task.id, task]),
-    );
-
-    const subjectsWithParents = Object.fromEntries(
-      tasks.map((task) => [task.id, task.parentIds]),
-    );
-
-    this.scheduler = new LearnSchedulerForIds(subjectsWithParents);
-  }
-
-  nextSession(count: number): T[] {
-    return this.scheduler
-      .nextSession(count)
-      .map((id) => this.idTaskMapping[id]);
-  }
-
-  recordResults(results: Record<string, number>) {
-    return this.scheduler.recordResults(results);
-  }
-
-  getSaveData(): SaveData {
-    return this.scheduler.getSaveData();
-  }
-
-  restoreFromSaveData(saveData: SaveData) {
-    this.scheduler.restoreFromSaveData(saveData);
   }
 }

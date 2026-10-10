@@ -1,4 +1,4 @@
-import { LearnSchedulerForIds } from './LearnScheduler';
+import { LearnScheduler } from './LearnScheduler';
 import { getMasteries } from './LearnScheduler.utils/getMasteries';
 import {
   learningInProgressMasteryMin,
@@ -11,7 +11,7 @@ import {
 interface DoSessionParams {
   time: number;
   index: number;
-  session: ReturnType<LearnSchedulerForIds['nextSession']>;
+  session: string[];
 }
 
 interface CheckSessionParams {
@@ -21,6 +21,15 @@ interface CheckSessionParams {
   session: string[];
   results: Record<string, number>;
 }
+
+const createScheduler = (ids: string[]) =>
+  new LearnScheduler(ids.map((id) => ({ id })));
+
+const nextSessionIds = (
+  scheduler: LearnScheduler,
+  count: number,
+  time: number,
+) => scheduler.nextSession(count, time).map((task) => task.id);
 
 const LearnSchedulerTestWrapper = ({
   learningTimes,
@@ -35,14 +44,14 @@ const LearnSchedulerTestWrapper = ({
   tasksPerSession: number;
   doSession: (
     params: DoSessionParams,
-  ) => Parameters<LearnSchedulerForIds['recordResults']>[0];
+  ) => Parameters<LearnScheduler['recordResults']>[0];
   checkSession: (params: CheckSessionParams) => void;
-  doFinal?: (scheduler: LearnSchedulerForIds) => void;
+  doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
-  const scheduler = new LearnSchedulerForIds(subjects);
+  const scheduler = createScheduler(subjects);
   const results: { id: string; time: number; correctness: number }[] = [];
   learningTimes.forEach((time, index) => {
-    const session = scheduler.nextSession(tasksPerSession, time);
+    const session = nextSessionIds(scheduler, tasksPerSession, time);
     const sessionResults = doSession({
       time,
       index,
@@ -88,9 +97,9 @@ describe('LearnScheduler', () => {
 
   describe('creates valid sessions', () => {
     it('returns the requested number of distinct known subjects', () => {
-      const scheduler = new LearnSchedulerForIds(subjects);
+      const scheduler = createScheduler(subjects);
 
-      const session = scheduler.nextSession(10, 0);
+      const session = nextSessionIds(scheduler, 10, 0);
 
       expect(session).toHaveLength(10);
       expect(new Set(session).size).toBe(session.length);
@@ -98,31 +107,31 @@ describe('LearnScheduler', () => {
     });
 
     it('returns an empty session when no subjects are requested', () => {
-      const scheduler = new LearnSchedulerForIds(subjects);
+      const scheduler = createScheduler(subjects);
 
-      expect(scheduler.nextSession(0, 0)).toEqual([]);
+      expect(nextSessionIds(scheduler, 0, 0)).toEqual([]);
     });
   });
 
   describe('repeats learned subjects', () => {
     it('keeps a mastered subject available for later repetition', () => {
-      const scheduler = new LearnSchedulerForIds(['subject']);
+      const scheduler = createScheduler(['subject']);
 
-      const firstSession = scheduler.nextSession(1, 0);
+      const firstSession = nextSessionIds(scheduler, 1, 0);
       scheduler.recordResults({ subject: 1 }, 0);
 
       expect(firstSession).toEqual(['subject']);
-      expect(scheduler.nextSession(1, 1)).toEqual(['subject']);
-      expect(scheduler.nextSession(1, 10)).toEqual(['subject']);
+      expect(nextSessionIds(scheduler, 1, 1)).toEqual(['subject']);
+      expect(nextSessionIds(scheduler, 1, 10)).toEqual(['subject']);
     });
 
     it('uses a failed repetition to make the subject available again', () => {
-      const scheduler = new LearnSchedulerForIds(['subject']);
+      const scheduler = createScheduler(['subject']);
 
-      expect(scheduler.nextSession(1, 0)).toEqual(['subject']);
+      expect(nextSessionIds(scheduler, 1, 0)).toEqual(['subject']);
       scheduler.recordResults({ subject: 0 }, 0);
 
-      expect(scheduler.nextSession(1, 1)).toContain('subject');
+      expect(nextSessionIds(scheduler, 1, 1)).toContain('subject');
     });
   });
 
