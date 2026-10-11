@@ -113,10 +113,6 @@ export class LearnScheduler<T extends Task = Task> {
       return lastRepetition !== undefined && lastCorrectness <= 0.5;
     });
 
-    const newSubjects = this.subjects.filter(
-      (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
-    );
-
     const subjects = Array.from(
       new Set([
         ...learningInProgressSubjects,
@@ -126,10 +122,96 @@ export class LearnScheduler<T extends Task = Task> {
     ).slice(0, count);
 
     if (subjects.length < count) {
-      subjects.push(...newSubjects.slice(0, count - subjects.length));
+      subjects.push(
+        ...this.getPrioritizedNewSubjects(subjectStatistics).slice(
+          0,
+          count - subjects.length,
+        ),
+      );
     }
 
     return subjects.map((id) => this.idTaskMapping[id]);
+  }
+
+  private getPrioritizedNewSubjects(
+    subjectStatistics: ReturnType<typeof this.getSubjectStatisticsAt>,
+  ) {
+    let newSubjects = this.subjects.filter(
+      (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
+    );
+
+    // @todo
+    return newSubjects;
+
+    type CategoryAndPriorityStatistics = {
+      category: string;
+      priority: number;
+      notLearned: number;
+      learning: number;
+      learned: number;
+      all: number;
+    };
+
+    const getCategoryAndPriorityStatistics = (
+      ids: string[],
+    ): CategoryAndPriorityStatistics[] => {
+      throw 'not implemented';
+    };
+
+    const prioritizeByCategoryAndPriority = (
+      statistics: CategoryAndPriorityStatistics[],
+      subjects: string[],
+    ): string[] => {
+      let subjectsWithCategoryPriorityStatistics = subjects
+        .map((id) => this.idTaskMapping[id])
+        .map(
+          (task) =>
+            [
+              task.id,
+              statistics.filter((s) => task.categories?.includes(s.category)),
+            ] as const,
+        );
+
+      subjectsWithCategoryPriorityStatistics =
+        subjectsWithCategoryPriorityStatistics.sort(([_, a], [__, b]) => {
+          const sortedItems = [
+            ...a.map((value) => ({ ...value, isA: true })),
+            ...b.map((value) => ({ ...value, isA: false })),
+          ].sort((a, b) => {
+            if ((a.learning === 0) !== (b.learning === 0)) {
+              return a.learning - b.learning;
+            }
+
+            if (a.learning > 0 && b.learning > 0) {
+              if (a.category === b.category) {
+                return a.priority - b.priority;
+              } else {
+                return a.learning / a.all - b.learning / b.all;
+              }
+            }
+
+            if (a.learning === 0 && b.learning === 0) {
+              if (a.category === b.category) {
+                return a.priority - b.priority;
+              } else {
+                return a.notLearned / a.all - b.notLearned / b.all;
+              }
+            }
+
+            return 0;
+          });
+
+          const isLastA = sortedItems.at(-1)?.isA;
+
+          return isLastA ? 1 : -1;
+        });
+
+      return subjectsWithCategoryPriorityStatistics.map(([id]) => id);
+    };
+
+    const statistics = getCategoryAndPriorityStatistics(this.subjects);
+
+    return prioritizeByCategoryAndPriority(statistics, newSubjects);
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
