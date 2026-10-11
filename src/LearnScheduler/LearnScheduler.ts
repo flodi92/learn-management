@@ -7,6 +7,9 @@ import {
 } from './LearnScheduler.constants';
 import { SaveData, Task, TimedResult } from '../model';
 
+const isNotUndefined = <T>(value: T): value is Exclude<T, undefined> =>
+  value !== undefined;
+
 export class LearnScheduler<T extends Task = Task> {
   private results: TimedResult[] = [];
 
@@ -140,10 +143,7 @@ export class LearnScheduler<T extends Task = Task> {
       (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
     );
 
-    // @todo
-    return newSubjects;
-
-    type CategoryAndPriorityStatistics = {
+    type CategoryAndPriorityStatisticsItem = {
       category: string;
       priority: number;
       notLearned: number;
@@ -152,14 +152,52 @@ export class LearnScheduler<T extends Task = Task> {
       all: number;
     };
 
+    type CategoryAndPriorityStatistics = Record<
+      string,
+      Record<number, CategoryAndPriorityStatisticsItem>
+    >;
+
     const getCategoryAndPriorityStatistics = (
-      ids: string[],
-    ): CategoryAndPriorityStatistics[] => {
-      throw 'not implemented';
+      subjectStatistics: ReturnType<typeof this.getSubjectStatisticsAt>,
+    ): CategoryAndPriorityStatistics => {
+      const buffer = {} as CategoryAndPriorityStatistics;
+
+      Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
+        const { priority, categories } = this.idTaskMapping[id];
+        if (!priority) return;
+
+        (categories ?? []).forEach((category) => {
+          if (!buffer[category]) {
+            buffer[category] = {};
+          }
+
+          if (!buffer[category][priority]) {
+            buffer[category][priority] = {
+              category,
+              priority,
+              notLearned: 0,
+              learning: 0,
+              learned: 0,
+              all: 0,
+            };
+          }
+
+          if (mastery < learningInProgressMasteryMin) {
+            buffer[category][priority].notLearned++;
+          } else if (mastery > learningInProgressMasteryMax) {
+            buffer[category][priority].learned++;
+          } else {
+            buffer[category][priority].learning++;
+          }
+          buffer[category][priority].all++;
+        });
+      });
+
+      return buffer;
     };
 
     const prioritizeByCategoryAndPriority = (
-      statistics: CategoryAndPriorityStatistics[],
+      statistics: CategoryAndPriorityStatistics,
       subjects: string[],
     ): string[] => {
       let subjectsWithCategoryPriorityStatistics = subjects
@@ -168,7 +206,13 @@ export class LearnScheduler<T extends Task = Task> {
           (task) =>
             [
               task.id,
-              statistics.filter((s) => task.categories?.includes(s.category)),
+              task.categories
+                ?.map((category) =>
+                  task.priority
+                    ? statistics[category][task.priority]
+                    : undefined,
+                )
+                .filter(isNotUndefined) ?? [],
             ] as const,
         );
 
@@ -209,7 +253,7 @@ export class LearnScheduler<T extends Task = Task> {
       return subjectsWithCategoryPriorityStatistics.map(([id]) => id);
     };
 
-    const statistics = getCategoryAndPriorityStatistics(this.subjects);
+    const statistics = getCategoryAndPriorityStatistics(subjectStatistics);
 
     return prioritizeByCategoryAndPriority(statistics, newSubjects);
   }
