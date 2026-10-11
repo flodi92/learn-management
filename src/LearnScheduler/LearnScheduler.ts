@@ -7,9 +7,6 @@ import {
 } from './LearnScheduler.constants';
 import { SaveData, Task, TimedResult } from '../model';
 
-const isNotUndefined = <T>(value: T): value is Exclude<T, undefined> =>
-  value !== undefined;
-
 export class LearnScheduler<T extends Task = Task> {
   private results: TimedResult[] = [];
 
