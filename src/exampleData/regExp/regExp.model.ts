@@ -1,3 +1,5 @@
+import { Task } from '../../model';
+
 // `alternative` is a readable replacement shown to the learner instead of `value`
 export type RegExpExample = string | { value: string; alternative: string };
 
@@ -8,9 +10,8 @@ export type InitialRegExpTask = {
   nots?: RegExp[];
 };
 
-export interface RegExpTask extends InitialRegExpTask {
+export interface RegExpTask extends InitialRegExpTask, Required<Task> {
   id: string;
-  parentIds: string[];
   elements: RegExpElement[];
   categories: RegExpCategory[];
   priority: RegExpPriority;

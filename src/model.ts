@@ -1,6 +1,8 @@
 export interface Task {
   id: string;
   parentIds?: string[];
+  categories?: string[];
+  priority?: number;
 }
 
 export interface SaveDataBase {
