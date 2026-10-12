@@ -114,3 +114,24 @@ export const prioritizeByCategoryAndPriority = (
 
   return subjectsWithCategoryPriorityStatistics.map(([id]) => id);
 };
+
+export const getPrioritizedNewSubjects = (
+  subjectStatistics: Record<string, { mastery: number }>,
+  subjects: string[],
+  idTaskMapping: Record<string, Task>,
+): string[] => {
+  const newSubjects = subjects.filter(
+    (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
+  );
+
+  const statistics = getCategoryAndPriorityStatistics(
+    subjectStatistics,
+    idTaskMapping,
+  );
+
+  return prioritizeByCategoryAndPriority(
+    statistics,
+    newSubjects,
+    idTaskMapping,
+  );
+};

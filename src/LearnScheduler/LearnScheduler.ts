@@ -1,8 +1,5 @@
 import { getMasteries } from './LearnScheduler.utils/getMasteries';
-import {
-  getCategoryAndPriorityStatistics,
-  prioritizeByCategoryAndPriority,
-} from './LearnScheduler.utils/prioritize';
+import { getPrioritizedNewSubjects } from './LearnScheduler.utils/prioritize';
 import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
@@ -127,7 +124,11 @@ export class LearnScheduler<T extends Task = Task> {
 
     if (subjects.length < count) {
       subjects.push(
-        ...this.getPrioritizedNewSubjects(subjectStatistics).slice(
+        ...getPrioritizedNewSubjects(
+          subjectStatistics,
+          this.subjects,
+          this.idTaskMapping,
+        ).slice(
           0,
           count - subjects.length,
         ),
@@ -135,25 +136,6 @@ export class LearnScheduler<T extends Task = Task> {
     }
 
     return subjects.map((id) => this.idTaskMapping[id]);
-  }
-
-  private getPrioritizedNewSubjects(
-    subjectStatistics: ReturnType<typeof this.getSubjectStatisticsAt>,
-  ) {
-    let newSubjects = this.subjects.filter(
-      (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
-    );
-
-    const statistics = getCategoryAndPriorityStatistics(
-      subjectStatistics,
-      this.idTaskMapping,
-    );
-
-    return prioritizeByCategoryAndPriority(
-      statistics,
-      newSubjects,
-      this.idTaskMapping,
-    );
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
