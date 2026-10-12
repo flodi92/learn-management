@@ -1,5 +1,9 @@
 import { getMasteries } from './LearnScheduler.utils/getMasteries';
 import {
+  getCategoryAndPriorityStatistics,
+  prioritizeByCategoryAndPriority,
+} from './LearnScheduler.utils/prioritize';
+import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
   milisecondsPerDay,
@@ -140,119 +144,16 @@ export class LearnScheduler<T extends Task = Task> {
       (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
     );
 
-    type CategoryAndPriorityStatisticsItem = {
-      category: string;
-      priority: number;
-      notLearned: number;
-      learning: number;
-      learned: number;
-      all: number;
-    };
+    const statistics = getCategoryAndPriorityStatistics(
+      subjectStatistics,
+      this.idTaskMapping,
+    );
 
-    type CategoryAndPriorityStatistics = Record<
-      string,
-      Record<number, CategoryAndPriorityStatisticsItem>
-    >;
-
-    const getCategoryAndPriorityStatistics = (
-      subjectStatistics: ReturnType<typeof this.getSubjectStatisticsAt>,
-    ): CategoryAndPriorityStatistics => {
-      const buffer = {} as CategoryAndPriorityStatistics;
-
-      Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
-        const { priority, categories } = this.idTaskMapping[id];
-        if (!priority) return;
-
-        (categories ?? []).forEach((category) => {
-          if (!buffer[category]) {
-            buffer[category] = {};
-          }
-
-          if (!buffer[category][priority]) {
-            buffer[category][priority] = {
-              category,
-              priority,
-              notLearned: 0,
-              learning: 0,
-              learned: 0,
-              all: 0,
-            };
-          }
-
-          if (mastery < learningInProgressMasteryMin) {
-            buffer[category][priority].notLearned++;
-          } else if (mastery > learningInProgressMasteryMax) {
-            buffer[category][priority].learned++;
-          } else {
-            buffer[category][priority].learning++;
-          }
-          buffer[category][priority].all++;
-        });
-      });
-
-      return buffer;
-    };
-
-    const prioritizeByCategoryAndPriority = (
-      statistics: CategoryAndPriorityStatistics,
-      subjects: string[],
-    ): string[] => {
-      let subjectsWithCategoryPriorityStatistics = subjects
-        .map((id) => this.idTaskMapping[id])
-        .map(
-          (task) =>
-            [
-              task.id,
-              task.categories
-                ?.map((category) =>
-                  task.priority
-                    ? statistics[category][task.priority]
-                    : undefined,
-                )
-                .filter(isNotUndefined) ?? [],
-            ] as const,
-        );
-
-      subjectsWithCategoryPriorityStatistics =
-        subjectsWithCategoryPriorityStatistics.sort(([_, a], [__, b]) => {
-          const sortedItems = [
-            ...a.map((value) => ({ ...value, isA: true })),
-            ...b.map((value) => ({ ...value, isA: false })),
-          ].sort((a, b) => {
-            if ((a.learning === 0) !== (b.learning === 0)) {
-              return a.learning - b.learning;
-            }
-
-            if (a.learning > 0 && b.learning > 0) {
-              if (a.category === b.category) {
-                return a.priority - b.priority;
-              } else {
-                return a.learning / a.all - b.learning / b.all;
-              }
-            }
-
-            if (a.learning === 0 && b.learning === 0) {
-              if (a.category === b.category) {
-                return a.priority - b.priority;
-              } else {
-                return a.notLearned / a.all - b.notLearned / b.all;
-              }
-            }
-
-            return 0;
-          });
-
-          const isLastA = sortedItems.at(-1)?.isA;
-
-          return isLastA ? 1 : -1;
-        });
-
-      return subjectsWithCategoryPriorityStatistics.map(([id]) => id);
-    };
-
-    const statistics = getCategoryAndPriorityStatistics(subjectStatistics);
-
-    return prioritizeByCategoryAndPriority(statistics, newSubjects);
+    return prioritizeByCategoryAndPriority(
+      statistics,
+      newSubjects,
+      this.idTaskMapping,
+    );
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
