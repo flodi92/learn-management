@@ -1,4 +1,4 @@
-import { getMastery } from './LearnScheduler/LearnScheduler.utils/getMastery';
+import { getMastery } from '../../src/LearnScheduler/LearnScheduler.utils/getMastery';
 
 const getBeforeDays = (date: Date) => undefined as unknown as number;
 
