@@ -3,7 +3,10 @@ import readline from 'node:readline';
 import { RegExpTask } from '../regExp.model';
 import { Result } from '../../../model';
 import { TaskPresenter } from '../../../userInterface/TaskPresenter';
-import { getExampleAlternative, getExampleValue } from '../utils/regExp.utils';
+import {
+  getExampleAlternative,
+  getExampleValue,
+} from '../regExp.utils/regExp.utils';
 
 type Example = {
   text: string;
