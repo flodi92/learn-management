@@ -1,5 +1,5 @@
 import { getMasteries } from './learnScheduler.utils/getMasteries';
-import { getPrioritizedNewSubjects } from './learnScheduler.utils/prioritize';
+import { prioritizeSubjects } from './learnScheduler.utils/prioritizeSubjects';
 import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
@@ -114,7 +114,7 @@ export class LearnScheduler<T extends Task = Task> {
       return lastRepetition !== undefined && lastCorrectness <= 0.5;
     });
 
-    const subjects = Array.from(
+    const sessionSubjects = Array.from(
       new Set([
         ...learningInProgressSubjects,
         ...repeatSubjects,
@@ -122,20 +122,21 @@ export class LearnScheduler<T extends Task = Task> {
       ]),
     ).slice(0, count);
 
-    if (subjects.length < count) {
-      subjects.push(
-        ...getPrioritizedNewSubjects(
+    if (sessionSubjects.length < count) {
+      const newSubjects = this.subjects.filter(
+        (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
+      );
+
+      sessionSubjects.push(
+        ...prioritizeSubjects(
           subjectStatistics,
-          this.subjects,
+          newSubjects,
           this.idTaskMapping,
-        ).slice(
-          0,
-          count - subjects.length,
-        ),
+        ).slice(0, count - sessionSubjects.length),
       );
     }
 
-    return subjects.map((id) => this.idTaskMapping[id]);
+    return sessionSubjects.map((id) => this.idTaskMapping[id]);
   }
 
   recordResults(results: Record<string, number>, time: number = this.today) {
