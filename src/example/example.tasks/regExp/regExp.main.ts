@@ -1,5 +1,5 @@
 import { regExpTasks } from './regExp.tasks/regExp.tasks';
-import { Main } from '../../../Main';
+import { Main } from '../../../main';
 import { RegExpTask } from './regExp.model';
 import { RegExpOverview } from './regExp.overview/regExp.overview';
 import { RegExpTaskPresenter } from './regExp.taskPresenter/regExp.taskPresenter';

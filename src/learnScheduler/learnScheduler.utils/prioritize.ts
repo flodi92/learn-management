@@ -1,7 +1,7 @@
 import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
-} from '../LearnScheduler.constants';
+} from '../learnScheduler.constants';
 import { Task } from '../../model';
 import { isNotUndefined } from '../../utils';
 

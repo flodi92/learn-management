@@ -1,6 +1,6 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
-import { Overview } from '../../../../userInterface/Overview';
+import { Overview } from '../../../../userInterface/overview';
 
 export class RegExpOverview extends Overview {
   async askForNumberOfTasks(): Promise<number> {

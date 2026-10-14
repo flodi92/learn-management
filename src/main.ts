@@ -1,7 +1,7 @@
-import { LearnScheduler } from './LearnScheduler/LearnScheduler';
+import { LearnScheduler } from './learnScheduler/learnScheduler';
 import { Result, SaveDataBase, Task } from './model';
-import { Overview } from './userInterface/Overview';
-import { TaskPresenter } from './userInterface/TaskPresenter';
+import { Overview } from './userInterface/overview';
+import { TaskPresenter } from './userInterface/taskPresenter';
 
 export class Main<T extends Task> {
   private scheduler;

@@ -1,11 +1,11 @@
-import { getMasteries } from './LearnScheduler.utils/getMasteries';
-import { getPrioritizedNewSubjects } from './LearnScheduler.utils/prioritize';
+import { getMasteries } from './learnScheduler.utils/getMasteries';
+import { getPrioritizedNewSubjects } from './learnScheduler.utils/prioritize';
 import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
   milisecondsPerDay,
   repeatSubjectsMasteryMax,
-} from './LearnScheduler.constants';
+} from './learnScheduler.constants';
 import { SaveData, Task, TimedResult } from '../model';
 
 export class LearnScheduler<T extends Task = Task> {
