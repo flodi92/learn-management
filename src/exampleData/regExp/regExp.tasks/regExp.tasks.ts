@@ -1,7 +1,7 @@
-import { InitialRegExpTask } from './regExp.model';
+import { InitialRegExpTask } from '../regExp.model';
 import { simpleCombinations } from './regExp.simpleCombinations';
 import { simpleExpressions } from './regExp.simpleExpressions';
-import { addMissingRegExpAttributes } from './utils/regExp.utils';
+import { addMissingRegExpAttributes } from '../utils/regExp.utils';
 
 export const initialTasks: InitialRegExpTask[] = [
   ...simpleExpressions,

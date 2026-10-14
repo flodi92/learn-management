@@ -1,4 +1,4 @@
-import { InitialRegExpTask } from './regExp.model';
+import { InitialRegExpTask } from '../regExp.model';
 
 const simpleCombinationsCharacterClassesAndQuantifiers: InitialRegExpTask[] = [
   {

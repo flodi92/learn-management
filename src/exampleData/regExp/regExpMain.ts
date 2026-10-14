@@ -1,4 +1,4 @@
-import { regExpTasks } from '.';
+import { regExpTasks } from './regExp.tasks/regExp.tasks';
 import { Main } from '../../Main';
 import { RegExpTask } from './regExp.model';
 import { RegExpDataBase } from './regExpDataBase/regExpDataBase';
