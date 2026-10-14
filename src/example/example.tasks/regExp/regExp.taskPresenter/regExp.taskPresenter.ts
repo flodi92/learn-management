@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
 import { RegExpTask } from '../regExp.model';
-import { Result } from '../../../model';
-import { TaskPresenter } from '../../../userInterface/TaskPresenter';
+import { Result } from '../../../../model';
+import { TaskPresenter } from '../../../../userInterface/TaskPresenter';
 import {
   getExampleAlternative,
   getExampleValue,

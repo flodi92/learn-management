@@ -1,9 +1,9 @@
 import { regExpTasks } from './regExp.tasks/regExp.tasks';
-import { Main } from '../../Main';
+import { Main } from '../../../Main';
 import { RegExpTask } from './regExp.model';
-import { RegExpDataBase } from './regExpDataBase/regExpDataBase';
-import { RegExpOverview } from './regExpOverview/regExpOverview';
-import { RegExpTaskPresenter } from './regExpTaskPresenter/regExpTaskPresenter';
+import { RegExpOverview } from './regExp.overview/regExp.overview';
+import { RegExpTaskPresenter } from './regExp.taskPresenter/regExp.taskPresenter';
+import { RegExpDataBase } from '../../example.dataBase/sqlite.dataBase';
 
 export class RegExpMain extends Main<RegExpTask> {
   constructor() {

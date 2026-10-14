@@ -2,7 +2,7 @@
   "scripts": {
     "prettify": "prettier . --write",
     "test": "vitest",
-    "start-regExp": "tsx src/exampleData/regExp/regExpMain.ts"
+    "start-regExp": "tsx src/example/example.tasks/regExp/regExp.main.ts"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

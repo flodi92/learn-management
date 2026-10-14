@@ -1,4 +1,4 @@
-import { Task } from '../../model';
+import { Task } from '../../../model';
 
 // `alternative` is a readable replacement shown to the learner instead of `value`
 export type RegExpExample = string | { value: string; alternative: string };
