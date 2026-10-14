@@ -3,7 +3,7 @@ import { Result, SaveDataBase, Task } from './model';
 import { Overview } from './userInterface/overview';
 import { TaskPresenter } from './userInterface/taskPresenter';
 
-export class Main<T extends Task> {
+export class Starter<T extends Task> {
   private scheduler;
   private presenter;
 
