@@ -14,7 +14,7 @@ export interface RegExpTask extends InitialRegExpTask, Required<Task> {
   id: string;
   elements: RegExpElement[];
   categories: RegExpCategory[];
-  priority: RegExpPriority;
+  relevance: RegExpRelevance;
 }
 
 export const regExpCategories = [
@@ -27,64 +27,64 @@ export const regExpCategories = [
 
 export type RegExpCategory = (typeof regExpCategories)[number];
 
-export const regExpPriorities = [1, 2, 3] as const;
+export const regExpRelevances = [1, 2, 3] as const;
 
-export type RegExpPriority = (typeof regExpPriorities)[number];
+export type RegExpRelevance = (typeof regExpRelevances)[number];
 
 export interface RegExpObjectInterface {
   category: RegExpCategory;
-  priority: RegExpPriority;
+  relevance: RegExpRelevance;
 }
 
 export const regExpObjects = {
-  ['[xyz]']: { category: 'characterClass', priority: 1 },
-  ['[^xyz]']: { category: 'characterClass', priority: 2 },
-  ['.']: { category: 'characterClass', priority: 1 },
-  ['\\d']: { category: 'characterClass', priority: 1 },
-  ['\\D']: { category: 'characterClass', priority: 2 },
-  ['\\w']: { category: 'characterClass', priority: 1 },
-  ['\\W']: { category: 'characterClass', priority: 2 },
-  ['\\s']: { category: 'characterClass', priority: 1 },
-  ['\\S']: { category: 'characterClass', priority: 2 },
-  ['\\t']: { category: 'characterClass', priority: 2 },
-  ['\\r']: { category: 'characterClass', priority: 2 },
-  ['\\n']: { category: 'characterClass', priority: 2 },
-  ['\\v']: { category: 'characterClass', priority: 3 },
-  ['\\f']: { category: 'characterClass', priority: 3 },
-  ['[\\b]']: { category: 'characterClass', priority: 3 },
-  ['\\0']: { category: 'characterClass', priority: 3 },
-  ['\\cX']: { category: 'characterClass', priority: 3 },
-  ['\\xHH']: { category: 'characterClass', priority: 3 },
-  ['\\uHHHH']: { category: 'characterClass', priority: 3 },
-  ['\\u{H…H}']: { category: 'characterClass', priority: 3 },
-  ['x|y']: { category: 'groupsAndBackreferences', priority: 1 },
-  ['^']: { category: 'assertion', priority: 1 },
-  ['$']: { category: 'assertion', priority: 1 },
-  ['anywhere']: { category: 'assertion', priority: 1 },
-  ['\\b']: { category: 'assertion', priority: 2 },
-  ['\\B']: { category: 'assertion', priority: 3 },
-  ['x(?=y)']: { category: 'assertion', priority: 3 },
-  ['x(?!y)']: { category: 'assertion', priority: 3 },
-  ['(?<=y)x']: { category: 'assertion', priority: 3 },
-  ['(?<!y)x']: { category: 'assertion', priority: 3 },
-  ['(x)']: { category: 'groupsAndBackreferences', priority: 1 },
-  ['(?<Name>x)']: { category: 'groupsAndBackreferences', priority: 3 },
-  ['(?:x)']: { category: 'groupsAndBackreferences', priority: 2 },
-  ['\\k<Name>']: { category: 'groupsAndBackreferences', priority: 3 },
-  ['x*']: { category: 'quantifier', priority: 1 },
-  ['x+']: { category: 'quantifier', priority: 1 },
-  ['x?']: { category: 'quantifier', priority: 1 },
-  ['x{n}']: { category: 'quantifier', priority: 2 },
-  ['x{n,}']: { category: 'quantifier', priority: 2 },
-  ['x{n,m}']: { category: 'quantifier', priority: 2 },
-  ['d']: { category: 'modifier', priority: 3 },
-  ['g']: { category: 'modifier', priority: 1 },
-  ['i']: { category: 'modifier', priority: 1 },
-  ['m']: { category: 'modifier', priority: 2 },
-  ['s']: { category: 'modifier', priority: 2 },
-  ['u']: { category: 'modifier', priority: 3 },
-  ['v']: { category: 'modifier', priority: 3 },
-  ['y']: { category: 'modifier', priority: 3 },
+  ['[xyz]']: { category: 'characterClass', relevance: 1 },
+  ['[^xyz]']: { category: 'characterClass', relevance: 2 },
+  ['.']: { category: 'characterClass', relevance: 1 },
+  ['\\d']: { category: 'characterClass', relevance: 1 },
+  ['\\D']: { category: 'characterClass', relevance: 2 },
+  ['\\w']: { category: 'characterClass', relevance: 1 },
+  ['\\W']: { category: 'characterClass', relevance: 2 },
+  ['\\s']: { category: 'characterClass', relevance: 1 },
+  ['\\S']: { category: 'characterClass', relevance: 2 },
+  ['\\t']: { category: 'characterClass', relevance: 2 },
+  ['\\r']: { category: 'characterClass', relevance: 2 },
+  ['\\n']: { category: 'characterClass', relevance: 2 },
+  ['\\v']: { category: 'characterClass', relevance: 3 },
+  ['\\f']: { category: 'characterClass', relevance: 3 },
+  ['[\\b]']: { category: 'characterClass', relevance: 3 },
+  ['\\0']: { category: 'characterClass', relevance: 3 },
+  ['\\cX']: { category: 'characterClass', relevance: 3 },
+  ['\\xHH']: { category: 'characterClass', relevance: 3 },
+  ['\\uHHHH']: { category: 'characterClass', relevance: 3 },
+  ['\\u{H…H}']: { category: 'characterClass', relevance: 3 },
+  ['x|y']: { category: 'groupsAndBackreferences', relevance: 1 },
+  ['^']: { category: 'assertion', relevance: 1 },
+  ['$']: { category: 'assertion', relevance: 1 },
+  ['anywhere']: { category: 'assertion', relevance: 1 },
+  ['\\b']: { category: 'assertion', relevance: 2 },
+  ['\\B']: { category: 'assertion', relevance: 3 },
+  ['x(?=y)']: { category: 'assertion', relevance: 3 },
+  ['x(?!y)']: { category: 'assertion', relevance: 3 },
+  ['(?<=y)x']: { category: 'assertion', relevance: 3 },
+  ['(?<!y)x']: { category: 'assertion', relevance: 3 },
+  ['(x)']: { category: 'groupsAndBackreferences', relevance: 1 },
+  ['(?<Name>x)']: { category: 'groupsAndBackreferences', relevance: 3 },
+  ['(?:x)']: { category: 'groupsAndBackreferences', relevance: 2 },
+  ['\\k<Name>']: { category: 'groupsAndBackreferences', relevance: 3 },
+  ['x*']: { category: 'quantifier', relevance: 1 },
+  ['x+']: { category: 'quantifier', relevance: 1 },
+  ['x?']: { category: 'quantifier', relevance: 1 },
+  ['x{n}']: { category: 'quantifier', relevance: 2 },
+  ['x{n,}']: { category: 'quantifier', relevance: 2 },
+  ['x{n,m}']: { category: 'quantifier', relevance: 2 },
+  ['d']: { category: 'modifier', relevance: 3 },
+  ['g']: { category: 'modifier', relevance: 1 },
+  ['i']: { category: 'modifier', relevance: 1 },
+  ['m']: { category: 'modifier', relevance: 2 },
+  ['s']: { category: 'modifier', relevance: 2 },
+  ['u']: { category: 'modifier', relevance: 3 },
+  ['v']: { category: 'modifier', relevance: 3 },
+  ['y']: { category: 'modifier', relevance: 3 },
 } as const satisfies Record<string, RegExpObjectInterface>;
 
 export type RegExpObjects = typeof regExpObjects;

@@ -5,39 +5,39 @@ import {
 import { Task } from '../../model';
 import { isNotUndefined } from '../../utils';
 
-export type CategoryAndPriorityStatisticsItem = {
+export type CategoryAndRelevanceStatisticsItem = {
   category: string;
-  priority: number;
+  relevance: number;
   notLearned: number;
   learning: number;
   learned: number;
   all: number;
 };
 
-export type CategoryAndPriorityStatistics = Record<
+export type CategoryAndRelevanceStatistics = Record<
   string,
-  Record<number, CategoryAndPriorityStatisticsItem>
+  Record<number, CategoryAndRelevanceStatisticsItem>
 >;
 
-export const getCategoryAndPriorityStatistics = (
+export const getCategoryAndRelevanceStatistics = (
   subjectStatistics: Record<string, { mastery: number }>,
   idTaskMapping: Record<string, Task>,
-): CategoryAndPriorityStatistics => {
-  const buffer = {} as CategoryAndPriorityStatistics;
+): CategoryAndRelevanceStatistics => {
+  const buffer = {} as CategoryAndRelevanceStatistics;
 
   Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
-    const { priority, categories } = idTaskMapping[id];
-    if (!priority) return;
+    const { relevance, categories } = idTaskMapping[id];
+    if (!relevance) return;
 
     (categories ?? []).forEach((category) => {
       if (!buffer[category]) {
         buffer[category] = {};
       }
 
-      if (!buffer[category][priority]) {
-        buffer[category][priority] = {
+      if (!buffer[category][relevance]) {
+        buffer[category][relevance] = {
           category,
-          priority,
+          relevance,
           notLearned: 0,
           learning: 0,
           learned: 0,
@@ -46,25 +46,25 @@ export const getCategoryAndPriorityStatistics = (
       }
 
       if (mastery < learningInProgressMasteryMin) {
-        buffer[category][priority].notLearned++;
+        buffer[category][relevance].notLearned++;
       } else if (mastery > learningInProgressMasteryMax) {
-        buffer[category][priority].learned++;
+        buffer[category][relevance].learned++;
       } else {
-        buffer[category][priority].learning++;
+        buffer[category][relevance].learning++;
       }
-      buffer[category][priority].all++;
+      buffer[category][relevance].all++;
     });
   });
 
   return buffer;
 };
 
-export const prioritizeByCategoryAndPriority = (
-  statistics: CategoryAndPriorityStatistics,
+export const prioritizeByCategoryAndRelevance = (
+  statistics: CategoryAndRelevanceStatistics,
   subjects: string[],
   idTaskMapping: Record<string, Task>,
 ): string[] => {
-  let subjectsWithCategoryPriorityStatistics = subjects
+  let subjectsWithCategoryRelevanceStatistics = subjects
     .map((id) => idTaskMapping[id])
     .map(
       (task) =>
@@ -72,14 +72,14 @@ export const prioritizeByCategoryAndPriority = (
           task.id,
           task.categories
             ?.map((category) =>
-              task.priority ? statistics[category][task.priority] : undefined,
+              task.relevance ? statistics[category][task.relevance] : undefined,
             )
             .filter(isNotUndefined) ?? [],
         ] as const,
     );
 
-  subjectsWithCategoryPriorityStatistics =
-    subjectsWithCategoryPriorityStatistics.sort(([_, a], [__, b]) => {
+  subjectsWithCategoryRelevanceStatistics =
+    subjectsWithCategoryRelevanceStatistics.sort(([_, a], [__, b]) => {
       const sortedItems = [
         ...a.map((value) => ({ ...value, isA: true })),
         ...b.map((value) => ({ ...value, isA: false })),
@@ -90,7 +90,7 @@ export const prioritizeByCategoryAndPriority = (
 
         if (a.learning > 0 && b.learning > 0) {
           if (a.category === b.category) {
-            return a.priority - b.priority;
+            return a.relevance - b.relevance;
           } else {
             return a.learning / a.all - b.learning / b.all;
           }
@@ -98,7 +98,7 @@ export const prioritizeByCategoryAndPriority = (
 
         if (a.learning === 0 && b.learning === 0) {
           if (a.category === b.category) {
-            return a.priority - b.priority;
+            return a.relevance - b.relevance;
           } else {
             return a.notLearned / a.all - b.notLearned / b.all;
           }
@@ -112,7 +112,7 @@ export const prioritizeByCategoryAndPriority = (
       return isLastA ? 1 : -1;
     });
 
-  return subjectsWithCategoryPriorityStatistics.map(([id]) => id);
+  return subjectsWithCategoryRelevanceStatistics.map(([id]) => id);
 };
 
 export const getPrioritizedNewSubjects = (
@@ -124,12 +124,12 @@ export const getPrioritizedNewSubjects = (
     (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
   );
 
-  const statistics = getCategoryAndPriorityStatistics(
+  const statistics = getCategoryAndRelevanceStatistics(
     subjectStatistics,
     idTaskMapping,
   );
 
-  return prioritizeByCategoryAndPriority(
+  return prioritizeByCategoryAndRelevance(
     statistics,
     newSubjects,
     idTaskMapping,

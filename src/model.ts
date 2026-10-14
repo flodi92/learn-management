@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   parentIds?: string[];
   categories?: string[];
-  priority?: number;
+  relevance?: number;
 }
 
 export interface SaveDataBase {
