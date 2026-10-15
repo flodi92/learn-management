@@ -10,78 +10,23 @@ import { getToday } from '../utils';
 
 export class LearnScheduler<T extends Task = Task> {
   private results: TimedResult[] = [];
-
   private idTaskMapping: Record<string, T>;
 
-  private subjects: string[];
+  private get tasks() {
+    return Object.values(this.idTaskMapping);
+  }
 
-  private subjectsWithParents: Record<string, string[] | undefined>;
+  private get subjects() {
+    return this.tasks.map((task) => task.id);
+  }
 
   constructor(tasks: T[]) {
     this.idTaskMapping = Object.fromEntries(
-      tasks.map((task) => [task.id, task]),
-    );
-    this.subjects = tasks.map((task) => task.id);
-    this.subjectsWithParents = Object.fromEntries(
-      tasks.map((task) => [task.id, task.parentIds]),
+      tasks.map((task) => [task.id, task] as const),
     );
   }
 
-  private isChildSubjectOf(childId: string, parentId: string) {
-    return this.subjectsWithParents[childId]?.includes(parentId);
-  }
-
-  private getSubjectStatisticsAt(time: number): Record<
-    string,
-    {
-      mastery: number;
-      lastRepetition?: number;
-      lastMastery: number;
-      lastCorrectness: number;
-    }
-  > {
-    return Object.fromEntries(
-      Array.from(new Set(this.subjects)).map((id) => {
-        const relevantResults = this.results
-          .filter(
-            (result) =>
-              this.isChildSubjectOf(result.id, id) && result.time <= time,
-          )
-          .sort((a, b) => a.time - b.time);
-
-        const lastResult = relevantResults[relevantResults.length - 1];
-        const lastRepetition = lastResult ? lastResult.time : undefined;
-        const lastCorrectness = lastResult ? lastResult.correctness : 0;
-
-        const mastery =
-          relevantResults.length > 0
-            ? (getMasteries(relevantResults, time)[id] ?? 0)
-            : 0;
-
-        const lastMastery =
-          lastRepetition !== undefined && lastRepetition > 0
-            ? (getMasteries(
-                relevantResults.filter(
-                  (result) => result.time <= lastRepetition,
-                ),
-                lastRepetition,
-              )[id] ?? 0)
-            : 0;
-
-        return [
-          id,
-          {
-            mastery,
-            lastRepetition,
-            lastMastery,
-            lastCorrectness,
-          },
-        ];
-      }),
-    );
-  }
-
-  nextSession(count: number, time: number = getToday()): T[] {
+  public nextSession(count: number, time: number = getToday()): T[] {
     if (count <= 0) {
       return [];
     }
@@ -135,7 +80,10 @@ export class LearnScheduler<T extends Task = Task> {
     return sessionSubjects.map((id) => this.idTaskMapping[id]);
   }
 
-  recordResults(results: Record<string, number>, time: number = getToday()) {
+  public recordResults(
+    results: Record<string, number>,
+    time: number = getToday(),
+  ) {
     for (const [id, correctness] of Object.entries(results)) {
       if (!this.subjects.includes(id)) {
         continue;
@@ -151,43 +99,90 @@ export class LearnScheduler<T extends Task = Task> {
     }
   }
 
-  get lastCorrectness(): Record<string, number> {
+  public getSaveData(): SaveData {
+    return this.results;
+  }
+
+  public restoreFromSaveData(saveData: SaveData) {
+    this.results = saveData;
+  }
+
+  public get lastCorrectness(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
       this.subjects.map((id) => [id, subjectStatistics[id].lastCorrectness]),
     );
   }
 
-  get mastery(): Record<string, number> {
+  public get mastery(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
       this.subjects.map((id) => [id, subjectStatistics[id].mastery]),
     );
   }
 
-  get lastRepetition(): Record<string, number | undefined> {
+  public get lastRepetition(): Record<string, number | undefined> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
       this.subjects.map((id) => [id, subjectStatistics[id].lastRepetition]),
     );
   }
 
-  get lastMastery(): Record<string, number> {
+  public get lastMastery(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
       this.subjects.map((id) => [id, subjectStatistics[id].lastMastery]),
     );
   }
 
-  get subjectStatistics() {
-    return this.getSubjectStatisticsAt(getToday());
-  }
+  private getSubjectStatisticsAt(time: number): Record<
+    string,
+    {
+      mastery: number;
+      lastRepetition?: number;
+      lastMastery: number;
+      lastCorrectness: number;
+    }
+  > {
+    return Object.fromEntries(
+      Array.from(new Set(this.subjects)).map((id) => {
+        const relevantResults = this.results
+          .filter(
+            (result) =>
+              this.idTaskMapping[result.id].parentIds?.includes(id) &&
+              result.time <= time,
+          )
+          .sort((a, b) => a.time - b.time);
 
-  getSaveData(): SaveData {
-    return this.results;
-  }
+        const lastResult = relevantResults[relevantResults.length - 1];
+        const lastRepetition = lastResult ? lastResult.time : undefined;
+        const lastCorrectness = lastResult ? lastResult.correctness : 0;
 
-  restoreFromSaveData(saveData: SaveData) {
-    this.results = saveData;
+        const mastery =
+          relevantResults.length > 0
+            ? (getMasteries(relevantResults, time)[id] ?? 0)
+            : 0;
+
+        const lastMastery =
+          lastRepetition !== undefined && lastRepetition > 0
+            ? (getMasteries(
+                relevantResults.filter(
+                  (result) => result.time <= lastRepetition,
+                ),
+                lastRepetition,
+              )[id] ?? 0)
+            : 0;
+
+        return [
+          id,
+          {
+            mastery,
+            lastRepetition,
+            lastMastery,
+            lastCorrectness,
+          },
+        ];
+      }),
+    );
   }
 }
