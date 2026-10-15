@@ -1,62 +1,22 @@
 import {
-  learningInProgressMasteryMax,
-  learningInProgressMasteryMin,
-} from '../learnScheduler.constants';
-import {
   CategoryAndRelevanceStatistics,
   LearnSubject,
   SubjectStatistics,
 } from '../../model';
 import { isNotUndefined } from '../../utils';
-import { determineLearningStateFromStatisticsItem } from './determineLearningStateFromStatisticsItem';
+import { determineCategoryAndRelevanceStatistics } from './determineCategoryAndRelevanceStatistics';
 
-export const getCategoryAndRelevanceStatistics = (
-  subjectStatistics: SubjectStatistics,
-  idSubjectMapping: Record<string, LearnSubject>,
-): CategoryAndRelevanceStatistics => {
-  const buffer = {} as CategoryAndRelevanceStatistics;
-
-  Object.entries(subjectStatistics).forEach(([id, subjectStatisticsItem]) => {
-    if (!idSubjectMapping[id]) return;
-
-    const { relevance, categories } = idSubjectMapping[id];
-    if (!relevance) return;
-
-    (categories ?? []).forEach((category) => {
-      if (!buffer[category]) {
-        buffer[category] = {};
-      }
-
-      if (!buffer[category][relevance]) {
-        buffer[category][relevance] = {
-          category,
-          relevance,
-          notLearned: 0,
-          learning: 0,
-          forRepeat: 0,
-          learned: 0,
-          all: 0,
-        };
-      }
-
-      const learningState = determineLearningStateFromStatisticsItem(
-        subjectStatisticsItem,
-      );
-
-      buffer[category][relevance][learningState]++;
-      buffer[category][relevance].all++;
-    });
-  });
-
-  return buffer;
-};
-
-export const prioritizeByCategoryAndRelevance = <S extends LearnSubject>(
-  statistics: CategoryAndRelevanceStatistics,
+export const prioritizeSubjects = <S extends LearnSubject>(
   subjects: S[],
+  subjectStatistics: SubjectStatistics,
 ): S[] => {
   const idSubjectMapping = Object.fromEntries(
     subjects.map((subject) => [subject.id, subject] as const),
+  );
+
+  const statistics = determineCategoryAndRelevanceStatistics(
+    subjectStatistics,
+    idSubjectMapping,
   );
 
   let subjectsWithCategoryRelevanceStatistics = subjects.map(
@@ -110,20 +70,4 @@ export const prioritizeByCategoryAndRelevance = <S extends LearnSubject>(
   return subjectsWithCategoryRelevanceStatistics.map(
     ([id]) => idSubjectMapping[id],
   );
-};
-
-export const prioritizeSubjects = <S extends LearnSubject>(
-  subjects: S[],
-  subjectStatistics: SubjectStatistics,
-): S[] => {
-  const idSubjectMapping = Object.fromEntries(
-    subjects.map((subject) => [subject.id, subject] as const),
-  );
-
-  const statistics = getCategoryAndRelevanceStatistics(
-    subjectStatistics,
-    idSubjectMapping,
-  );
-
-  return prioritizeByCategoryAndRelevance(statistics, subjects);
 };
