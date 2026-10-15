@@ -1,4 +1,3 @@
-import { LearnScheduler } from './learnScheduler';
 import { getMasteries } from './learnScheduler.utils/getMasteries';
 import {
   learningInProgressMasteryMin,
@@ -7,6 +6,7 @@ import {
   intensiveLearningInProgressMasteryMax,
   minTimeForRepetition,
 } from './learnScheduler.constants';
+import { LearnScheduler } from './learnScheduler';
 
 interface DoSessionParams {
   time: number;

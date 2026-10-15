@@ -1,15 +1,15 @@
 import { LearnScheduler } from './learnScheduler/learnScheduler';
-import { Result, SaveDataBase, Task } from './model';
+import { Result, SaveDataBase, LearnSubject } from './model';
 import { Overview } from './userInterface/overview';
 import { TaskPresenter } from './userInterface/taskPresenter';
 
-export class Starter<T extends Task> {
+export class Starter<Task extends LearnSubject> {
   private scheduler;
   private presenter;
 
   constructor(
-    presenter: TaskPresenter<T>,
-    tasks: T[],
+    presenter: TaskPresenter<Task>,
+    tasks: Task[],
     private saveDataBase: SaveDataBase,
     private overview: Overview,
   ) {

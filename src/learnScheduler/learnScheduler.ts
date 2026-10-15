@@ -5,35 +5,35 @@ import {
   learningInProgressMasteryMin,
   repeatSubjectsMasteryMax,
 } from './learnScheduler.constants';
-import { SaveData, Task, TimedResult } from '../model';
+import { SaveData, LearnSubject, TimedResult } from '../model';
 import { getToday } from '../utils';
 
-export class LearnScheduler<T extends Task = Task> {
+export class LearnScheduler<S extends LearnSubject = LearnSubject> {
   private results: TimedResult[] = [];
-  private idTaskMapping: Record<string, T>;
-
-  private get tasks() {
-    return Object.values(this.idTaskMapping);
-  }
+  private idSubjectMapping: Record<string, S>;
 
   private get subjects() {
-    return this.tasks.map((task) => task.id);
+    return Object.values(this.idSubjectMapping);
   }
 
-  constructor(tasks: T[]) {
-    this.idTaskMapping = Object.fromEntries(
-      tasks.map((task) => [task.id, task] as const),
+  private get subjectIds() {
+    return this.subjects.map((subject) => subject.id);
+  }
+
+  constructor(subjects: S[]) {
+    this.idSubjectMapping = Object.fromEntries(
+      subjects.map((subject) => [subject.id, subject] as const),
     );
   }
 
-  public nextSession(count: number, time: number = getToday()): T[] {
+  public nextSession(count: number, time: number = getToday()): S[] {
     if (count <= 0) {
       return [];
     }
 
     const subjectStatistics = this.getSubjectStatisticsAt(time);
 
-    const learningInProgressSubjects = this.subjects.filter((id) => {
+    const learningInProgressSubjects = this.subjectIds.filter((id) => {
       const { mastery, lastMastery } = subjectStatistics[id];
       return (
         mastery > learningInProgressMasteryMin &&
@@ -42,7 +42,7 @@ export class LearnScheduler<T extends Task = Task> {
       );
     });
 
-    const repeatSubjects = this.subjects.filter((id) => {
+    const repeatSubjects = this.subjectIds.filter((id) => {
       const { mastery, lastMastery } = subjectStatistics[id];
       return (
         lastMastery > learningInProgressMasteryMax &&
@@ -50,7 +50,7 @@ export class LearnScheduler<T extends Task = Task> {
       );
     });
 
-    const repeatWrongSubjects = this.subjects.filter((id) => {
+    const repeatWrongSubjects = this.subjectIds.filter((id) => {
       const { lastCorrectness, lastRepetition } = subjectStatistics[id];
       return lastRepetition !== undefined && lastCorrectness <= 0.5;
     });
@@ -64,7 +64,7 @@ export class LearnScheduler<T extends Task = Task> {
     ).slice(0, count);
 
     if (sessionSubjects.length < count) {
-      const newSubjects = this.subjects.filter(
+      const newSubjects = this.subjectIds.filter(
         (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
       );
 
@@ -72,12 +72,12 @@ export class LearnScheduler<T extends Task = Task> {
         ...prioritizeSubjects(
           subjectStatistics,
           newSubjects,
-          this.idTaskMapping,
+          this.idSubjectMapping,
         ).slice(0, count - sessionSubjects.length),
       );
     }
 
-    return sessionSubjects.map((id) => this.idTaskMapping[id]);
+    return sessionSubjects.map((id) => this.idSubjectMapping[id]);
   }
 
   public recordResults(
@@ -85,7 +85,7 @@ export class LearnScheduler<T extends Task = Task> {
     time: number = getToday(),
   ) {
     for (const [id, correctness] of Object.entries(results)) {
-      if (!this.subjects.includes(id)) {
+      if (!this.subjectIds.includes(id)) {
         continue;
       }
 
@@ -110,28 +110,28 @@ export class LearnScheduler<T extends Task = Task> {
   public get lastCorrectness(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
-      this.subjects.map((id) => [id, subjectStatistics[id].lastCorrectness]),
+      this.subjectIds.map((id) => [id, subjectStatistics[id].lastCorrectness]),
     );
   }
 
   public get mastery(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
-      this.subjects.map((id) => [id, subjectStatistics[id].mastery]),
+      this.subjectIds.map((id) => [id, subjectStatistics[id].mastery]),
     );
   }
 
   public get lastRepetition(): Record<string, number | undefined> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
-      this.subjects.map((id) => [id, subjectStatistics[id].lastRepetition]),
+      this.subjectIds.map((id) => [id, subjectStatistics[id].lastRepetition]),
     );
   }
 
   public get lastMastery(): Record<string, number> {
     const subjectStatistics = this.getSubjectStatisticsAt(getToday());
     return Object.fromEntries(
-      this.subjects.map((id) => [id, subjectStatistics[id].lastMastery]),
+      this.subjectIds.map((id) => [id, subjectStatistics[id].lastMastery]),
     );
   }
 
@@ -145,11 +145,11 @@ export class LearnScheduler<T extends Task = Task> {
     }
   > {
     return Object.fromEntries(
-      Array.from(new Set(this.subjects)).map((id) => {
+      Array.from(new Set(this.subjectIds)).map((id) => {
         const relevantResults = this.results
           .filter(
             (result) =>
-              this.idTaskMapping[result.id].parentIds?.includes(id) &&
+              this.idSubjectMapping[result.id].parentIds?.includes(id) &&
               result.time <= time,
           )
           .sort((a, b) => a.time - b.time);

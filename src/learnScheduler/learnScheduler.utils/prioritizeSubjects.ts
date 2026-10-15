@@ -2,7 +2,7 @@ import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
 } from '../learnScheduler.constants';
-import { Task } from '../../model';
+import { LearnSubject } from '../../model';
 import { isNotUndefined } from '../../utils';
 
 export type CategoryAndRelevanceStatisticsItem = {
@@ -21,12 +21,12 @@ export type CategoryAndRelevanceStatistics = Record<
 
 export const getCategoryAndRelevanceStatistics = (
   subjectStatistics: Record<string, { mastery: number }>,
-  idTaskMapping: Record<string, Task>,
+  idSubjectMapping: Record<string, LearnSubject>,
 ): CategoryAndRelevanceStatistics => {
   const buffer = {} as CategoryAndRelevanceStatistics;
 
   Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
-    const { relevance, categories } = idTaskMapping[id];
+    const { relevance, categories } = idSubjectMapping[id];
     if (!relevance) return;
 
     (categories ?? []).forEach((category) => {
@@ -62,17 +62,19 @@ export const getCategoryAndRelevanceStatistics = (
 export const prioritizeByCategoryAndRelevance = (
   statistics: CategoryAndRelevanceStatistics,
   subjects: string[],
-  idTaskMapping: Record<string, Task>,
+  idSubjectMapping: Record<string, LearnSubject>,
 ): string[] => {
   let subjectsWithCategoryRelevanceStatistics = subjects
-    .map((id) => idTaskMapping[id])
+    .map((id) => idSubjectMapping[id])
     .map(
-      (task) =>
+      (subject) =>
         [
-          task.id,
-          task.categories
+          subject.id,
+          subject.categories
             ?.map((category) =>
-              task.relevance ? statistics[category][task.relevance] : undefined,
+              subject.relevance
+                ? statistics[category][subject.relevance]
+                : undefined,
             )
             .filter(isNotUndefined) ?? [],
         ] as const,
@@ -118,12 +120,16 @@ export const prioritizeByCategoryAndRelevance = (
 export const prioritizeSubjects = (
   subjectStatistics: Record<string, { mastery: number }>,
   subjects: string[],
-  idTaskMapping: Record<string, Task>,
+  idSubjectMapping: Record<string, LearnSubject>,
 ): string[] => {
   const statistics = getCategoryAndRelevanceStatistics(
     subjectStatistics,
-    idTaskMapping,
+    idSubjectMapping,
   );
 
-  return prioritizeByCategoryAndRelevance(statistics, subjects, idTaskMapping);
+  return prioritizeByCategoryAndRelevance(
+    statistics,
+    subjects,
+    idSubjectMapping,
+  );
 };

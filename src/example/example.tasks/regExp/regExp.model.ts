@@ -1,4 +1,4 @@
-import { Task } from '../../../model';
+import { LearnSubject } from '../../../model';
 import { ExtendsType, AssertTrue } from '../../../utils';
 
 export type RegExpExample = string | { value: string; alternative: string };
@@ -18,8 +18,8 @@ export interface RegExpTask extends InitialRegExpTask {
   relevance: RegExpRelevance;
 }
 
-export type CheckThatRegExpTaskExtendsTask = AssertTrue<
-  ExtendsType<RegExpTask, Task>
+export type CheckThatRegExpTaskExtendsLearnSubject = AssertTrue<
+  ExtendsType<RegExpTask, LearnSubject>
 >;
 
 export const regExpCategories = [
