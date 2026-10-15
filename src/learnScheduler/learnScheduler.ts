@@ -13,10 +13,10 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     );
   }
 
-  public nextSession(count: number, time: number = getToday()): S[] {
+  public nextSession(count: number, day: number = getToday()): S[] {
     return assembleNextSession({
       count,
-      time,
+      day,
       idSubjectMapping: this.idSubjectMapping,
       results: this.results,
     });
@@ -24,7 +24,7 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
 
   public recordResults(
     results: Record<string, number>,
-    time: number = getToday(),
+    day: number = getToday(),
   ) {
     for (const [id, correctness] of Object.entries(results)) {
       if (!this.subjectIds.includes(id)) {
@@ -37,7 +37,7 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
         );
       }
 
-      this.results.push({ id, time, correctness });
+      this.results.push({ id, day, correctness });
     }
   }
 

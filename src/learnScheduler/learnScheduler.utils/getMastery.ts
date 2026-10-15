@@ -1,7 +1,7 @@
 const converge0 = (a: number) => (val: number) => a / (val + a);
 const converge1 = (a: number) => (val: number) => 1 - converge0(a)(val);
 
-const forgetDays = converge0(10 /* days until half forgotten */);
+const forgetDays = converge0(10 /* day until half forgotten */);
 const keepDays = converge1(10);
 
 const keepRepetitions = converge1(3);

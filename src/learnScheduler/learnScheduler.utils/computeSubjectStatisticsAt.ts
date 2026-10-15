@@ -2,7 +2,7 @@ import { LearnSubject, TimedResult, SubjectStatistics } from '../../model';
 import { getMasteries } from './getMasteries';
 
 export const computeSubjectStatisticsAt = (
-  time: number,
+  day: number,
   idSubjectMapping: Record<string, LearnSubject>,
   results: TimedResult[],
 ): SubjectStatistics => {
@@ -12,23 +12,23 @@ export const computeSubjectStatisticsAt = (
         .filter(
           (result) =>
             idSubjectMapping[result.id].parentIds?.includes(id) &&
-            result.time <= time,
+            result.day <= day,
         )
-        .sort((a, b) => a.time - b.time);
+        .sort((a, b) => a.day - b.day);
 
       const lastResult = relevantResults[relevantResults.length - 1];
-      const lastRepetition = lastResult ? lastResult.time : undefined;
+      const lastRepetition = lastResult ? lastResult.day : undefined;
       const lastCorrectness = lastResult ? lastResult.correctness : 0;
 
       const mastery =
         relevantResults.length > 0
-          ? (getMasteries(relevantResults, time)[id] ?? 0)
+          ? (getMasteries(relevantResults, day)[id] ?? 0)
           : 0;
 
       const lastMastery =
         lastRepetition !== undefined && lastRepetition > 0
           ? (getMasteries(
-              relevantResults.filter((result) => result.time <= lastRepetition),
+              relevantResults.filter((result) => result.day <= lastRepetition),
               lastRepetition,
             )[id] ?? 0)
           : 0;

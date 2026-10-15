@@ -9,13 +9,13 @@ import {
 import { LearnScheduler } from './learnScheduler';
 
 interface DoSessionParams {
-  time: number;
+  day: number;
   index: number;
   session: string[];
 }
 
 interface CheckSessionParams {
-  time: number;
+  day: number;
   index: number;
   masteries: Record<string, number>;
   session: string[];
@@ -28,8 +28,8 @@ const createScheduler = (ids: string[]) =>
 const nextSessionIds = (
   scheduler: LearnScheduler,
   count: number,
-  time: number,
-) => scheduler.nextSession(count, time).map((task) => task.id);
+  day: number,
+) => scheduler.nextSession(count, day).map((task) => task.id);
 
 const LearnSchedulerTestWrapper = ({
   learningTimes,
@@ -49,29 +49,29 @@ const LearnSchedulerTestWrapper = ({
   doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
   const scheduler = createScheduler(subjects);
-  const results: { id: string; time: number; correctness: number }[] = [];
-  learningTimes.forEach((time, index) => {
-    const session = nextSessionIds(scheduler, tasksPerSession, time);
+  const results: { id: string; day: number; correctness: number }[] = [];
+  learningTimes.forEach((day, index) => {
+    const session = nextSessionIds(scheduler, tasksPerSession, day);
     const sessionResults = doSession({
-      time,
+      day,
       index,
       session,
     });
 
-    scheduler.recordResults(sessionResults, time);
+    scheduler.recordResults(sessionResults, day);
 
     results.push(
       ...Object.entries(sessionResults).map(([id, correctness]) => ({
         id,
         correctness,
-        time,
+        day,
       })),
     );
 
-    const masteries = getMasteries(results, time);
+    const masteries = getMasteries(results, day);
 
     checkSession({
-      time,
+      day,
       index,
       masteries,
       session,
@@ -187,28 +187,27 @@ describe('LearnScheduler', () => {
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
     ])('case $#', ({ learningTimes, doSession }) => {
-      let lastRepetition: Record<string, { time: number; mastery: number }> =
-        {};
+      let lastRepetition: Record<string, { day: number; mastery: number }> = {};
       LearnSchedulerTestWrapper({
         learningTimes,
         subjects,
         tasksPerSession: 10,
         doSession,
-        checkSession: ({ time, masteries, session }) => {
+        checkSession: ({ day, masteries, session }) => {
           expect(
             session.every(
               (task) =>
                 !(
                   masteries[task] > learningInProgressMasteryMax &&
                   lastRepetition[task].mastery > learningInProgressMasteryMax
-                ) || time - lastRepetition[task].time > minTimeForRepetition,
+                ) || day - lastRepetition[task].day > minTimeForRepetition,
             ),
           );
 
           lastRepetition = {
             ...lastRepetition,
             ...Object.fromEntries(
-              session.map((task) => [task, { time, mastery: masteries[task] }]),
+              session.map((task) => [task, { day, mastery: masteries[task] }]),
             ),
           };
         },

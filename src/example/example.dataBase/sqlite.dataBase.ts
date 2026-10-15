@@ -10,26 +10,26 @@ export class RegExpDataBase implements SaveDataBase {
       CREATE TABLE IF NOT EXISTS results (
         id TEXT NOT NULL,
         correctness REAL NOT NULL,
-        time INTEGER NOT NULL
+        day INTEGER NOT NULL
       )
     `);
   }
 
   loadSaveData(): SaveData {
     return this.db
-      .prepare('SELECT id, correctness, time FROM results ORDER BY time, rowid')
+      .prepare('SELECT id, correctness, day FROM results ORDER BY day, rowid')
       .all() as unknown as TimedResult[];
   }
 
   saveData(saveData: SaveData): void {
     const insert = this.db.prepare(
-      'INSERT INTO results (id, correctness, time) VALUES (?, ?, ?)',
+      'INSERT INTO results (id, correctness, day) VALUES (?, ?, ?)',
     );
     this.db.exec('BEGIN');
     try {
       this.db.exec('DELETE FROM results');
-      for (const { id, correctness, time } of saveData) {
-        insert.run(id, correctness, time);
+      for (const { id, correctness, day } of saveData) {
+        insert.run(id, correctness, day);
       }
       this.db.exec('COMMIT');
     } catch (error) {

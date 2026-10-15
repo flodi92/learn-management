@@ -10,7 +10,7 @@ describe('getMastery', () => {
       }
     });
   };
-  describe('mastery decreases with increasing time of last repetition', () => {
+  describe('mastery decreases with increasing day of last repetition', () => {
     it('case 0', () => {
       const a = getMastery([{ beforeDays: 1, correctness: 1 }]);
       const b = getMastery([{ beforeDays: 2, correctness: 1 }]);
@@ -199,7 +199,7 @@ describe('getMastery', () => {
     });
   });
 
-  describe('mastery is considered more when the user has kept the skill for a longer time', () => {
+  describe('mastery is considered more when the user has kept the skill for a longer day', () => {
     it('case 1', () => {
       const a = getMastery([
         { beforeDays: 1, correctness: 1 },
@@ -386,7 +386,7 @@ describe('getMastery', () => {
     });
   });
 
-  describe('mastery is considered less when the user has lost the skill over a longer time', () => {
+  describe('mastery is considered less when the user has lost the skill over a longer day', () => {
     it('case 1', () => {
       const a = getMastery([
         { beforeDays: 1, correctness: 1 },
@@ -417,7 +417,7 @@ describe('getMastery', () => {
     });
   });
 
-  describe('mastery decreases less after a longer time', () => {
+  describe('mastery decreases less after a longer day', () => {
     it('case 0', () => {
       const a = getMastery([{ beforeDays: 1, correctness: 1 }]);
       const b = getMastery([{ beforeDays: 2, correctness: 1 }]);

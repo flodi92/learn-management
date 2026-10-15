@@ -40,7 +40,7 @@ export interface Result {
 }
 
 export interface TimedResult extends Result {
-  time: number;
+  day: number;
 }
 
 export type SaveData = TimedResult[];

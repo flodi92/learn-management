@@ -5,14 +5,14 @@ import { prioritizeSubjects } from './prioritizeSubjects';
 
 interface AssembleNextSessionProps<S extends LearnSubject> {
   count: number;
-  time: number;
+  day: number;
   idSubjectMapping: Record<string, S>;
   results: TimedResult[];
 }
 
 export const assembleNextSession = <S extends LearnSubject>({
   count,
-  time,
+  day,
   idSubjectMapping,
   results,
 }: AssembleNextSessionProps<S>): S[] => {
@@ -21,7 +21,7 @@ export const assembleNextSession = <S extends LearnSubject>({
   }
 
   const subjectStatistics = computeSubjectStatisticsAt(
-    time,
+    day,
     idSubjectMapping,
     results,
   );
