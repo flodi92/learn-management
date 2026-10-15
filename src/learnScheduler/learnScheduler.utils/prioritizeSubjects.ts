@@ -26,6 +26,8 @@ export const getCategoryAndRelevanceStatistics = (
   const buffer = {} as CategoryAndRelevanceStatistics;
 
   Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
+    if (!idSubjectMapping[id]) return;
+
     const { relevance, categories } = idSubjectMapping[id];
     if (!relevance) return;
 
@@ -61,24 +63,21 @@ export const getCategoryAndRelevanceStatistics = (
 
 export const prioritizeByCategoryAndRelevance = (
   statistics: CategoryAndRelevanceStatistics,
-  subjects: string[],
-  idSubjectMapping: Record<string, LearnSubject>,
+  subjects: LearnSubject[],
 ): string[] => {
-  let subjectsWithCategoryRelevanceStatistics = subjects
-    .map((id) => idSubjectMapping[id])
-    .map(
-      (subject) =>
-        [
-          subject.id,
-          subject.categories
-            ?.map((category) =>
-              subject.relevance
-                ? statistics[category][subject.relevance]
-                : undefined,
-            )
-            .filter(isNotUndefined) ?? [],
-        ] as const,
-    );
+  let subjectsWithCategoryRelevanceStatistics = subjects.map(
+    (subject) =>
+      [
+        subject.id,
+        subject.categories
+          ?.map((category) =>
+            subject.relevance
+              ? statistics[category][subject.relevance]
+              : undefined,
+          )
+          .filter(isNotUndefined) ?? [],
+      ] as const,
+  );
 
   subjectsWithCategoryRelevanceStatistics =
     subjectsWithCategoryRelevanceStatistics.sort(([_, a], [__, b]) => {
@@ -119,17 +118,16 @@ export const prioritizeByCategoryAndRelevance = (
 
 export const prioritizeSubjects = (
   subjectStatistics: Record<string, { mastery: number }>,
-  subjects: string[],
-  idSubjectMapping: Record<string, LearnSubject>,
+  subjects: LearnSubject[],
 ): string[] => {
+  const idSubjectMapping = Object.fromEntries(
+    subjects.map((subject) => [subject.id, subject] as const),
+  );
+
   const statistics = getCategoryAndRelevanceStatistics(
     subjectStatistics,
     idSubjectMapping,
   );
 
-  return prioritizeByCategoryAndRelevance(
-    statistics,
-    subjects,
-    idSubjectMapping,
-  );
+  return prioritizeByCategoryAndRelevance(statistics, subjects);
 };

@@ -64,16 +64,16 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     ).slice(0, count);
 
     if (sessionSubjects.length < count) {
-      const newSubjects = this.subjectIds.filter(
-        (id) => subjectStatistics[id].mastery < learningInProgressMasteryMin,
+      const newSubjects = this.subjects.filter(
+        (subject) =>
+          subjectStatistics[subject.id].mastery < learningInProgressMasteryMin,
       );
 
       sessionSubjects.push(
-        ...prioritizeSubjects(
-          subjectStatistics,
-          newSubjects,
-          this.idSubjectMapping,
-        ).slice(0, count - sessionSubjects.length),
+        ...prioritizeSubjects(subjectStatistics, newSubjects).slice(
+          0,
+          count - sessionSubjects.length,
+        ),
       );
     }
 
