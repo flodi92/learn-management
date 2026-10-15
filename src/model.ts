@@ -5,6 +5,32 @@ export interface LearnSubject {
   relevance?: number;
 }
 
+export interface SubjectStatisticsItem {
+  mastery: number;
+  lastRepetition?: number;
+  lastMastery: number;
+  lastCorrectness: number;
+}
+
+export type SubjectStatistics = Record<string, SubjectStatisticsItem>;
+
+export type CategoryAndRelevanceStatisticsItem = {
+  category: string;
+  relevance: number;
+  notLearned: number;
+  learning: number;
+  learned: number;
+  all: number;
+};
+
+export type CategoryAndRelevanceStatistics = Record<
+  CategoryAndRelevanceStatisticsItem['category'],
+  Record<
+    CategoryAndRelevanceStatisticsItem['relevance'],
+    CategoryAndRelevanceStatisticsItem
+  >
+>;
+
 export interface SaveDataBase {
   loadSaveData(): SaveData;
   saveData(saveData: SaveData): void;

@@ -5,7 +5,12 @@ import {
   learningInProgressMasteryMin,
   repeatSubjectsMasteryMax,
 } from './learnScheduler.constants';
-import { SaveData, LearnSubject, TimedResult } from '../model';
+import {
+  SaveData,
+  LearnSubject,
+  TimedResult,
+  SubjectStatistics,
+} from '../model';
 import { getToday } from '../utils';
 
 export class LearnScheduler<S extends LearnSubject = LearnSubject> {
@@ -135,15 +140,7 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     );
   }
 
-  private getSubjectStatisticsAt(time: number): Record<
-    string,
-    {
-      mastery: number;
-      lastRepetition?: number;
-      lastMastery: number;
-      lastCorrectness: number;
-    }
-  > {
+  private getSubjectStatisticsAt(time: number): SubjectStatistics {
     return Object.fromEntries(
       Array.from(new Set(this.subjectIds)).map((id) => {
         const relevantResults = this.results

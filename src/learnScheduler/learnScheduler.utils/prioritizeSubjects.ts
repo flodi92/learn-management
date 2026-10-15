@@ -2,25 +2,15 @@ import {
   learningInProgressMasteryMax,
   learningInProgressMasteryMin,
 } from '../learnScheduler.constants';
-import { LearnSubject } from '../../model';
+import {
+  CategoryAndRelevanceStatistics,
+  LearnSubject,
+  SubjectStatistics,
+} from '../../model';
 import { isNotUndefined } from '../../utils';
 
-export type CategoryAndRelevanceStatisticsItem = {
-  category: string;
-  relevance: number;
-  notLearned: number;
-  learning: number;
-  learned: number;
-  all: number;
-};
-
-export type CategoryAndRelevanceStatistics = Record<
-  string,
-  Record<number, CategoryAndRelevanceStatisticsItem>
->;
-
 export const getCategoryAndRelevanceStatistics = (
-  subjectStatistics: Record<string, { mastery: number }>,
+  subjectStatistics: SubjectStatistics,
   idSubjectMapping: Record<string, LearnSubject>,
 ): CategoryAndRelevanceStatistics => {
   const buffer = {} as CategoryAndRelevanceStatistics;
@@ -117,7 +107,7 @@ export const prioritizeByCategoryAndRelevance = (
 };
 
 export const prioritizeSubjects = (
-  subjectStatistics: Record<string, { mastery: number }>,
+  subjectStatistics: SubjectStatistics,
   subjects: LearnSubject[],
 ): string[] => {
   const idSubjectMapping = Object.fromEntries(
