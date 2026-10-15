@@ -1,6 +1,6 @@
 import { Task } from '../../../model';
+import { ExtendsType, AssertTrue } from '../../../utils';
 
-// `alternative` is a readable replacement shown to the learner instead of `value`
 export type RegExpExample = string | { value: string; alternative: string };
 
 export type InitialRegExpTask = {
@@ -10,12 +10,17 @@ export type InitialRegExpTask = {
   nots?: RegExp[];
 };
 
-export interface RegExpTask extends InitialRegExpTask, Required<Task> {
+export interface RegExpTask extends InitialRegExpTask {
   id: string;
+  parentIds: string[];
   elements: RegExpElement[];
   categories: RegExpCategory[];
   relevance: RegExpRelevance;
 }
+
+export type CheckThatRegExpTaskExtendsTask = AssertTrue<
+  ExtendsType<RegExpTask, Task>
+>;
 
 export const regExpCategories = [
   'characterClass',
