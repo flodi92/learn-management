@@ -20,8 +20,7 @@ export type CategoryAndRelevanceStatisticsItem = {
   category: string;
   relevance: number;
   all: number;
-} & Record<Exclude<LearningState, 'forRepeat'>, number>; // @todo no Exclude
-
+} & Record<LearningState, number>;
 export type CategoryAndRelevanceStatistics = Record<
   CategoryAndRelevanceStatisticsItem['category'],
   Record<

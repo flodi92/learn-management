@@ -8,6 +8,7 @@ import {
   SubjectStatistics,
 } from '../../model';
 import { isNotUndefined } from '../../utils';
+import { determineLearningStateFromStatisticsItem } from './determineLearningStateFromStatisticsItem';
 
 export const getCategoryAndRelevanceStatistics = (
   subjectStatistics: SubjectStatistics,
@@ -15,7 +16,7 @@ export const getCategoryAndRelevanceStatistics = (
 ): CategoryAndRelevanceStatistics => {
   const buffer = {} as CategoryAndRelevanceStatistics;
 
-  Object.entries(subjectStatistics).forEach(([id, { mastery }]) => {
+  Object.entries(subjectStatistics).forEach(([id, subjectStatisticsItem]) => {
     if (!idSubjectMapping[id]) return;
 
     const { relevance, categories } = idSubjectMapping[id];
@@ -32,18 +33,17 @@ export const getCategoryAndRelevanceStatistics = (
           relevance,
           notLearned: 0,
           learning: 0,
+          forRepeat: 0,
           learned: 0,
           all: 0,
         };
       }
 
-      if (mastery < learningInProgressMasteryMin) {
-        buffer[category][relevance].notLearned++;
-      } else if (mastery > learningInProgressMasteryMax) {
-        buffer[category][relevance].learned++;
-      } else {
-        buffer[category][relevance].learning++;
-      }
+      const learningState = determineLearningStateFromStatisticsItem(
+        subjectStatisticsItem,
+      );
+
+      buffer[category][relevance][learningState]++;
       buffer[category][relevance].all++;
     });
   });
