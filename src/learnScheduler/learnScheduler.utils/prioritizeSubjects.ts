@@ -51,10 +51,14 @@ export const getCategoryAndRelevanceStatistics = (
   return buffer;
 };
 
-export const prioritizeByCategoryAndRelevance = (
+export const prioritizeByCategoryAndRelevance = <S extends LearnSubject>(
   statistics: CategoryAndRelevanceStatistics,
-  subjects: LearnSubject[],
-): string[] => {
+  subjects: S[],
+): S[] => {
+  const idSubjectMapping = Object.fromEntries(
+    subjects.map((subject) => [subject.id, subject] as const),
+  );
+
   let subjectsWithCategoryRelevanceStatistics = subjects.map(
     (subject) =>
       [
@@ -103,13 +107,15 @@ export const prioritizeByCategoryAndRelevance = (
       return isLastA ? 1 : -1;
     });
 
-  return subjectsWithCategoryRelevanceStatistics.map(([id]) => id);
+  return subjectsWithCategoryRelevanceStatistics.map(
+    ([id]) => idSubjectMapping[id],
+  );
 };
 
-export const prioritizeSubjects = (
+export const prioritizeSubjects = <S extends LearnSubject>(
+  subjects: S[],
   subjectStatistics: SubjectStatistics,
-  subjects: LearnSubject[],
-): string[] => {
+): S[] => {
   const idSubjectMapping = Object.fromEntries(
     subjects.map((subject) => [subject.id, subject] as const),
   );

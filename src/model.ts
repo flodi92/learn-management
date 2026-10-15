@@ -14,14 +14,13 @@ export interface SubjectStatisticsItem {
 
 export type SubjectStatistics = Record<string, SubjectStatisticsItem>;
 
+export type LearningState = 'notLearned' | 'learning' | 'learned' | 'forRepeat';
+
 export type CategoryAndRelevanceStatisticsItem = {
   category: string;
   relevance: number;
-  notLearned: number;
-  learning: number;
-  learned: number;
   all: number;
-};
+} & Record<Exclude<LearningState, 'forRepeat'>, number>; // @todo no Exclude
 
 export type CategoryAndRelevanceStatistics = Record<
   CategoryAndRelevanceStatisticsItem['category'],
