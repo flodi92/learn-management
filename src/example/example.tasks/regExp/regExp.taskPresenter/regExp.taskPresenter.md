@@ -1,20 +1,13 @@
-## definition
+## Definition
 
-The TaskPresenter is a console tool that is invoked with all the tasks in [[../index.ts]].
+The `RegExpTaskPresenter` guides the user through a sequence of regular-expression tasks in the console. For each task, it displays the regular expression and a shuffled selection of its positive and negative examples. When the task contains examples of both kinds, the selection includes at least one of each; the number shown is limited by the configured maximum. Examples with an alternative display that alternative in angle brackets instead of the example value.
 
-It can be started with npm start-regExp.
+The user classifies every displayed example as positive (it matches) or negative (it does not match). Use **↑/↓** to move between examples; movement wraps from the last example to the first and vice versa. Use **←/→** to set the selected example to positive or negative, or press **p/n** to classify it and automatically move to the next example. The cursor also wraps when advancing with **p/n**.
 
-Now, the console tool processes the 10 randomly chosen examples in the following way.
+Press **Enter** after classifying all examples to check the task. If any examples are still unclassified, the presenter asks the user to classify them first. Once checked, each example is shown in green if its classification is correct and red if it is incorrect. The presenter reports whether all answers were correct or some were wrong, and records the task result. Press **Enter** again to continue to the next task.
 
-It presents the expression to the user.
+After the final task, the presenter displays a summary of the number of correctly and incorrectly answered tasks, then signals that the presentation has finished. If started with no tasks, it reports that no tasks are available.
 
-Then it presents the concated and shuffled array of positiveExamples and negativeExamples. Each example in one line.
-The user is asked to categorize each example as positive or negative by pressing p or n. When an example is categorized "positive" or "negative" is written in brackets behind the example The cursor then jumps to the next line. A console text explains that principle. When the last example is categorized the cursor jumps back to the first example which then can be overridden.
+## Relationship to `TaskPresenter`
 
-When the user hits enter all the user's categorizations are checked. False positive categorizations and false negative categorizations are marked as red.
-
-When all is correct the console will tell. All correct.
-
-When hitting enter again then the next task is examined.
-
-When the last task has been resolved a summary is presented of how many tasks have been answered correctly and how many tasks have been answered incorrectly.
+The superclass defines the lifecycle shared by task presenters: `start(tasks)` begins presenting a list of tasks, `onAnswered` receives a `Result` whenever a task has been checked, and `onFinished` signals that the presentation is complete. `RegExpTaskPresenter.start` initializes the task sequence and starts the console interaction. After each check, it calls the registered `onAnswered` handler with the current task's ID and a correctness score of `1` when every example was classified correctly or `0` otherwise. After the last task, it shows the summary and calls the registered `onFinished` handler. When started with an empty task list, it reports that there are no tasks and returns without starting the interaction.
