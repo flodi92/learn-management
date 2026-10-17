@@ -3,10 +3,12 @@ import readline from 'node:readline';
 import { RegExpTask } from '../regExp.model';
 import { Result } from '../../../../model';
 import { TaskPresenter } from '../../../../userInterface/taskPresenter';
+import { maximumNumberOfShownExamples } from '../regExp.constants';
 import {
   getExampleAlternative,
   getExampleValue,
 } from '../regExp.utils/regExp.utils';
+import { isNotUndefined } from '../../../../utils';
 
 type Example = {
   text: string;
@@ -24,19 +26,35 @@ const shuffle = <T>(items: T[]): T[] => {
   return copy;
 };
 
-const buildExamples = (task: RegExpTask): Example[] =>
-  shuffle([
-    ...(task.positiveExamples ?? []).map((example) => ({
+const buildExamples = (task: RegExpTask): Example[] => {
+  const positives = shuffle(
+    (task.positiveExamples ?? []).map((example) => ({
       text: getExampleValue(example),
       alternative: getExampleAlternative(example),
       isPositive: true,
     })),
-    ...(task.negativeExamples ?? []).map((example) => ({
+  );
+  const negatives = shuffle(
+    (task.negativeExamples ?? []).map((example) => ({
       text: getExampleValue(example),
       alternative: getExampleAlternative(example),
       isPositive: false,
     })),
-  ]);
+  );
+
+  // Reserve one of each kind (if available), then fill the rest randomly.
+  const selected = [positives.shift(), negatives.shift()].filter(
+    isNotUndefined,
+  );
+  const rest = shuffle([...positives, ...negatives]);
+  selected.push(
+    ...rest.slice(
+      0,
+      Math.max(0, maximumNumberOfShownExamples - selected.length),
+    ),
+  );
+  return shuffle(selected);
+};
 
 const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
