@@ -5,13 +5,13 @@ import { LearningState } from '../model';
 interface ProgressItem {
   label: string;
   mastery: number;
-  lastRepetitionBeforeDays: number; // 1 to 365
-  numberOfRepetitions: number; // 1 to 5
+  lastRepetitionBeforeDays: number;
+  numberOfRepetitions: number;
   learningState: LearningState;
 }
 
 type ProgressAggregation = {
-  avgLastRepetitionBeforeDays: number; // 1 to 365
+  avgLastRepetitionBeforeDays: number;
 } & Record<LearningState, number>;
 
 type Statistics<
