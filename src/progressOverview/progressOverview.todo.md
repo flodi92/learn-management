@@ -1,0 +1,6 @@
+- camel case to normal
+- show label if available
+- general refactoring
+- separation of interface and implementation
+- display of data as arrow function that comes from outsite in constructor
+- avoid any
