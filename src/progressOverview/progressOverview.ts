@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import readline from 'node:readline';
 import { LearningState } from '../model';
 
-interface ProgressItem {
+export interface ProgressItem {
   label: string;
   mastery: number;
   lastRepetitionBeforeDays: number;
@@ -10,30 +10,15 @@ interface ProgressItem {
   learningState: LearningState;
 }
 
-type ProgressAggregation = {
+export type ProgressAggregation = {
   avgLastRepetitionBeforeDays: number;
 } & Record<LearningState, number>;
 
-type Statistics<
-  ChildType extends string | undefined = undefined,
-  ChildKey extends string | number = string,
-  ChildStatistics extends Statistics<any, any, any> = Statistics<any, any, any>,
-> = {
-  statistics: ChildType extends undefined ? ProgressItem : ProgressAggregation;
-} & (ChildType extends undefined
-  ? {}
-  : {
-      childType: ChildType;
-      children: Record<ChildKey, ChildStatistics>;
-    });
-
-export type StatisticsHierarchy = Statistics<
-  'category',
-  string,
-  Statistics<'relevance', number, Statistics>
->;
-
-type AnyStatistics = Statistics<any, any, any>;
+export interface GeneralStatistics {
+  statistics: ProgressItem | ProgressAggregation;
+  childType?: string;
+  children?: Record<string | number, GeneralStatistics>;
+}
 
 // A path of child keys leading from the root to a (nested) child.
 type Path = string[];
@@ -73,19 +58,19 @@ const formatStatistics = (statistics: object): string =>
     .join(', ');
 
 const getChildren = (
-  node: AnyStatistics,
-): { childType: string; entries: [string, AnyStatistics][] } | undefined =>
-  'children' in node
+  node: GeneralStatistics,
+): { childType: string; entries: [string, GeneralStatistics][] } | undefined =>
+  node.children !== undefined && node.childType !== undefined
     ? { childType: node.childType, entries: Object.entries(node.children) }
     : undefined;
 
 export class ProgressOverview {
-  private root?: AnyStatistics;
+  private root?: GeneralStatistics;
   private expanded = new Set<string>();
   private lines: Line[] = [];
   private focus?: Path;
 
-  display(statistics: Statistics<any, any, any>) {
+  display(statistics: GeneralStatistics) {
     this.root = statistics;
     this.expanded.clear();
     this.focus = undefined;
@@ -93,7 +78,7 @@ export class ProgressOverview {
     this.listen();
   }
 
-  private buildLines(node: AnyStatistics, path: Path): Line[] {
+  private buildLines(node: GeneralStatistics, path: Path): Line[] {
     const depth = path.length;
     const lines: Line[] = [{ depth, text: formatStatistics(node.statistics) }];
     const children = getChildren(node);
