@@ -69,13 +69,17 @@ export class ProgressOverview {
   private expanded = new Set<string>();
   private lines: Line[] = [];
   private focus?: Path;
+  private resolveDisplay?: () => void;
 
-  display(statistics: GeneralStatistics) {
-    this.root = statistics;
-    this.expanded.clear();
-    this.focus = undefined;
-    this.update();
-    this.listen();
+  display(statistics: GeneralStatistics): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.resolveDisplay = resolve;
+      this.root = statistics;
+      this.expanded.clear();
+      this.focus = undefined;
+      this.update();
+      this.listen();
+    });
   }
 
   private buildLines(node: GeneralStatistics, path: Path): Line[] {
@@ -166,6 +170,8 @@ export class ProgressOverview {
   private onKeypress(str: string | undefined, key?: readline.Key) {
     if ((key?.ctrl && key.name === 'c') || str === 'q') {
       this.stopListening();
+      this.resolveDisplay?.();
+      this.resolveDisplay = undefined;
       return;
     }
     switch (key?.name) {

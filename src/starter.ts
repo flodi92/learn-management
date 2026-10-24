@@ -23,6 +23,10 @@ export class Starter<Task extends LearnSubject> {
   private finishSession?: () => void;
 
   private async runSession() {
+    await this.overview.showStatistics(
+      this.scheduler.idSubjectMapping,
+      this.scheduler.results,
+    );
     const numberOfTasks = await this.overview.askForNumberOfTasks();
     const session = this.scheduler.nextSession(numberOfTasks);
 

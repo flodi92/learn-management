@@ -4,11 +4,11 @@ import { assembleNextSession } from './learnScheduler.utils/assembleNextSession'
 import { computeSubjectStatisticsAt } from './learnScheduler.utils/computeSubjectStatisticsAt';
 
 export class LearnScheduler<S extends LearnSubject = LearnSubject> {
-  private results: TimedResult[] = [];
-  private idSubjectMapping: Record<string, S>;
+  private _results: TimedResult[] = [];
+  private _idSubjectMapping: Record<string, S>;
 
   constructor(subjects: S[]) {
-    this.idSubjectMapping = Object.fromEntries(
+    this._idSubjectMapping = Object.fromEntries(
       subjects.map((subject) => [subject.id, subject] as const),
     );
   }
@@ -17,8 +17,8 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     return assembleNextSession({
       count,
       day,
-      idSubjectMapping: this.idSubjectMapping,
-      results: this.results,
+      idSubjectMapping: this._idSubjectMapping,
+      results: this._results,
     });
   }
 
@@ -37,20 +37,20 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
         );
       }
 
-      this.results.push({ id, day, correctness });
+      this._results.push({ id, day, correctness });
     }
   }
 
   public getSaveData(): SaveData {
-    return this.results;
+    return this._results;
   }
 
   public restoreFromSaveData(saveData: SaveData) {
-    this.results = saveData;
+    this._results = saveData;
   }
 
   private get subjects() {
-    return Object.values(this.idSubjectMapping);
+    return Object.values(this._idSubjectMapping);
   }
 
   private get subjectIds() {
@@ -60,8 +60,8 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
   public get lastCorrectness(): Record<string, number> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
-      this.idSubjectMapping,
-      this.results,
+      this._idSubjectMapping,
+      this._results,
     );
     return Object.fromEntries(
       this.subjectIds.map((id) => [id, subjectStatistics[id].lastCorrectness]),
@@ -71,8 +71,8 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
   public get mastery(): Record<string, number> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
-      this.idSubjectMapping,
-      this.results,
+      this._idSubjectMapping,
+      this._results,
     );
     return Object.fromEntries(
       this.subjectIds.map((id) => [id, subjectStatistics[id].mastery]),
@@ -82,8 +82,8 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
   public get lastRepetition(): Record<string, number | undefined> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
-      this.idSubjectMapping,
-      this.results,
+      this._idSubjectMapping,
+      this._results,
     );
     return Object.fromEntries(
       this.subjectIds.map((id) => [id, subjectStatistics[id].lastRepetition]),
@@ -93,11 +93,19 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
   public get lastMastery(): Record<string, number> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
-      this.idSubjectMapping,
-      this.results,
+      this._idSubjectMapping,
+      this._results,
     );
     return Object.fromEntries(
       this.subjectIds.map((id) => [id, subjectStatistics[id].lastMastery]),
     );
+  }
+
+  public get results() {
+    return this._results;
+  }
+
+  public get idSubjectMapping() {
+    return this._idSubjectMapping;
   }
 }
