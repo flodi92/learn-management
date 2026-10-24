@@ -10,6 +10,7 @@ export interface SubjectStatisticsItem {
   lastRepetition?: number;
   lastMastery: number;
   lastCorrectness: number;
+  numberOfRepetitions: number;
 }
 
 export type SubjectStatistics = Record<string, SubjectStatisticsItem>;

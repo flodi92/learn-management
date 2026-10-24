@@ -40,6 +40,7 @@ export const computeSubjectStatisticsAt = (
           lastRepetition,
           lastMastery,
           lastCorrectness,
+          numberOfRepetitions: relevantResults.length,
         },
       ];
     }),
