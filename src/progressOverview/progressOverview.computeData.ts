@@ -129,5 +129,5 @@ export const computeData = <S extends LearnSubject>(
     day,
     getLabelFromId,
   );
-  return new ComputeData(statistics, ['relevance', 'category']);
+  return new ComputeData(statistics, ['category', 'relevance']);
 };
