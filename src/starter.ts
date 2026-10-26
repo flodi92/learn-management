@@ -60,4 +60,8 @@ export class Starter<Task extends LearnSubject> {
   private restoreFromSaveData() {
     this.scheduler.restoreFromSaveData(this.saveDataBase.loadSaveData());
   }
+
+  protected get idSubjectMapping() {
+    return this.scheduler.idSubjectMapping;
+  }
 }

@@ -4,6 +4,7 @@ import { computeStatistics } from './overview.utils/overview.computeStatistics';
 import { getToday } from '../utils';
 
 export abstract class Overview {
+  constructor(public getLabelFromId: (id: string) => string) {}
   async displayStatistics(
     idSubjectMapping: Record<string, LearnSubject>,
     results: TimedResult[],
@@ -12,7 +13,7 @@ export abstract class Overview {
       idSubjectMapping,
       results,
       getToday(),
-      (id) => id,
+      this.getLabelFromId,
     );
     this.displayComputedStatistics(statistics);
   }

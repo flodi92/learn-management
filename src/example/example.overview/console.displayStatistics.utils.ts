@@ -19,8 +19,20 @@ export const indentation = (depth: number) => '  '.repeat(depth);
 
 export const pathId = (path: string[]) => JSON.stringify(path);
 
-export const formatStatistics = (statistics: object): string =>
-  Object.entries(statistics)
+const getLabel = (statistics: object): string | undefined => {
+  const label = (statistics as { label?: unknown }).label;
+  return typeof label === 'string' && label !== '' ? label : undefined;
+};
+
+export const getDisplayName = (
+  node: OverviewRecursiveStatistics,
+  id: string,
+): string => getLabel(node.statistics) ?? id;
+
+export const formatStatistics = (statistics: object): string => {
+  const hideId = getLabel(statistics) !== undefined;
+  return Object.entries(statistics)
+    .filter(([key]) => !(hideId && key === 'id'))
     .map(([key, value]) => {
       const state = isLearningState(key)
         ? key
@@ -31,6 +43,7 @@ export const formatStatistics = (statistics: object): string =>
       return `${chalk.dim(`${key}:`)} ${state ? learningStateColors[state](text) : text}`;
     })
     .join(', ');
+};
 
 export const getChildren = (
   node: OverviewRecursiveStatistics,

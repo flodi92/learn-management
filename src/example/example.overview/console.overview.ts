@@ -5,6 +5,9 @@ import { Overview } from '../../overview/overview';
 import { consoleDisplayStatistics } from './console.displayStatistics';
 
 export class ConsoleOverview extends Overview {
+  constructor(getLabelFromId: (id: string) => string) {
+    super(getLabelFromId);
+  }
   async askForNumberOfTasks(): Promise<number> {
     const readline = createInterface({ input: stdin, output: stdout });
     try {

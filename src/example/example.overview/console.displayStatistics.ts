@@ -5,6 +5,7 @@ import { Line } from './console.displayStatistics.model';
 import {
   formatStatistics,
   getChildren,
+  getDisplayName,
   indentation,
   pathId,
 } from './console.displayStatistics.utils';
@@ -39,7 +40,7 @@ export class ConsoleDisplayStatistics {
     lines.push({ depth, text: chalk.bold(`${children.childType} statistics`) });
     for (const [key, child] of children.entries) {
       const childPath = [...path, key];
-      lines.push({ depth, text: key, path: childPath });
+      lines.push({ depth, text: getDisplayName(child, key), path: childPath });
       if (this.expanded.has(pathId(childPath))) {
         lines.push(...this.buildLines(child, childPath));
       }
