@@ -31,18 +31,23 @@ export class ConsoleDisplayStatistics {
   private buildLines(
     node: OverviewRecursiveStatistics,
     path: string[],
+    depth: number,
   ): Line[] {
-    const depth = path.length;
     const lines: Line[] = [{ depth, text: formatStatistics(node.statistics) }];
     const children = getChildren(node);
     if (!children) return lines;
 
     lines.push({ depth, text: chalk.bold(`${children.childType} statistics`) });
+    const childDepth = depth + 1;
     for (const [key, child] of children.entries) {
       const childPath = [...path, key];
-      lines.push({ depth, text: getDisplayName(child, key), path: childPath });
+      lines.push({
+        depth: childDepth,
+        text: getDisplayName(child, key),
+        path: childPath,
+      });
       if (this.expanded.has(pathId(childPath))) {
-        lines.push(...this.buildLines(child, childPath));
+        lines.push(...this.buildLines(child, childPath, childDepth + 1));
       }
     }
     return lines;
@@ -55,7 +60,7 @@ export class ConsoleDisplayStatistics {
   // Rebuilds the lines and keeps the focus on a valid child.
   private update() {
     if (!this.root) return;
-    this.lines = this.buildLines(this.root, []);
+    this.lines = this.buildLines(this.root, [], 0);
     const focusable = this.focusablePaths;
     if (
       !this.focus ||
