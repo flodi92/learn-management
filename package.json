@@ -3,7 +3,7 @@
     "prettify": "prettier . --write",
     "test": "vitest",
     "start-regExp": "tsx src/example/example.tasks/regExp/regExp.main.ts",
-    "start-progress": "tsx src/progressOverview/progressOverview.main.ts"
+    "start-overview": "tsx src/example/example.overview/console.displayStatistics.main.ts"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

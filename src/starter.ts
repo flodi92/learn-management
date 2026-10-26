@@ -1,6 +1,6 @@
 import { LearnScheduler } from './learnScheduler/learnScheduler';
 import { Result, SaveDataBase, LearnSubject } from './model';
-import { Overview } from './userInterface/overview';
+import { Overview } from './overview/overview';
 import { TaskPresenter } from './userInterface/taskPresenter';
 
 export class Starter<Task extends LearnSubject> {
@@ -23,7 +23,7 @@ export class Starter<Task extends LearnSubject> {
   private finishSession?: () => void;
 
   private async runSession() {
-    await this.overview.showStatistics(
+    await this.overview.displayStatistics(
       this.scheduler.idSubjectMapping,
       this.scheduler.results,
     );

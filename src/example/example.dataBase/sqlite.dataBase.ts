@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { SaveData, SaveDataBase, TimedResult } from '../../model';
 
-export class RegExpDataBase implements SaveDataBase {
+export class SQLiteDataBase implements SaveDataBase {
   private db: Database.Database;
 
   constructor(path = 'regExp.sqlite') {

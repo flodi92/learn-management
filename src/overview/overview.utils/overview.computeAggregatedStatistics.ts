@@ -1,7 +1,7 @@
 import {
   OverviewSubjectStatisticsItem,
   OverviewAggregatedStatisticsItem,
-} from '../progressOverview.model';
+} from '../overview.model';
 
 export const computeAggregatedStatistics = (
   statisticsItems: OverviewSubjectStatisticsItem[],

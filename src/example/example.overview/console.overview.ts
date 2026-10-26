@@ -1,25 +1,10 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
-import { Overview } from '../../../userInterface/overview';
-import { LearnSubject, TimedResult } from '../../../model';
-import { computeStatistics } from '../../../progressOverview/progressOverview.utils/progressOverview.computeStatistics';
-import { getToday } from '../../../utils';
-import { ProgressOverview } from '../../../progressOverview/progressOverview';
+import { OverviewRecursiveStatistics } from '../../overview/overview.model';
+import { Overview } from '../../overview/overview';
+import { consoleDisplayStatistics } from './console.displayStatistics';
 
 export class ConsoleOverview extends Overview {
-  async showStatistics(
-    idSubjectMapping: Record<string, LearnSubject>,
-    results: TimedResult[],
-  ): Promise<void> {
-    const statistics = computeStatistics(
-      idSubjectMapping,
-      results,
-      getToday(),
-      (id) => id,
-    );
-    const overview = new ProgressOverview();
-    await overview.display(statistics);
-  }
   async askForNumberOfTasks(): Promise<number> {
     const readline = createInterface({ input: stdin, output: stdout });
     try {
@@ -49,5 +34,11 @@ export class ConsoleOverview extends Overview {
     } finally {
       readline.close();
     }
+  }
+
+  protected async displayComputedStatistics(
+    statistics: OverviewRecursiveStatistics,
+  ): Promise<void> {
+    consoleDisplayStatistics(statistics);
   }
 }

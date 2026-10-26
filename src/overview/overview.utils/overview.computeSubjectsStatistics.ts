@@ -1,7 +1,7 @@
 import { computeSubjectStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeSubjectStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/learnScheduler.utils/determineLearningStateFromStatisticsItem';
 import { LearnSubject, TimedResult } from '../../model';
-import { SubjectStatisticsTuple } from '../progressOverview.model';
+import { SubjectStatisticsTuple } from '../overview.model';
 
 export const computeSubjectsStatistics = <S extends LearnSubject>(
   idSubjectMapping: Record<string, S>,

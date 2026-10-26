@@ -3,9 +3,9 @@ import { getToday } from '../../utils';
 import {
   OverviewRecursiveStatistics,
   SubjectStatisticsTuples,
-} from '../progressOverview.model';
-import { computeAggregatedStatistics } from './progressOverview.computeAggregatedStatistics';
-import { computeSubjectsStatistics } from './progressOverview.computeSubjectsStatistics';
+} from '../overview.model';
+import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
+import { computeSubjectsStatistics } from './overview.computeSubjectsStatistics';
 
 class StatisticsComputation<
   S extends LearnSubject,

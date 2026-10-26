@@ -1,4 +1,4 @@
-import { OverviewRecursiveStatistics } from './progressOverview.model';
+import { OverviewRecursiveStatistics } from '../overview.model';
 
 export const statisticsExample: OverviewRecursiveStatistics = {
   childType: 'category',

@@ -27,9 +27,3 @@ export type SubjectStatisticsTuple<S extends LearnSubject> = [
 
 export type SubjectStatisticsTuples<S extends LearnSubject> =
   SubjectStatisticsTuple<S>[];
-
-export type Line = {
-  depth: number;
-  text: string;
-  path?: string[];
-};

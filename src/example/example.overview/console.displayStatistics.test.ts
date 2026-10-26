@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ProgressOverview } from './progressOverview';
-import { statisticsExample } from './progressOverview.exampleData';
+import { statisticsExample } from '../../overview/overview.utils/overview.computeStatistics.exampleData';
+import { ConsoleDisplayStatistics } from './console.displayStatistics';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
-describe('ProgressOverview', () => {
+describe('ConsoleDisplayStatistics', () => {
   let output: string[];
 
   const press = (name: string) => {
@@ -21,7 +21,7 @@ describe('ProgressOverview', () => {
     vi.spyOn(console, 'log').mockImplementation((line = '') => {
       output.push(String(line));
     });
-    new ProgressOverview().display(statisticsExample);
+    new ConsoleDisplayStatistics().display(statisticsExample);
   });
 
   afterEach(() => {

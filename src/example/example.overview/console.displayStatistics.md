@@ -1,7 +1,7 @@
-## ProgressOverview
+## ConsoleDisplayStatistics
 
-The class ProgressOverview is a console tool to display the statistics of type Statistics<any, any, any> on the console.
-The type Statistics is recursive. ProgressOverview only shows child statistics if they have been selected.
+The class ConsoleDisplayStatistics is a console tool to display the statistics of type Statistics<any, any, any> on the console.
+The type Statistics is recursive. ConsoleDisplayStatistics only shows child statistics if they have been selected.
 
 One layer is displayed in the following way.
 It starts with the data listed in the statistics attribute of each layer. That is comma-separated without curly brackets and without line breaks.
@@ -14,10 +14,5 @@ Having focused one expanded child and pressing the arrow down key the focus jump
 
 All actions that can be performed (which keys have which effect) should by explained by gray a console.log
 
-ProgressOverview does not know the type StatisticsHierarchy, it only knows the type Statistics.
 Try to use already existing libraries for that job.
 Use a color scheme similar to that used in the file regExp.taskPresenter.ts
-
-## Testing Scenario
-
-The command npm run start-progress invokes ProgressOverview with testing data from progressOverview.exampleData.ts.

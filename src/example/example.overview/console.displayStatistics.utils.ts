@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { LearningState } from '../../model';
-import { OverviewRecursiveStatistics } from '../progressOverview.model';
+import { OverviewRecursiveStatistics } from '../../overview/overview.model';
 
 export const learningStateColors: Record<
   LearningState,
