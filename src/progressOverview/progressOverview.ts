@@ -1,74 +1,18 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { LearningState } from '../model';
-
-export interface ProgressItem {
-  label: string;
-  mastery: number;
-  lastRepetitionBeforeDays: number;
-  numberOfRepetitions: number;
-  learningState: LearningState;
-}
-
-export type ProgressAggregation = {
-  avgLastRepetitionBeforeDays: number;
-} & Record<LearningState, number>;
-
-export interface GeneralStatistics {
-  statistics: ProgressItem | ProgressAggregation;
-  childType?: string;
-  children?: Record<string | number, GeneralStatistics>;
-}
-
-// A path of child keys leading from the root to a (nested) child.
-type Path = string[];
-
-type Line = {
-  depth: number;
-  text: string;
-  // Only lines of children can be focused.
-  path?: Path;
-};
-
-const learningStateColors: Record<LearningState, (text: string) => string> = {
-  notLearned: chalk.red,
-  learning: chalk.magenta,
-  learned: chalk.green,
-  forRepeat: chalk.cyan,
-};
-
-const isLearningState = (value: unknown): value is LearningState =>
-  typeof value === 'string' && value in learningStateColors;
-
-const indentation = (depth: number) => '  '.repeat(depth);
-
-const pathId = (path: Path) => JSON.stringify(path);
-
-const formatStatistics = (statistics: object): string =>
-  Object.entries(statistics)
-    .map(([key, value]) => {
-      const state = isLearningState(key)
-        ? key
-        : isLearningState(value)
-          ? value
-          : undefined;
-      const text = String(value);
-      return `${chalk.dim(`${key}:`)} ${state ? learningStateColors[state](text) : text}`;
-    })
-    .join(', ');
-
-const getChildren = (
-  node: GeneralStatistics,
-): { childType: string; entries: [string, GeneralStatistics][] } | undefined =>
-  node.children !== undefined && node.childType !== undefined
-    ? { childType: node.childType, entries: Object.entries(node.children) }
-    : undefined;
+import { GeneralStatistics, Line } from './progressOverview.model';
+import {
+  formatStatistics,
+  getChildren,
+  indentation,
+  pathId,
+} from './progressOverview.utils/progressOverview.utils';
 
 export class ProgressOverview {
   private root?: GeneralStatistics;
   private expanded = new Set<string>();
   private lines: Line[] = [];
-  private focus?: Path;
+  private focus?: string[];
   private resolveDisplay?: () => void;
 
   display(statistics: GeneralStatistics): Promise<void> {
@@ -82,7 +26,7 @@ export class ProgressOverview {
     });
   }
 
-  private buildLines(node: GeneralStatistics, path: Path): Line[] {
+  private buildLines(node: GeneralStatistics, path: string[]): Line[] {
     const depth = path.length;
     const lines: Line[] = [{ depth, text: formatStatistics(node.statistics) }];
     const children = getChildren(node);
@@ -99,7 +43,7 @@ export class ProgressOverview {
     return lines;
   }
 
-  private get focusablePaths(): Path[] {
+  private get focusablePaths(): string[][] {
     return this.lines.flatMap((line) => (line.path ? [line.path] : []));
   }
 

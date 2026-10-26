@@ -1,4 +1,4 @@
-import { GeneralStatistics } from './progressOverview';
+import { GeneralStatistics } from './progressOverview.model';
 
 export const statisticsExample: GeneralStatistics = {
   childType: 'category',

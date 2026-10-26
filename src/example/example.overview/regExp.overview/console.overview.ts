@@ -2,7 +2,7 @@ import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import { Overview } from '../../../userInterface/overview';
 import { LearnSubject, TimedResult } from '../../../model';
-import { computeData } from '../../../progressOverview/progressOverview.computeData';
+import { computeData } from '../../../progressOverview/progressOverview.utils/progressOverview.computeData';
 import { getToday } from '../../../utils';
 import { ProgressOverview } from '../../../progressOverview/progressOverview';
 
