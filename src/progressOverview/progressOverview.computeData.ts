@@ -65,12 +65,12 @@ class ComputeData<S extends LearnSubject> implements GeneralStatistics {
     private childTypes: ('relevance' | 'category')[],
   ) {}
 
-  public get childType() {
-    return this.childTypes.length ? this.childTypes[0] : undefined;
+  public get childType(): 'relevance' | 'category' | 'subject' {
+    return this.childTypes.length ? this.childTypes[0] : 'subject';
   }
 
   private get childrensChildTypes() {
-    return this.childTypes.length ? this.childTypes.slice(1) : undefined;
+    return this.childTypes.slice(1);
   }
 
   public get statistics() {
@@ -82,11 +82,11 @@ class ComputeData<S extends LearnSubject> implements GeneralStatistics {
   get children() {
     const { childType, childrensChildTypes } = this;
 
-    if (childType === undefined || childrensChildTypes === undefined) {
+    if (childType === 'subject') {
       return Object.fromEntries(
         this.progressTuples.map(
           ([id, subject, progressItem]) =>
-            [id, { statistics: progressItem }] as const,
+            [id, { childType: 'subject', statistics: progressItem }] as const,
         ),
       );
     }
