@@ -1,12 +1,17 @@
 import { LearnSubject, TimedResult } from '../../model';
 import { getToday } from '../../utils';
-import { GeneralStatistics, ProgressTuples } from '../progressOverview.model';
-import { aggregateProgressItems } from './progressOverview.aggregateProgressItems';
-import { getItemStatistics } from './progressOverview.getItemStatistics';
+import {
+  OverviewRecursiveStatistics,
+  SubjectStatisticsTuples,
+} from '../progressOverview.model';
+import { computeAggregatedStatistics } from './progressOverview.computeAggregatedStatistics';
+import { computeSubjectsStatistics } from './progressOverview.computeSubjectsStatistics';
 
-class ComputeData<S extends LearnSubject> implements GeneralStatistics {
+class StatisticsComputation<
+  S extends LearnSubject,
+> implements OverviewRecursiveStatistics {
   constructor(
-    private progressTuples: ProgressTuples<S>,
+    private subjectStatisticsTuples: SubjectStatisticsTuples<S>,
     private childTypes: ('relevance' | 'category')[],
   ) {}
 
@@ -19,8 +24,10 @@ class ComputeData<S extends LearnSubject> implements GeneralStatistics {
   }
 
   public get statistics() {
-    return aggregateProgressItems(
-      this.progressTuples.map(([id, subject, progressItem]) => progressItem),
+    return computeAggregatedStatistics(
+      this.subjectStatisticsTuples.map(
+        ([id, subject, progressItem]) => progressItem,
+      ),
     );
   }
 
@@ -29,14 +36,14 @@ class ComputeData<S extends LearnSubject> implements GeneralStatistics {
 
     if (childType === 'subject') {
       return Object.fromEntries(
-        this.progressTuples.map(
+        this.subjectStatisticsTuples.map(
           ([id, subject, progressItem]) =>
             [id, { childType: 'subject', statistics: progressItem }] as const,
         ),
       );
     }
 
-    const groupedTuples = this.progressTuples.reduce(
+    const groupedTuples = this.subjectStatisticsTuples.reduce(
       (acc, tuple) => {
         const [id, subject, progressItem] = tuple;
         const groups =
@@ -50,29 +57,29 @@ class ComputeData<S extends LearnSubject> implements GeneralStatistics {
         });
         return acc;
       },
-      {} as Record<string | number, ProgressTuples<S>>,
+      {} as Record<string | number, SubjectStatisticsTuples<S>>,
     );
 
     return Object.fromEntries(
       Object.entries(groupedTuples).map(([group, tuple]) => [
         group,
-        new ComputeData(tuple, childrensChildTypes),
+        new StatisticsComputation(tuple, childrensChildTypes),
       ]),
     );
   }
 }
 
-export const computeData = <S extends LearnSubject>(
+export const computeStatistics = <S extends LearnSubject>(
   idSubjectMapping: Record<string, S>,
   results: TimedResult[],
   day: number = getToday(),
   getLabelFromId: (id: string) => string,
-): GeneralStatistics => {
-  const statistics = getItemStatistics(
+): OverviewRecursiveStatistics => {
+  const statistics = computeSubjectsStatistics(
     idSubjectMapping,
     results,
     day,
     getLabelFromId,
   );
-  return new ComputeData(statistics, ['category', 'relevance']);
+  return new StatisticsComputation(statistics, ['category', 'relevance']);
 };

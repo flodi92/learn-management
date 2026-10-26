@@ -1,6 +1,6 @@
-import { GeneralStatistics } from './progressOverview.model';
+import { OverviewRecursiveStatistics } from './progressOverview.model';
 
-export const statisticsExample: GeneralStatistics = {
+export const statisticsExample: OverviewRecursiveStatistics = {
   childType: 'category',
   statistics: {
     avgLastRepetitionBeforeDays: 19,

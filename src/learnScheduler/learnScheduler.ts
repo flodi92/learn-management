@@ -57,7 +57,7 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     return this.subjects.map((subject) => subject.id);
   }
 
-  public get lastCorrectness(): Record<string, number> {
+  public get lastCorrectness(): Record<string, number | undefined> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
       this._idSubjectMapping,
@@ -90,7 +90,7 @@ export class LearnScheduler<S extends LearnSubject = LearnSubject> {
     );
   }
 
-  public get lastMastery(): Record<string, number> {
+  public get lastMastery(): Record<string, number | undefined> {
     const subjectStatistics = computeSubjectStatisticsAt(
       getToday(),
       this._idSubjectMapping,

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { LearningState } from '../../model';
-import { GeneralStatistics } from '../progressOverview.model';
+import { OverviewRecursiveStatistics } from '../progressOverview.model';
 
 export const learningStateColors: Record<
   LearningState,
@@ -33,8 +33,10 @@ export const formatStatistics = (statistics: object): string =>
     .join(', ');
 
 export const getChildren = (
-  node: GeneralStatistics,
-): { childType: string; entries: [string, GeneralStatistics][] } | undefined =>
+  node: OverviewRecursiveStatistics,
+):
+  | { childType: string; entries: [string, OverviewRecursiveStatistics][] }
+  | undefined =>
   node.children !== undefined && node.childType !== undefined
     ? { childType: node.childType, entries: Object.entries(node.children) }
     : undefined;

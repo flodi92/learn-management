@@ -8,8 +8,8 @@ export interface LearnSubject {
 export interface SubjectStatisticsItem {
   mastery: number;
   lastRepetition?: number;
-  lastMastery: number;
-  lastCorrectness: number;
+  lastMastery?: number;
+  lastCorrectness?: number;
   numberOfRepetitions: number;
 }
 

@@ -18,7 +18,7 @@ export const computeSubjectStatisticsAt = (
 
       const lastResult = relevantResults[relevantResults.length - 1];
       const lastRepetition = lastResult ? lastResult.day : undefined;
-      const lastCorrectness = lastResult ? lastResult.correctness : 0;
+      const lastCorrectness = lastResult ? lastResult.correctness : undefined;
 
       const mastery =
         relevantResults.length > 0
@@ -31,7 +31,7 @@ export const computeSubjectStatisticsAt = (
               relevantResults.filter((result) => result.day <= lastRepetition),
               lastRepetition,
             )[id] ?? 0)
-          : 0;
+          : undefined;
 
       return [
         id,

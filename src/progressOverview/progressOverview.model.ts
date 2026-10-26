@@ -1,30 +1,35 @@
-import { LearningState, LearnSubject } from '../model';
+import { LearningState, LearnSubject, SubjectStatisticsItem } from '../model';
 
-export interface ProgressItem {
+export interface OverviewSubjectStatisticsItem extends Omit<
+  SubjectStatisticsItem,
+  'lastRepetition'
+> {
   label: string;
-  mastery: number;
   lastRepetitionBeforeDays: number;
-  numberOfRepetitions: number;
   learningState: LearningState;
 }
 
-export type ProgressAggregation = {
+export type OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: number;
 } & Record<LearningState, number>;
 
-export interface GeneralStatistics {
-  statistics: ProgressItem | ProgressAggregation;
+export interface OverviewRecursiveStatistics {
+  statistics: OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
   childType?: string;
-  children?: Record<string | number, GeneralStatistics>;
+  children?: Record<string | number, OverviewRecursiveStatistics>;
 }
+
+export type SubjectStatisticsTuple<S extends LearnSubject> = [
+  string,
+  S,
+  OverviewSubjectStatisticsItem,
+];
+
+export type SubjectStatisticsTuples<S extends LearnSubject> =
+  SubjectStatisticsTuple<S>[];
 
 export type Line = {
   depth: number;
   text: string;
-  // Only lines of children can be focused.
   path?: string[];
 };
-
-export type ProgressTuple<S extends LearnSubject> = [string, S, ProgressItem];
-
-export type ProgressTuples<S extends LearnSubject> = ProgressTuple<S>[];

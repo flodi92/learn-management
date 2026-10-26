@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { GeneralStatistics, Line } from './progressOverview.model';
+import { OverviewRecursiveStatistics, Line } from './progressOverview.model';
 import {
   formatStatistics,
   getChildren,
@@ -9,13 +9,13 @@ import {
 } from './progressOverview.utils/progressOverview.utils';
 
 export class ProgressOverview {
-  private root?: GeneralStatistics;
+  private root?: OverviewRecursiveStatistics;
   private expanded = new Set<string>();
   private lines: Line[] = [];
   private focus?: string[];
   private resolveDisplay?: () => void;
 
-  display(statistics: GeneralStatistics): Promise<void> {
+  display(statistics: OverviewRecursiveStatistics): Promise<void> {
     return new Promise<void>((resolve) => {
       this.resolveDisplay = resolve;
       this.root = statistics;
@@ -26,7 +26,10 @@ export class ProgressOverview {
     });
   }
 
-  private buildLines(node: GeneralStatistics, path: string[]): Line[] {
+  private buildLines(
+    node: OverviewRecursiveStatistics,
+    path: string[],
+  ): Line[] {
     const depth = path.length;
     const lines: Line[] = [{ depth, text: formatStatistics(node.statistics) }];
     const children = getChildren(node);

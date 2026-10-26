@@ -17,17 +17,21 @@ export const determineLearningStateFromStatisticsItem = ({
   if (
     mastery >= learningInProgressMasteryMin &&
     mastery < learningInProgressMasteryMax &&
-    lastMastery < learningInProgressMasteryMax
+    (lastMastery ?? 0) < learningInProgressMasteryMax
   ) {
     return 'learning';
   }
   if (
-    lastMastery > learningInProgressMasteryMax &&
+    (lastMastery ?? 0) > learningInProgressMasteryMax &&
     mastery < repeatSubjectsMasteryMax
   ) {
     return 'forRepeat';
   }
-  if (lastRepetition !== undefined && lastCorrectness <= 0.5) {
+  if (
+    lastRepetition !== undefined &&
+    lastCorrectness &&
+    lastCorrectness <= 0.5
+  ) {
     return 'forRepeat';
   }
 

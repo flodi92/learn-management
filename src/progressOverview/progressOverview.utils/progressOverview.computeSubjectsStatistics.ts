@@ -1,9 +1,9 @@
 import { computeSubjectStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeSubjectStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/learnScheduler.utils/determineLearningStateFromStatisticsItem';
 import { LearnSubject, TimedResult } from '../../model';
-import { ProgressTuple } from '../progressOverview.model';
+import { SubjectStatisticsTuple } from '../progressOverview.model';
 
-export const getItemStatistics = <S extends LearnSubject>(
+export const computeSubjectsStatistics = <S extends LearnSubject>(
   idSubjectMapping: Record<string, S>,
   results: TimedResult[],
   day: number,
@@ -29,7 +29,9 @@ export const getItemStatistics = <S extends LearnSubject>(
           numberOfRepetitions: statisticsItem.numberOfRepetitions,
           learningState:
             determineLearningStateFromStatisticsItem(statisticsItem),
+          lastMastery: statisticsItem.lastMastery,
+          lastCorrectness: statisticsItem.lastCorrectness,
         },
-      ] as ProgressTuple<S>,
+      ] satisfies SubjectStatisticsTuple<S>,
   );
 };

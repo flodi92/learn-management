@@ -2,7 +2,7 @@ import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import { Overview } from '../../../userInterface/overview';
 import { LearnSubject, TimedResult } from '../../../model';
-import { computeData } from '../../../progressOverview/progressOverview.utils/progressOverview.computeData';
+import { computeStatistics } from '../../../progressOverview/progressOverview.utils/progressOverview.computeStatistics';
 import { getToday } from '../../../utils';
 import { ProgressOverview } from '../../../progressOverview/progressOverview';
 
@@ -11,7 +11,7 @@ export class ConsoleOverview extends Overview {
     idSubjectMapping: Record<string, LearnSubject>,
     results: TimedResult[],
   ): Promise<void> {
-    const statistics = computeData(
+    const statistics = computeStatistics(
       idSubjectMapping,
       results,
       getToday(),
