@@ -4,3 +4,8 @@
 - separation of interface and implementation
 - display of data as arrow function that comes from outsite in constructor
 - avoid any
+- relevance and category confused
+- "- Infinity" by relevance statistics
+- RegExp.overview to other file
+- id anzeigen
+- progressOverview display by async
