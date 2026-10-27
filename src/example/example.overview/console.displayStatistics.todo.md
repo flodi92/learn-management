@@ -1,6 +1,11 @@
 - "- Infinity" by relevance statistics
-- RegExp.overview to other file
-- id anzeigen
+
+The children of each layer should be sorted in the following way.
+
+- If the layer's children have an OverviewAggregatedStatisticsItem then the element is shown first that has the highest number for learned. If that number is equal it sorts for the highest number of learning. If that number is equal, too it sorts for the lowest number of not learned. But do not use the absolute numbers for the sorting comparisons for not learned, learning, learned, for repeat. Use releative numbers normalized by the sum of all of them instead.
+- If the layer's children have an OverviewSubjectStatisticsItem it sorts for the mastery. Highest mastery first.
+- adopt the md accordingly
+- extract the sort logic to the existing utils file.
 
 ---
 

@@ -13,6 +13,14 @@ All lines that appear when expanding (`${childType} statistics` and the children
 Having focused one expanded child and pressing the arrow down key the focus jumps to that child's first child. There is only one focus for all layers. The root statistics line and the `${childType} statistics` lines cannot be focused.
 When a child statistic has a `label`, display the label instead of its id. The label is shown only once (as the name of the line) and is not repeated in the statistics.
 
+### Sorting of the children
+
+The children of a layer are sorted by `sortChildren` in console.displayStatistics.utils.ts.
+
+- Children with an OverviewAggregatedStatisticsItem: the child with the highest share of `learned` comes first. If the shares are equal, the highest share of `learning` comes first. If these are equal, too, the lowest share of `notLearned` comes first. The shares are not the absolute numbers but the numbers normalized by the sum of notLearned, learning, learned and forRepeat (a sum of 0 results in the share 0).
+- Children with an OverviewSubjectStatisticsItem: the highest `mastery` comes first.
+- Children that are equal in all compared values keep their original order.
+
 ### Display of the statistics
 
 The statistics of a line are formatted by `formatStatistics` in console.displayStatistics.utils.ts. It determines the type of the statistics (`isOverviewSubjectStatisticsItem`) and delegates to `formatSubjectStatistics` or `formatAggregatedStatistics`. Only the line that has the focus shows the additional details. The statistics of the root line are never focused and therefore show the short form.

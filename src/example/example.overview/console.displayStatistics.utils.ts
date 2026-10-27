@@ -1,4 +1,4 @@
-import { learningStates } from '../../model';
+import { LearningState, learningStates } from '../../model';
 import {
   OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
@@ -111,11 +111,67 @@ export const getStatisticsColor = (
   return learningStateColors[dominantState];
 };
 
+const learningStateShares = (
+  statistics: OverviewAggregatedStatisticsItem,
+): Record<LearningState, number> => {
+  const sum = learningStates.reduce((acc, state) => acc + statistics[state], 0);
+  return Object.fromEntries(
+    learningStates.map((state) => [
+      state,
+      sum === 0 ? 0 : statistics[state] / sum,
+    ]),
+  ) as Record<LearningState, number>;
+};
+
+// Negative if a is shown before b: highest share of learned, then highest of learning, then lowest of notLearned.
+const compareAggregatedStatistics = (
+  a: OverviewAggregatedStatisticsItem,
+  b: OverviewAggregatedStatisticsItem,
+): number => {
+  const sharesA = learningStateShares(a);
+  const sharesB = learningStateShares(b);
+  return (
+    sharesB.learned - sharesA.learned ||
+    sharesB.learning - sharesA.learning ||
+    sharesA.notLearned - sharesB.notLearned
+  );
+};
+
+// Subjects: highest mastery first. Statistics of different types keep their order.
+export const compareStatistics = (
+  a: OverviewStatistics,
+  b: OverviewStatistics,
+): number => {
+  if (
+    isOverviewSubjectStatisticsItem(a) &&
+    isOverviewSubjectStatisticsItem(b)
+  ) {
+    return b.mastery - a.mastery;
+  }
+  if (
+    !isOverviewSubjectStatisticsItem(a) &&
+    !isOverviewSubjectStatisticsItem(b)
+  ) {
+    return compareAggregatedStatistics(a, b);
+  }
+  return 0;
+};
+
+export const sortChildren = (
+  entries: [string, OverviewRecursiveStatistics][],
+): [string, OverviewRecursiveStatistics][] =>
+  [...entries].sort(([, a], [, b]) =>
+    compareStatistics(a.statistics, b.statistics),
+  );
+
 export const getChildren = (
   node: OverviewRecursiveStatistics,
 ):
   | { childType: string; entries: [string, OverviewRecursiveStatistics][] }
   | undefined =>
   node.children !== undefined && node.childType !== undefined
-    ? { childType: node.childType, entries: Object.entries(node.children) }
+    ? {
+        childType: node.childType,
+        entries: sortChildren(Object.entries(node.children)),
+      }
     : undefined;

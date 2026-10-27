@@ -35,9 +35,9 @@ describe('ConsoleDisplayStatistics', () => {
       '  ⌀ 19 days before 6 5 9 4',
       '  category statistics',
       '  > Mathematics ⌀ 10.5 days before not learned: 1, learning: 1, learned: 3, for repeat: 1',
-      '    Chemistry ⌀ 7.17 days before 2 2 1 1',
       '    Physics ⌀ 23.33 days before 1 1 3 1',
       '    History ⌀ 35 days before 2 1 2 1',
+      '    Chemistry ⌀ 7.17 days before 2 2 1 1',
     ]);
   });
 
@@ -51,11 +51,11 @@ describe('ConsoleDisplayStatistics', () => {
       '  > Mathematics ⌀ 10.5 days before not learned: 1, learning: 1, learned: 3, for repeat: 1',
       '      relevance statistics',
       '        1 ⌀ 2.5 days before 0 0 2 0',
-      '        2 ⌀ 22.5 days before 0 1 0 1',
       '        3 ⌀ 6.5 days before 1 0 1 0',
-      '    Chemistry ⌀ 7.17 days before 2 2 1 1',
+      '        2 ⌀ 22.5 days before 0 1 0 1',
       '    Physics ⌀ 23.33 days before 1 1 3 1',
       '    History ⌀ 35 days before 2 1 2 1',
+      '    Chemistry ⌀ 7.17 days before 2 2 1 1',
     ]);
   });
 
@@ -90,8 +90,8 @@ describe('ConsoleDisplayStatistics', () => {
     expect(view().slice(4, 8)).toEqual([
       '      > 1 ⌀ 2.5 days before not learned: 0, learning: 0, learned: 2, for repeat: 0',
       '          subject statistics',
-      '            Solving equations learned (90%) 4x 3 days before',
       '            Fractions learned (95%) 5x 2 days before',
+      '            Solving equations learned (90%) 4x 3 days before',
     ]);
   });
 
@@ -156,6 +156,6 @@ describe('ConsoleDisplayStatistics', () => {
     press('up');
     expect(view()[2]).toMatch(/^ {2}> Mathematics /);
     for (let i = 0; i < 10; i++) press('down');
-    expect(view()[5]).toMatch(/^ {2}> History /);
+    expect(view()[5]).toMatch(/^ {2}> Chemistry /);
   });
 });

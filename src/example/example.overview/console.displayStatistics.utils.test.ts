@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   OverviewAggregatedStatisticsItem,
+  OverviewRecursiveStatistics,
   OverviewSubjectStatisticsItem,
 } from '../../overview/overview.model';
 import { learningStateColors, statisticsLabelColor } from './console.constants';
@@ -10,6 +11,7 @@ import {
   formatStatistics,
   getStatisticsColor,
   isOverviewSubjectStatisticsItem,
+  sortChildren,
 } from './console.displayStatistics.utils';
 
 beforeAll(() => {
@@ -95,5 +97,68 @@ describe('getStatisticsColor', () => {
     expect(getStatisticsColor({ ...aggregated, forRepeat: 20 })('x')).toBe(
       learningStateColors.forRepeat('x'),
     );
+  });
+});
+
+describe('sortChildren', () => {
+  const aggregatedChild = (
+    counts: [number, number, number, number],
+  ): OverviewRecursiveStatistics => ({
+    statistics: {
+      avgLastRepetitionBeforeDays: 0,
+      notLearned: counts[0],
+      learning: counts[1],
+      learned: counts[2],
+      forRepeat: counts[3],
+    },
+  });
+  const subjectChild = (mastery: number): OverviewRecursiveStatistics => ({
+    statistics: { ...subject, mastery },
+  });
+  const sortedKeys = (children: Record<string, OverviewRecursiveStatistics>) =>
+    sortChildren(Object.entries(children)).map(([key]) => key);
+
+  it('sorts aggregated statistics by the relative learned numbers first', () => {
+    expect(
+      sortedKeys({
+        // 1/10 learned
+        low: aggregatedChild([0, 0, 1, 9]),
+        // 2/4 learned although fewer absolute numbers than "high"
+        high: aggregatedChild([1, 1, 2, 0]),
+        // 4/20 learned
+        middle: aggregatedChild([4, 4, 4, 8]),
+      }),
+    ).toEqual(['high', 'middle', 'low']);
+  });
+
+  it('sorts by the relative learning numbers and then the fewest not learned', () => {
+    // All have the same share of learned (1/4)
+    expect(
+      sortedKeys({
+        a: aggregatedChild([2, 1, 1, 0]),
+        b: aggregatedChild([0, 1, 1, 2]),
+        c: aggregatedChild([1, 2, 1, 0]),
+        d: aggregatedChild([0, 2, 1, 1]),
+      }),
+    ).toEqual(['d', 'c', 'b', 'a']);
+  });
+
+  it('handles aggregated statistics without any numbers', () => {
+    expect(
+      sortedKeys({
+        empty: aggregatedChild([0, 0, 0, 0]),
+        learned: aggregatedChild([0, 0, 1, 0]),
+      }),
+    ).toEqual(['learned', 'empty']);
+  });
+
+  it('sorts subjects by the highest mastery first', () => {
+    expect(
+      sortedKeys({
+        a: subjectChild(0.2),
+        b: subjectChild(0.9),
+        c: subjectChild(0.5),
+      }),
+    ).toEqual(['b', 'c', 'a']);
   });
 });

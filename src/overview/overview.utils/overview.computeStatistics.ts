@@ -61,9 +61,9 @@ class StatisticsComputation<
     );
 
     return Object.fromEntries(
-      Object.entries(groupedTuples).map(([group, tuple]) => [
+      Object.entries(groupedTuples).map(([group, tuples]) => [
         group,
-        new StatisticsComputation(tuple, childrensChildTypes),
+        new StatisticsComputation(tuples, childrensChildTypes),
       ]),
     );
   }
