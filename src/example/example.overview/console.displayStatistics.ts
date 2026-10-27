@@ -4,13 +4,16 @@ import {
   focusPointerColor,
   headingColor,
   helpColor,
+  inactiveColor,
 } from './console.constants';
 import { Line } from './console.displayStatistics.model';
 import {
   formatStatistics,
   getChildren,
   getDisplayName,
+  getStatisticsColor,
   indentation,
+  isHighlighted,
   pathId,
 } from './console.displayStatistics.utils';
 
@@ -41,12 +44,17 @@ export class ConsoleDisplayStatistics {
     if (!children) return [];
 
     const lines: Line[] = [
-      { depth, text: headingColor(`${children.childType} statistics`) },
+      {
+        depth,
+        nodePath: path,
+        text: headingColor(`${children.childType} statistics`),
+      },
     ];
     for (const [key, child] of children.entries) {
       const childPath = [...path, key];
       lines.push({
         depth: depth + 1,
+        nodePath: childPath,
         text: getDisplayName(child, key),
         path: childPath,
         statistics: child.statistics,
@@ -67,7 +75,11 @@ export class ConsoleDisplayStatistics {
     if (!this.root) return;
     this.lines = [
       // Only the root shows its statistics in an own line, children show them in their line.
-      { depth: 0, text: formatStatistics(this.root.statistics, false) },
+      {
+        depth: 0,
+        nodePath: [],
+        text: formatStatistics(this.root.statistics, false),
+      },
       ...this.buildLines(this.root, [], 0),
     ];
     const focusable = this.focusablePaths;
@@ -93,9 +105,15 @@ export class ConsoleDisplayStatistics {
       // Every line reserves the space of the pointer to keep a layer aligned.
       const pointer = isFocused ? focusPointerColor('> ') : '  ';
       const text = line.statistics
-        ? `${line.text} ${formatStatistics(line.statistics, isFocused)}`
+        ? `${getStatisticsColor(line.statistics)(line.text)} ${formatStatistics(line.statistics, isFocused)}`
         : line.text;
-      console.log(indentation(line.depth) + pointer + text);
+      const isInactive =
+        this.focus !== undefined && !isHighlighted(line, this.focus);
+      console.log(
+        indentation(line.depth) +
+          pointer +
+          (isInactive ? inactiveColor(text) : text),
+      );
     }
   }
 

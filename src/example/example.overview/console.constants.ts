@@ -15,3 +15,10 @@ export const statisticsLabelColor = chalk.dim;
 export const headingColor = chalk.bold;
 export const focusPointerColor = chalk.yellow;
 export const helpColor = chalk.gray;
+
+// Opacity of all layers that do not contain the focused line.
+export const inactiveOpacity = 0.8;
+
+// A terminal cannot render partial opacity, so the faint style is used instead.
+export const inactiveColor = (text: string): string =>
+  inactiveOpacity < 1 ? chalk.dim(text) : text;

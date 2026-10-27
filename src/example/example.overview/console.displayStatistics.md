@@ -17,6 +17,18 @@ When a child statistic has a `label`, display the label instead of its id. The l
 
 The statistics of a line are formatted by `formatStatistics` in console.displayStatistics.utils.ts. It determines the type of the statistics (`isOverviewSubjectStatisticsItem`) and delegates to `formatSubjectStatistics` or `formatAggregatedStatistics`. Only the line that has the focus shows the additional details. The statistics of the root line are never focused and therefore show the short form.
 
+The id or label of a child is colored like its statistics (`getStatisticsColor`): in the color of the learning state for an OverviewSubjectStatisticsItem, in the color of the learning state with the highest number for an OverviewAggregatedStatisticsItem.
+
+### Opacity of the lines
+
+Everything is shown with the opacity `inactiveOpacity` defined in console.constants.ts, except
+
+- the focused child line,
+- the child lines that have the focused line somewhere below them (the parents of the focused child), and
+- the root statistics line and the `${childType} statistics` line of every node that has the focused line as a child or further below.
+
+All siblings of the focused child (and of its parents) as well as the lines below the focused child remain dimmed. A terminal cannot display partial opacity, so the faint style (chalk.dim) is used for the dimmed lines.
+
 OverviewAggregatedStatisticsItem
 
 - `⌀ ${avgLastRepetitionBeforeDays} days before ` followed by the numbers of notLearned, learning, learned and forRepeat. Each number has the color of its learning state, the names of the learning states are not shown.

@@ -5,6 +5,7 @@ import {
   OverviewSubjectStatisticsItem,
   OverviewStatistics,
 } from '../../overview/overview.model';
+import { Line } from './console.displayStatistics.model';
 import { learningStateColors, statisticsLabelColor } from './console.constants';
 
 // Keys of OverviewSubjectStatisticsItem that are not shown as "other values"
@@ -19,6 +20,16 @@ const summarizedSubjectKeys = new Set<string>([
 export const indentation = (depth: number) => '  '.repeat(depth);
 
 export const pathId = (path: string[]) => JSON.stringify(path);
+
+const startsWith = (path: string[], prefix: string[]) =>
+  prefix.every((key, index) => path[index] === key);
+
+// A child line is highlighted if it is focused or has the focused line below it.
+// The heading and the statistics of a node are highlighted if one of its children is focused.
+export const isHighlighted = (line: Line, focus: string[]): boolean =>
+  line.path
+    ? startsWith(focus, line.path)
+    : focus.length > line.nodePath.length && startsWith(focus, line.nodePath);
 
 const getLabel = (statistics: object): string | undefined => {
   const label = (statistics as { label?: unknown }).label;
@@ -86,6 +97,19 @@ export const formatStatistics = (
   isOverviewSubjectStatisticsItem(statistics)
     ? formatSubjectStatistics(statistics, isFocused)
     : formatAggregatedStatistics(statistics, isFocused);
+
+// Subjects use the color of their learning state, aggregated statistics the one of the highest number.
+export const getStatisticsColor = (
+  statistics: OverviewStatistics,
+): ((text: string) => string) => {
+  if (isOverviewSubjectStatisticsItem(statistics)) {
+    return learningStateColors[statistics.learningState];
+  }
+  const dominantState = learningStates.reduce((dominant, state) =>
+    statistics[state] > statistics[dominant] ? state : dominant,
+  );
+  return learningStateColors[dominantState];
+};
 
 export const getChildren = (
   node: OverviewRecursiveStatistics,

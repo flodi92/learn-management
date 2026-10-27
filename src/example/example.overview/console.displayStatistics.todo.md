@@ -1,9 +1,12 @@
-- camel case to normal
-- show label if available
-- display of data as arrow function that comes from outsite in constructor
 - "- Infinity" by relevance statistics
 - RegExp.overview to other file
 - id anzeigen
+
+---
+
+I want to have the current id or label to be colored in the same color as the learning state or for OverviewAggregatedStatisticsItem in the color of the learning state with the highest number.
+
+All layers that are currently not focused or have children that are currently not focused should have opacity of only 60%. Value should be defined in constants file.
 
 ---
 

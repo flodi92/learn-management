@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { statisticsExample } from '../../overview/overview.utils/overview.computeStatistics.exampleData';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
@@ -92,6 +93,48 @@ describe('ConsoleDisplayStatistics', () => {
       '            Solving equations learned (90%) 4x 3 days before',
       '            Fractions learned (95%) 5x 2 days before',
     ]);
+  });
+
+  it('only the focused line and the lines above it have full opacity', () => {
+    const previousLevel = chalk.level;
+    chalk.level = 1;
+    try {
+      const isDimmed = (line: string) =>
+        /^\s*(?:\u001b\[33m> \u001b\[39m)?\u001b\[2m/.test(line);
+      const rawView = () => output.slice(output.indexOf('') + 1);
+
+      press('right');
+      // The siblings and the children of the focused Mathematics are dimmed
+      expect(rawView().map(isDimmed)).toEqual([
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+      ]);
+
+      press('down');
+      // Mathematics has the focused child 1, whose siblings 2 and 3 are dimmed
+      expect(rawView().map(isDimmed)).toEqual([
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+      ]);
+    } finally {
+      chalk.level = previousLevel;
+    }
   });
 
   it('collapses an expanded child with the right arrow key again', () => {

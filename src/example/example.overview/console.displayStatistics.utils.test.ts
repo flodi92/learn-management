@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import chalk from 'chalk';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   OverviewAggregatedStatisticsItem,
   OverviewSubjectStatisticsItem,
@@ -7,8 +8,13 @@ import { learningStateColors, statisticsLabelColor } from './console.constants';
 import {
   camelCaseToWords,
   formatStatistics,
+  getStatisticsColor,
   isOverviewSubjectStatisticsItem,
 } from './console.displayStatistics.utils';
+
+beforeAll(() => {
+  chalk.level = 1;
+});
 
 const aggregated: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 19,
@@ -71,6 +77,23 @@ describe('formatStatistics', () => {
     const label = statisticsLabelColor;
     expect(formatStatistics(subject, true)).toBe(
       `${forRepeat('for repeat (95%)')} 5x 2 days before, ${label('last mastery:')} 0.5, ${label('last correctness:')} undefined`,
+    );
+  });
+});
+
+describe('getStatisticsColor', () => {
+  it('uses the color of the learning state for a subject', () => {
+    expect(getStatisticsColor(subject)('x')).toBe(
+      learningStateColors.forRepeat('x'),
+    );
+  });
+
+  it('uses the color of the highest number for aggregated statistics', () => {
+    expect(getStatisticsColor(aggregated)('x')).toBe(
+      learningStateColors.learned('x'),
+    );
+    expect(getStatisticsColor({ ...aggregated, forRepeat: 20 })('x')).toBe(
+      learningStateColors.forRepeat('x'),
     );
   });
 });
