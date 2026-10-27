@@ -128,7 +128,7 @@ export class ConsoleDisplayStatistics {
       // Every line reserves the space of the pointer to keep a layer aligned.
       const pointer = isFocused ? focusPointerColor('> ') : '  ';
       const text = line.statistics
-        ? `${getStatisticsColor(line.statistics)(line.text)} ${formatStatistics(line.statistics, isFocused)}`
+        ? `${getStatisticsColor(line.statistics)(`${line.text}:`)} ${formatStatistics(line.statistics, isFocused)}`
         : line.text;
       const isInactive =
         this.focus !== undefined && !isHighlighted(line, this.focus);

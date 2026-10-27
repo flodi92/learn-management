@@ -1,5 +1,20 @@
 - "- Infinity" by relevance statistics
 
+---
+
+After the id or the label there should be a colon
+
+For OverviewAggregatedStatisticsItem
+
+- "⌀ 7 days before" should be the last data to be shown in the row
+- "⌀ Infinity days before" is replaced by "never trained"
+  For OverviewSubjectStatisticsItem
+- when focused the mastery and the learningState should be displayed as currently implemented
+- when not focused only the mastery should be shown but in the same color as currently without brackets
+- "Infinity days before" is not displayed
+
+---
+
 Adopt the expanding behaviour.
 Pressing on right arrow it expands and jumps to the first element of the expansion.
 Pressing on the left arrow it jumps to the parent element and the expansion is closed.

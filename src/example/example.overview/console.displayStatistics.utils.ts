@@ -61,17 +61,22 @@ const formatLabeledValue = (
   return `${statisticsLabelColor(`${camelCaseToWords(key)}:`)} ${color ? color(text) : text}`;
 };
 
+const neverTrained = 'never trained';
+
 export const formatAggregatedStatistics = (
   statistics: OverviewAggregatedStatisticsItem,
   isFocused: boolean,
 ): string => {
-  const average = `⌀ ${statistics.avgLastRepetitionBeforeDays} days before `;
   const counts = learningStates.map((state) =>
     isFocused
       ? formatLabeledValue(state, statistics[state], learningStateColors[state])
       : learningStateColors[state](String(statistics[state])),
   );
-  return average + counts.join(isFocused ? ', ' : ' ');
+  const average = Number.isFinite(statistics.avgLastRepetitionBeforeDays)
+    ? `⌀ ${statistics.avgLastRepetitionBeforeDays} days before`
+    : neverTrained;
+  const separator = isFocused ? ', ' : ' ';
+  return [...counts, average].join(separator);
 };
 
 export const formatSubjectStatistics = (
@@ -79,14 +84,16 @@ export const formatSubjectStatistics = (
   isFocused: boolean,
 ): string => {
   const color = learningStateColors[statistics.learningState];
-  const summary = [
-    color(
-      `${camelCaseToWords(statistics.learningState)} (${Math.round(statistics.mastery * 100)}%)`,
-    ),
-    `${statistics.numberOfRepetitions}x ${statistics.lastRepetitionBeforeDays} days before`,
-  ].join(' ');
-  if (!isFocused) return summary;
+  const mastery = `${Math.round(statistics.mastery * 100)}%`;
+  if (!isFocused) return color(mastery);
 
+  const repetitions = Number.isFinite(statistics.lastRepetitionBeforeDays)
+    ? `${statistics.numberOfRepetitions}x ${statistics.lastRepetitionBeforeDays} days before`
+    : `${statistics.numberOfRepetitions}x`;
+  const summary = [
+    color(`${camelCaseToWords(statistics.learningState)} (${mastery})`),
+    repetitions,
+  ].join(' ');
   const otherValues = Object.entries(statistics)
     .filter(([key]) => !summarizedSubjectKeys.has(key))
     .map(([key, value]) => formatLabeledValue(key, value));

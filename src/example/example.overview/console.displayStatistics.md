@@ -32,7 +32,7 @@ The children of a layer are sorted by `sortChildren` in console.displayStatistic
 
 The statistics of a line are formatted by `formatStatistics` in console.displayStatistics.utils.ts. It determines the type of the statistics (`isOverviewSubjectStatisticsItem`) and delegates to `formatSubjectStatistics` or `formatAggregatedStatistics`. Only the line that has the focus shows the additional details. The statistics of the root line are never focused and therefore show the short form.
 
-The id or label of a child is colored like its statistics (`getStatisticsColor`): in the color of the learning state for an OverviewSubjectStatisticsItem, in the color of the learning state with the highest number for an OverviewAggregatedStatisticsItem.
+The id or label of a child is followed by a colon and colored like its statistics (`getStatisticsColor`): in the color of the learning state for an OverviewSubjectStatisticsItem, in the color of the learning state with the highest number for an OverviewAggregatedStatisticsItem.
 
 ### Opacity of the lines
 
@@ -46,13 +46,13 @@ All siblings of the focused child (and of its parents) as well as the lines belo
 
 OverviewAggregatedStatisticsItem
 
-- `⌀ ${avgLastRepetitionBeforeDays} days before ` followed by the numbers of notLearned, learning, learned and forRepeat. Each number has the color of its learning state, the names of the learning states are not shown.
-- Focused line: every number is preceded by its learning state in separate words, e.g. `not learned: 153`.
+- The numbers of notLearned, learning, learned and forRepeat, followed by `⌀ ${avgLastRepetitionBeforeDays} days before` as the last data of the line. Each number has the color of its learning state, the names of the learning states are not shown. If avgLastRepetitionBeforeDays is infinite, `never trained` is shown instead of `⌀ Infinity days before`.
+- Focused line: every number is preceded by its learning state in separate words, e.g. `not learned: 153`. All data are separated by commas.
 
 OverviewSubjectStatisticsItem
 
-- `${learningState} (${Math.round(mastery * 100)}%)`, all in the color of the learning state, followed by `${numberOfRepetitions}x ${lastRepetitionBeforeDays} days before`.
-- Focused line: all other values (e.g. lastMastery, lastCorrectness) are appended as `name: value` with the name transformed from camel case to separate words, e.g. `last mastery: 0.5`.
+- Only the mastery `${Math.round(mastery * 100)}%` in the color of the learning state (without brackets and without the learning state).
+- Focused line: `${learningState} (${Math.round(mastery * 100)}%)`, all in the color of the learning state, followed by `${numberOfRepetitions}x ${lastRepetitionBeforeDays} days before`. If lastRepetitionBeforeDays is infinite, only `${numberOfRepetitions}x` is shown. Additionally all other values (e.g. lastMastery, lastCorrectness) are appended as `name: value` with the name transformed from camel case to separate words, e.g. `last mastery: 0.5`.
 
 All actions that can be performed (which keys have which effect) should by explained by gray a console.log
 

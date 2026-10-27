@@ -56,30 +56,50 @@ describe('isOverviewSubjectStatisticsItem', () => {
 describe('formatStatistics', () => {
   const { notLearned, learning, learned, forRepeat } = learningStateColors;
 
-  it('shows only the colored numbers of aggregated statistics', () => {
+  it('shows only the colored numbers of aggregated statistics, the average last', () => {
     expect(formatStatistics(aggregated, false)).toBe(
-      `⌀ 19 days before ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')}`,
+      `${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
     );
   });
 
   it('adds the learning states to aggregated statistics when focused', () => {
     const label = statisticsLabelColor;
     expect(formatStatistics(aggregated, true)).toBe(
-      `⌀ 19 days before ${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}`,
+      `${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
     );
   });
 
-  it('shows learning state, mastery and repetitions of a subject without its label', () => {
-    expect(formatStatistics(subject, false)).toBe(
-      `${forRepeat('for repeat (95%)')} 5x 2 days before`,
+  it('shows "never trained" instead of an infinite average', () => {
+    const neverTrained = {
+      ...aggregated,
+      avgLastRepetitionBeforeDays: Infinity,
+    };
+    expect(formatStatistics(neverTrained, false)).toBe(
+      `${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
     );
+    expect(formatStatistics(neverTrained, true)).toMatch(/, never trained$/);
+    expect(formatStatistics(neverTrained, true)).not.toContain('Infinity');
   });
 
-  it('shows all other values of a subject with separated words when focused', () => {
+  it('shows only the colored mastery of a subject when not focused', () => {
+    expect(formatStatistics(subject, false)).toBe(forRepeat('95%'));
+  });
+
+  it('shows learning state, mastery and repetitions of a subject when focused', () => {
     const label = statisticsLabelColor;
     expect(formatStatistics(subject, true)).toBe(
       `${forRepeat('for repeat (95%)')} 5x 2 days before, ${label('last mastery:')} 0.5, ${label('last correctness:')} undefined`,
     );
+  });
+
+  it('does not show an infinite number of days of a subject', () => {
+    const neverRepeated = {
+      ...subject,
+      lastRepetitionBeforeDays: Infinity,
+      numberOfRepetitions: 0,
+    };
+    expect(formatStatistics(neverRepeated, true)).not.toContain('Infinity');
+    expect(formatStatistics(neverRepeated, true)).toContain('0x');
   });
 });
 

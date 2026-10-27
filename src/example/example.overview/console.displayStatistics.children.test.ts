@@ -71,8 +71,8 @@ describe('ConsoleDisplayStatistics with many children', () => {
     start(35);
     const lines = childLines();
     expect(lines).toHaveLength(16);
-    expect(lines[0]).toMatch(/^ {2}> subject 01 /);
-    expect(lines[14]).toMatch(/^ {4}subject 15 /);
+    expect(lines[0]).toMatch(/^ {2}> subject 01: /);
+    expect(lines[14]).toMatch(/^ {4}subject 15: /);
     expect(lines[15]).toBe('    …');
   });
 
@@ -85,21 +85,21 @@ describe('ConsoleDisplayStatistics with many children', () => {
   it('adds the next 15 children when going down from the last shown child', () => {
     start(35);
     press('down', 14);
-    expect(focusedLine()).toMatch(/subject 15 /);
+    expect(focusedLine()).toMatch(/subject 15: /);
     expect(childLines()).toHaveLength(16);
 
     press('down');
-    expect(focusedLine()).toMatch(/subject 16 /);
+    expect(focusedLine()).toMatch(/subject 16: /);
     const lines = childLines();
     expect(lines).toHaveLength(31);
-    expect(lines[29]).toMatch(/subject 30 /);
+    expect(lines[29]).toMatch(/subject 30: /);
     expect(lines[30]).toBe('    …');
   });
 
   it('shows all children after loading the last chunk', () => {
     start(35);
     press('down', 14 + 1 + 14 + 1);
-    expect(focusedLine()).toMatch(/subject 31 /);
+    expect(focusedLine()).toMatch(/subject 31: /);
     const lines = childLines();
     expect(lines).toHaveLength(35);
     expect(lines.every((line) => !line.includes('…'))).toBe(true);
@@ -120,13 +120,13 @@ describe('ConsoleDisplayStatistics with many children', () => {
     };
     new ConsoleDisplayStatistics().display(statistics);
     press('right');
-    expect(focusedLine()).toMatch(/subject 01 /);
+    expect(focusedLine()).toMatch(/subject 01: /);
     // parent, heading, 15 children, ellipsis
     expect(childLines()).toHaveLength(18);
     press('down', 14);
-    expect(focusedLine()).toMatch(/subject 15 /);
+    expect(focusedLine()).toMatch(/subject 15: /);
     press('down');
-    expect(focusedLine()).toMatch(/subject 16 /);
+    expect(focusedLine()).toMatch(/subject 16: /);
     expect(childLines()).toHaveLength(22);
   });
 });
