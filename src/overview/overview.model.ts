@@ -13,8 +13,11 @@ export type OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: number;
 } & Record<LearningState, number>;
 
+export type OverviewStatistics =
+  OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
+
 export interface OverviewRecursiveStatistics {
-  statistics: OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
+  statistics: OverviewStatistics;
   childType?: string;
   children?: Record<string | number, OverviewRecursiveStatistics>;
 }

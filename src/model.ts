@@ -15,7 +15,14 @@ export interface SubjectStatisticsItem {
 
 export type SubjectStatistics = Record<string, SubjectStatisticsItem>;
 
-export type LearningState = 'notLearned' | 'learning' | 'learned' | 'forRepeat';
+export const learningStates = [
+  'notLearned',
+  'learning',
+  'learned',
+  'forRepeat',
+] as const;
+
+export type LearningState = (typeof learningStates)[number];
 
 export type CategoryAndRelevanceStatisticsItem = {
   category: string;

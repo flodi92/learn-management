@@ -1,6 +1,10 @@
-import chalk from 'chalk';
 import readline from 'node:readline';
 import { OverviewRecursiveStatistics } from '../../overview/overview.model';
+import {
+  focusPointerColor,
+  headingColor,
+  helpColor,
+} from './console.constants';
 import { Line } from './console.displayStatistics.model';
 import {
   formatStatistics,
@@ -33,21 +37,22 @@ export class ConsoleDisplayStatistics {
     path: string[],
     depth: number,
   ): Line[] {
-    const lines: Line[] = [{ depth, text: formatStatistics(node.statistics) }];
     const children = getChildren(node);
-    if (!children) return lines;
+    if (!children) return [];
 
-    lines.push({ depth, text: chalk.bold(`${children.childType} statistics`) });
-    const childDepth = depth + 1;
+    const lines: Line[] = [
+      { depth, text: headingColor(`${children.childType} statistics`) },
+    ];
     for (const [key, child] of children.entries) {
       const childPath = [...path, key];
       lines.push({
-        depth: childDepth,
+        depth: depth + 1,
         text: getDisplayName(child, key),
         path: childPath,
+        statistics: child.statistics,
       });
       if (this.expanded.has(pathId(childPath))) {
-        lines.push(...this.buildLines(child, childPath, childDepth + 1));
+        lines.push(...this.buildLines(child, childPath, depth + 2));
       }
     }
     return lines;
@@ -60,7 +65,11 @@ export class ConsoleDisplayStatistics {
   // Rebuilds the lines and keeps the focus on a valid child.
   private update() {
     if (!this.root) return;
-    this.lines = this.buildLines(this.root, [], 0);
+    this.lines = [
+      // Only the root shows its statistics in an own line, children show them in their line.
+      { depth: 0, text: formatStatistics(this.root.statistics, false) },
+      ...this.buildLines(this.root, [], 0),
+    ];
     const focusable = this.focusablePaths;
     if (
       !this.focus ||
@@ -73,17 +82,20 @@ export class ConsoleDisplayStatistics {
 
   private render() {
     console.clear();
-    console.log(chalk.gray('↑/↓: move the focus'));
-    console.log(chalk.gray('→: expand / collapse the focused entry'));
-    console.log(chalk.gray('q or Ctrl+C: quit'));
+    console.log(helpColor('↑/↓: move the focus'));
+    console.log(helpColor('→: expand / collapse the focused entry'));
+    console.log(helpColor('q or Ctrl+C: quit'));
     console.log();
 
     const focusId = this.focus && pathId(this.focus);
     for (const line of this.lines) {
+      const isFocused = !!line.path && pathId(line.path) === focusId;
       // Every line reserves the space of the pointer to keep a layer aligned.
-      const pointer =
-        line.path && pathId(line.path) === focusId ? chalk.yellow('> ') : '  ';
-      console.log(indentation(line.depth) + pointer + line.text);
+      const pointer = isFocused ? focusPointerColor('> ') : '  ';
+      const text = line.statistics
+        ? `${line.text} ${formatStatistics(line.statistics, isFocused)}`
+        : line.text;
+      console.log(indentation(line.depth) + pointer + text);
     }
   }
 

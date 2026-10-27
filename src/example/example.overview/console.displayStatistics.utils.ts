@@ -1,19 +1,20 @@
-import chalk from 'chalk';
-import { LearningState } from '../../model';
-import { OverviewRecursiveStatistics } from '../../overview/overview.model';
+import { learningStates } from '../../model';
+import {
+  OverviewAggregatedStatisticsItem,
+  OverviewRecursiveStatistics,
+  OverviewSubjectStatisticsItem,
+  OverviewStatistics,
+} from '../../overview/overview.model';
+import { learningStateColors, statisticsLabelColor } from './console.constants';
 
-export const learningStateColors: Record<
-  LearningState,
-  (text: string) => string
-> = {
-  notLearned: chalk.red,
-  learning: chalk.magenta,
-  learned: chalk.green,
-  forRepeat: chalk.cyan,
-};
-
-export const isLearningState = (value: unknown): value is LearningState =>
-  typeof value === 'string' && value in learningStateColors;
+// Keys of OverviewSubjectStatisticsItem that are not shown as "other values"
+const summarizedSubjectKeys = new Set<string>([
+  'label',
+  'mastery',
+  'lastRepetitionBeforeDays',
+  'numberOfRepetitions',
+  'learningState',
+]);
 
 export const indentation = (depth: number) => '  '.repeat(depth);
 
@@ -29,21 +30,62 @@ export const getDisplayName = (
   id: string,
 ): string => getLabel(node.statistics) ?? id;
 
-export const formatStatistics = (statistics: object): string => {
-  const hideId = getLabel(statistics) !== undefined;
-  return Object.entries(statistics)
-    .filter(([key]) => !(hideId && key === 'id'))
-    .map(([key, value]) => {
-      const state = isLearningState(key)
-        ? key
-        : isLearningState(value)
-          ? value
-          : undefined;
-      const text = String(value);
-      return `${chalk.dim(`${key}:`)} ${state ? learningStateColors[state](text) : text}`;
-    })
-    .join(', ');
+// "forRepeat" -> "for repeat"
+export const camelCaseToWords = (text: string): string =>
+  text.replace(/([a-z\d])([A-Z])/g, '$1 $2').toLowerCase();
+
+export const isOverviewSubjectStatisticsItem = (
+  statistics: OverviewStatistics,
+): statistics is OverviewSubjectStatisticsItem => 'learningState' in statistics;
+
+const formatLabeledValue = (
+  key: string,
+  value: unknown,
+  color?: (text: string) => string,
+) => {
+  const text = String(value);
+  return `${statisticsLabelColor(`${camelCaseToWords(key)}:`)} ${color ? color(text) : text}`;
 };
+
+export const formatAggregatedStatistics = (
+  statistics: OverviewAggregatedStatisticsItem,
+  isFocused: boolean,
+): string => {
+  const average = `⌀ ${statistics.avgLastRepetitionBeforeDays} days before `;
+  const counts = learningStates.map((state) =>
+    isFocused
+      ? formatLabeledValue(state, statistics[state], learningStateColors[state])
+      : learningStateColors[state](String(statistics[state])),
+  );
+  return average + counts.join(isFocused ? ', ' : ' ');
+};
+
+export const formatSubjectStatistics = (
+  statistics: OverviewSubjectStatisticsItem,
+  isFocused: boolean,
+): string => {
+  const color = learningStateColors[statistics.learningState];
+  const summary = [
+    color(
+      `${camelCaseToWords(statistics.learningState)} (${Math.round(statistics.mastery * 100)}%)`,
+    ),
+    `${statistics.numberOfRepetitions}x ${statistics.lastRepetitionBeforeDays} days before`,
+  ].join(' ');
+  if (!isFocused) return summary;
+
+  const otherValues = Object.entries(statistics)
+    .filter(([key]) => !summarizedSubjectKeys.has(key))
+    .map(([key, value]) => formatLabeledValue(key, value));
+  return [summary, ...otherValues].join(', ');
+};
+
+export const formatStatistics = (
+  statistics: OverviewStatistics,
+  isFocused: boolean,
+): string =>
+  isOverviewSubjectStatisticsItem(statistics)
+    ? formatSubjectStatistics(statistics, isFocused)
+    : formatAggregatedStatistics(statistics, isFocused);
 
 export const getChildren = (
   node: OverviewRecursiveStatistics,
