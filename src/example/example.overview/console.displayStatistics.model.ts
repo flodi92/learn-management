@@ -8,4 +8,6 @@ export type Line = {
   text: string;
   path?: string[];
   statistics?: OverviewStatistics;
+  // Set for the ellipsis line that stands for the not yet shown children of this node.
+  hiddenChildrenOf?: string[];
 };

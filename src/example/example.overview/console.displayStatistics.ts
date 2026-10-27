@@ -1,10 +1,12 @@
 import readline from 'node:readline';
 import { OverviewRecursiveStatistics } from '../../overview/overview.model';
 import {
+  ellipsis,
   focusPointerColor,
   headingColor,
   helpColor,
   inactiveColor,
+  numberOfInitiallyShownChildren,
 } from './console.constants';
 import { Line } from './console.displayStatistics.model';
 import {
@@ -20,6 +22,7 @@ import {
 export class ConsoleDisplayStatistics {
   private root?: OverviewRecursiveStatistics;
   private expanded = new Set<string>();
+  private shownChildren = new Map<string, number>();
   private lines: Line[] = [];
   private focus?: string[];
   private resolveDisplay?: () => void;
@@ -29,6 +32,7 @@ export class ConsoleDisplayStatistics {
       this.resolveDisplay = resolve;
       this.root = statistics;
       this.expanded.clear();
+      this.shownChildren.clear();
       this.focus = undefined;
       this.update();
       this.listen();
@@ -50,7 +54,9 @@ export class ConsoleDisplayStatistics {
         text: headingColor(`${children.childType} statistics`),
       },
     ];
-    for (const [key, child] of children.entries) {
+    const shownCount =
+      this.shownChildren.get(pathId(path)) ?? numberOfInitiallyShownChildren;
+    for (const [key, child] of children.entries.slice(0, shownCount)) {
       const childPath = [...path, key];
       lines.push({
         depth: depth + 1,
@@ -63,6 +69,14 @@ export class ConsoleDisplayStatistics {
         lines.push(...this.buildLines(child, childPath, depth + 2));
       }
     }
+    if (children.entries.length > shownCount) {
+      lines.push({
+        depth: depth + 1,
+        nodePath: path,
+        text: ellipsis,
+        hiddenChildrenOf: path,
+      });
+    }
     return lines;
   }
 
@@ -70,8 +84,7 @@ export class ConsoleDisplayStatistics {
     return this.lines.flatMap((line) => (line.path ? [line.path] : []));
   }
 
-  // Rebuilds the lines and keeps the focus on a valid child.
-  private update() {
+  private rebuildLines() {
     if (!this.root) return;
     this.lines = [
       // Only the root shows its statistics in an own line, children show them in their line.
@@ -82,6 +95,12 @@ export class ConsoleDisplayStatistics {
       },
       ...this.buildLines(this.root, [], 0),
     ];
+  }
+
+  // Rebuilds the lines and keeps the focus on a valid child.
+  private update() {
+    if (!this.root) return;
+    this.rebuildLines();
     const focusable = this.focusablePaths;
     if (
       !this.focus ||
@@ -117,7 +136,31 @@ export class ConsoleDisplayStatistics {
     }
   }
 
+  // Shows the next children if the focus is on the last shown child in front of an ellipsis.
+  private showMoreChildrenBelowFocus(): boolean {
+    if (!this.focus) return false;
+    const focusId = pathId(this.focus);
+    const start = this.lines.findIndex(
+      (line) => line.path && pathId(line.path) === focusId,
+    );
+    for (const line of this.lines.slice(start + 1)) {
+      if (line.path) return false;
+      if (line.hiddenChildrenOf) {
+        const id = pathId(line.hiddenChildrenOf);
+        this.shownChildren.set(
+          id,
+          (this.shownChildren.get(id) ?? numberOfInitiallyShownChildren) +
+            numberOfInitiallyShownChildren,
+        );
+        this.rebuildLines();
+        return true;
+      }
+    }
+    return false;
+  }
+
   private moveFocus(delta: number) {
+    if (delta > 0) this.showMoreChildrenBelowFocus();
     const focusable = this.focusablePaths;
     if (!this.focus || focusable.length === 0) return;
     const focusId = pathId(this.focus);

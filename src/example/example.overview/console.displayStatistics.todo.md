@@ -1,5 +1,23 @@
 - "- Infinity" by relevance statistics
 
+Adopt the expanding behaviour.
+Pressing on right arrow it expands and jumps to the first element of the expansion.
+Pressing on the left arrow it jumps to the parent element and the expansion is closed.
+The behaviour for up arrow and down arrow should remain the same.
+
+- adopt the md accordingly
+
+---
+
+Only show a maximum of 15 children for each element.
+If the list of children is longer than 15 indicate that by an eclipse sign in that row.
+
+When focusing the last element before the eclipse and going down again the children's list is added the next 15 children and so on until all children are shown.
+
+Adopt the md accordingly
+
+---
+
 The children of each layer should be sorted in the following way.
 
 - If the layer's children have an OverviewAggregatedStatisticsItem then the element is shown first that has the highest number for learned. If that number is equal it sorts for the highest number of learning. If that number is equal, too it sorts for the lowest number of not learned. But do not use the absolute numbers for the sorting comparisons for not learned, learning, learned, for repeat. Use releative numbers normalized by the sum of all of them instead.

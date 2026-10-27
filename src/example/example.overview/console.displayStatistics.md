@@ -13,6 +13,11 @@ All lines that appear when expanding (`${childType} statistics` and the children
 Having focused one expanded child and pressing the arrow down key the focus jumps to that child's first child. There is only one focus for all layers. The root statistics line and the `${childType} statistics` lines cannot be focused.
 When a child statistic has a `label`, display the label instead of its id. The label is shown only once (as the name of the line) and is not repeated in the statistics.
 
+### Number of shown children
+
+At most `numberOfInitiallyShownChildren` (defined in console.constants.ts) children are shown for each element, in the order given by the sorting below. If there are more children, an additional line with an ellipsis sign (…) follows the last shown child of that element, indented like the children. The ellipsis line cannot be focused and is always shown dimmed.
+When the last shown child (or, if it is expanded, the last line of its expansion) is focused and the arrow down key is pressed, the next 15 children are added to the list and the focus moves to the first of them. That can be repeated until all children are shown; then the ellipsis disappears. Loaded children stay visible while the element is collapsed and expanded again.
+
 ### Sorting of the children
 
 The children of a layer are sorted by `sortChildren` in console.displayStatistics.utils.ts.

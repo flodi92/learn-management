@@ -26,10 +26,13 @@ const startsWith = (path: string[], prefix: string[]) =>
 
 // A child line is highlighted if it is focused or has the focused line below it.
 // The heading and the statistics of a node are highlighted if one of its children is focused.
+// The ellipsis is a sibling of the shown children and therefore never highlighted.
 export const isHighlighted = (line: Line, focus: string[]): boolean =>
-  line.path
-    ? startsWith(focus, line.path)
-    : focus.length > line.nodePath.length && startsWith(focus, line.nodePath);
+  line.hiddenChildrenOf
+    ? false
+    : line.path
+      ? startsWith(focus, line.path)
+      : focus.length > line.nodePath.length && startsWith(focus, line.nodePath);
 
 const getLabel = (statistics: object): string | undefined => {
   const label = (statistics as { label?: unknown }).label;
