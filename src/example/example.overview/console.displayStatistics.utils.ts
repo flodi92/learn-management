@@ -167,6 +167,15 @@ export const sortChildren = (
     compareStatistics(a.statistics, b.statistics),
   );
 
+export const getNode = (
+  root: OverviewRecursiveStatistics,
+  path: string[],
+): OverviewRecursiveStatistics | undefined =>
+  path.reduce<OverviewRecursiveStatistics | undefined>(
+    (node, key) => node?.children?.[key],
+    root,
+  );
+
 export const getChildren = (
   node: OverviewRecursiveStatistics,
 ):

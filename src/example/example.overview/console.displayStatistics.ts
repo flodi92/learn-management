@@ -13,6 +13,7 @@ import {
   formatStatistics,
   getChildren,
   getDisplayName,
+  getNode,
   getStatisticsColor,
   indentation,
   isHighlighted,
@@ -114,7 +115,10 @@ export class ConsoleDisplayStatistics {
   private render() {
     console.clear();
     console.log(helpColor('↑/↓: move the focus'));
-    console.log(helpColor('→: expand / collapse the focused entry'));
+    console.log(helpColor('→: expand the focused entry and jump into it'));
+    console.log(
+      helpColor('←: jump to the parent entry and collapse its expansion'),
+    );
     console.log(helpColor('q or Ctrl+C: quit'));
     console.log();
 
@@ -170,10 +174,21 @@ export class ConsoleDisplayStatistics {
     this.render();
   }
 
-  private toggleExpansion() {
-    if (!this.focus) return;
-    const focusId = pathId(this.focus);
-    if (!this.expanded.delete(focusId)) this.expanded.add(focusId);
+  private expandFocus() {
+    if (!this.root || !this.focus) return;
+    const node = getNode(this.root, this.focus);
+    const firstChild = node && getChildren(node)?.entries[0];
+    if (!firstChild) return;
+    this.expanded.add(pathId(this.focus));
+    this.focus = [...this.focus, firstChild[0]];
+    this.update();
+  }
+
+  // Jumps to the parent child and closes its expansion. The first layer has no parent to jump to.
+  private collapseToParent() {
+    if (!this.focus || this.focus.length < 2) return;
+    this.focus = this.focus.slice(0, -1);
+    this.expanded.delete(pathId(this.focus));
     this.update();
   }
 
@@ -209,7 +224,10 @@ export class ConsoleDisplayStatistics {
         this.moveFocus(1);
         break;
       case 'right':
-        this.toggleExpansion();
+        this.expandFocus();
+        break;
+      case 'left':
+        this.collapseToParent();
         break;
     }
   }

@@ -42,15 +42,15 @@ describe('ConsoleDisplayStatistics', () => {
   });
 
   it('explains the keys', () => {
-    expect(output.slice(0, 3).join('\n')).toMatch(/↑\/↓.*\n.*→.*\n.*q/);
+    expect(output.slice(0, 4).join('\n')).toMatch(/↑\/↓.*\n.*→.*\n.*←.*\n.*q/);
   });
 
-  it('expands the focused child with the right arrow key', () => {
+  it('expands the focused child with the right arrow key and focuses its first child', () => {
     press('right');
     expect(view().slice(2)).toEqual([
-      '  > Mathematics ⌀ 10.5 days before not learned: 1, learning: 1, learned: 3, for repeat: 1',
+      '    Mathematics ⌀ 10.5 days before 1 1 3 1',
       '      relevance statistics',
-      '        1 ⌀ 2.5 days before 0 0 2 0',
+      '      > 1 ⌀ 2.5 days before not learned: 0, learning: 0, learned: 2, for repeat: 0',
       '        3 ⌀ 6.5 days before 1 0 1 0',
       '        2 ⌀ 22.5 days before 0 1 0 1',
       '    Physics ⌀ 23.33 days before 1 1 3 1',
@@ -63,9 +63,9 @@ describe('ConsoleDisplayStatistics', () => {
     const indentationOf = (line: string) => line.search(/\S/);
     press('right');
     const lines = view();
-    const trigger = lines.findIndex((line) => line.includes('> Mathematics'));
+    const trigger = lines.findIndex((line) => line.includes('Mathematics'));
     expect(lines[trigger + 1]).toMatch(/^ {6}\S/);
-    const triggerIndentation = indentationOf(lines[trigger].replace('>', ' '));
+    const triggerIndentation = indentationOf(lines[trigger]);
     // child type and the three children of Mathematics
     lines.slice(trigger + 1, trigger + 5).forEach((line) => {
       expect(indentationOf(line.replace('>', ' '))).toBeGreaterThan(
@@ -74,25 +74,36 @@ describe('ConsoleDisplayStatistics', () => {
     });
   });
 
-  it('moves the focus into an expanded child with the down arrow key', () => {
+  it('moves the focus through the expansion with the down arrow key', () => {
     press('right');
     press('down');
     expect(view()).toContain(
-      '      > 1 ⌀ 2.5 days before not learned: 0, learning: 0, learned: 2, for repeat: 0',
+      '      > 3 ⌀ 6.5 days before not learned: 1, learning: 0, learned: 1, for repeat: 0',
     );
     expect(view()).toContain('    Mathematics ⌀ 10.5 days before 1 1 3 1');
   });
 
   it('shows the statistics of leaves without expanding them', () => {
     press('right');
-    press('down');
     press('right');
     expect(view().slice(4, 8)).toEqual([
-      '      > 1 ⌀ 2.5 days before not learned: 0, learning: 0, learned: 2, for repeat: 0',
+      '        1 ⌀ 2.5 days before 0 0 2 0',
       '          subject statistics',
-      '            Fractions learned (95%) 5x 2 days before',
+      '          > Fractions learned (95%) 5x 2 days before',
       '            Solving equations learned (90%) 4x 3 days before',
     ]);
+  });
+
+  it('does nothing on the right arrow key for a child without children', () => {
+    press('right');
+    press('right');
+    const before = view();
+    press('right');
+    press('down');
+    expect(view()).toHaveLength(before.length);
+    expect(view()).toContain(
+      '          > Solving equations learned (90%) 4x 3 days before',
+    );
   });
 
   it('only the focused line and the lines above it have full opacity', () => {
@@ -104,13 +115,13 @@ describe('ConsoleDisplayStatistics', () => {
       const rawView = () => output.slice(output.indexOf('') + 1);
 
       press('right');
-      // The siblings and the children of the focused Mathematics are dimmed
+      // Mathematics has the focused child 1, whose siblings 3 and 2 are dimmed
       expect(rawView().map(isDimmed)).toEqual([
         false,
         false,
         false,
-        true,
-        true,
+        false,
+        false,
         true,
         true,
         true,
@@ -119,14 +130,13 @@ describe('ConsoleDisplayStatistics', () => {
       ]);
 
       press('down');
-      // Mathematics has the focused child 1, whose siblings 2 and 3 are dimmed
       expect(rawView().map(isDimmed)).toEqual([
         false,
         false,
         false,
         false,
-        false,
         true,
+        false,
         true,
         true,
         true,
@@ -137,19 +147,35 @@ describe('ConsoleDisplayStatistics', () => {
     }
   });
 
-  it('collapses an expanded child with the right arrow key again', () => {
+  it('jumps to the parent and collapses it with the left arrow key', () => {
     const collapsed = view();
     press('right');
     expect(view()).not.toEqual(collapsed);
-    press('right');
+    press('down');
+    press('left');
     expect(view()).toEqual(collapsed);
   });
 
-  it('does not expand on the left arrow key', () => {
+  it('collapses only the expansion of the parent', () => {
+    press('right');
+    press('right');
+    press('left');
+    expect(view().slice(2, 6)).toEqual([
+      '    Mathematics ⌀ 10.5 days before 1 1 3 1',
+      '      relevance statistics',
+      '      > 1 ⌀ 2.5 days before not learned: 0, learning: 0, learned: 2, for repeat: 0',
+      '        3 ⌀ 6.5 days before 1 0 1 0',
+    ]);
+  });
+
+  it('does nothing on the left arrow key in the first layer', () => {
     const before = view();
     press('left');
-    press('up');
-    expect(view()).toEqual(before);
+    press('down');
+    expect(view()).toHaveLength(before.length);
+    expect(view()).toContain(
+      '  > Physics ⌀ 23.33 days before not learned: 1, learning: 1, learned: 3, for repeat: 1',
+    );
   });
 
   it('keeps the focus within the bounds', () => {

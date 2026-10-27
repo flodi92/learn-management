@@ -120,9 +120,10 @@ describe('ConsoleDisplayStatistics with many children', () => {
     };
     new ConsoleDisplayStatistics().display(statistics);
     press('right');
+    expect(focusedLine()).toMatch(/subject 01 /);
     // parent, heading, 15 children, ellipsis
     expect(childLines()).toHaveLength(18);
-    press('down', 15);
+    press('down', 14);
     expect(focusedLine()).toMatch(/subject 15 /);
     press('down');
     expect(focusedLine()).toMatch(/subject 16 /);
