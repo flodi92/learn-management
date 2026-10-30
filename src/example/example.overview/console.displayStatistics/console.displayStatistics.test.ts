@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { statisticsExample } from '../../overview/overview.utils/overview.computeStatistics.exampleData';
+import { statisticsExample } from '../../../overview/overview.utils/overview.computeStatistics.exampleData';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
+import {
+  formatStatistics,
+  getStatisticsColor,
+  sortChildren,
+} from '../console.displayStatisticsItem/console.displayStatisticsItem.utils';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
@@ -22,7 +27,11 @@ describe('ConsoleDisplayStatistics', () => {
     vi.spyOn(console, 'log').mockImplementation((line = '') => {
       output.push(String(line));
     });
-    new ConsoleDisplayStatistics().display(statisticsExample);
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+    ).display(statisticsExample);
   });
 
   afterEach(() => {

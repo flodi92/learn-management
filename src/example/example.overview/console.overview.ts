@@ -2,7 +2,12 @@ import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import { OverviewRecursiveStatistics } from '../../overview/overview.model';
 import { Overview } from '../../overview/overview';
-import { consoleDisplayStatistics } from './console.displayStatistics';
+import { consoleDisplayStatistics } from './console.displayStatistics/console.displayStatistics';
+import {
+  formatStatistics,
+  getStatisticsColor,
+  sortChildren,
+} from './console.displayStatisticsItem/console.displayStatisticsItem.utils';
 
 export class ConsoleOverview extends Overview {
   constructor(getLabelFromId: (id: string) => string) {
@@ -42,6 +47,11 @@ export class ConsoleOverview extends Overview {
   protected async displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
   ): Promise<void> {
-    consoleDisplayStatistics(statistics);
+    consoleDisplayStatistics(
+      statistics,
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+    );
   }
 }

@@ -4,15 +4,18 @@ import {
   OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
   OverviewSubjectStatisticsItem,
-} from '../../overview/overview.model';
-import { learningStateColors, statisticsLabelColor } from './console.constants';
+} from '../../../overview/overview.model';
+import {
+  learningStateColors,
+  statisticsLabelColor,
+} from '../console.constants';
 import {
   camelCaseToWords,
   formatStatistics,
   getStatisticsColor,
   isOverviewSubjectStatisticsItem,
   sortChildren,
-} from './console.displayStatistics.utils';
+} from './console.displayStatisticsItem.utils';
 
 beforeAll(() => {
   chalk.level = 1;

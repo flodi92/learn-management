@@ -1,14 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { OverviewRecursiveStatistics } from '../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.model';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
-import { numberOfInitiallyShownChildren } from './console.constants';
+import { numberOfInitiallyShownChildren } from '../console.constants';
+import {
+  formatStatistics,
+  getStatisticsColor,
+  sortChildren,
+} from '../console.displayStatisticsItem/console.displayStatisticsItem.utils';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
 // Children are named "subject 01", "subject 02", ... and sorted by their decreasing mastery
 const createStatistics = (
   numberOfChildren: number,
-): OverviewRecursiveStatistics => ({
+): OverviewRecursiveUndeterminedStatistics => ({
   childType: 'subject',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
@@ -51,7 +56,11 @@ describe('ConsoleDisplayStatistics with many children', () => {
   const focusedLine = () => view().find((line) => line.includes('> '));
 
   const start = (numberOfChildren: number) =>
-    new ConsoleDisplayStatistics().display(createStatistics(numberOfChildren));
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+    ).display(createStatistics(numberOfChildren));
 
   beforeEach(() => {
     output = [];
@@ -113,12 +122,16 @@ describe('ConsoleDisplayStatistics with many children', () => {
   });
 
   it('adds the children of an expanded child when going down from its last shown child', () => {
-    const statistics: OverviewRecursiveStatistics = {
+    const statistics: OverviewRecursiveUndeterminedStatistics = {
       childType: 'category',
       statistics: createStatistics(1).statistics,
       children: { parent: createStatistics(20) },
     };
-    new ConsoleDisplayStatistics().display(statistics);
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+    ).display(statistics);
     press('right');
     expect(focusedLine()).toMatch(/subject 01: /);
     // parent, heading, 15 children, ellipsis

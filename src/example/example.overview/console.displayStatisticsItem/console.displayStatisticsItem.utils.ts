@@ -1,14 +1,15 @@
-import { LearningState, learningStates } from '../../model';
+import { LearningState, learningStates } from '../../../model';
 import {
   OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
   OverviewSubjectStatisticsItem,
   OverviewStatistics,
-} from '../../overview/overview.model';
-import { Line } from './console.displayStatistics.model';
-import { learningStateColors, statisticsLabelColor } from './console.constants';
+} from '../../../overview/overview.model';
+import {
+  learningStateColors,
+  statisticsLabelColor,
+} from '../console.constants';
 
-// Keys of OverviewSubjectStatisticsItem that are not shown as "other values"
 const summarizedSubjectKeys = new Set<string>([
   'label',
   'mastery',
@@ -16,33 +17,6 @@ const summarizedSubjectKeys = new Set<string>([
   'numberOfRepetitions',
   'learningState',
 ]);
-
-export const indentation = (depth: number) => '  '.repeat(depth);
-
-export const pathId = (path: string[]) => JSON.stringify(path);
-
-const startsWith = (path: string[], prefix: string[]) =>
-  prefix.every((key, index) => path[index] === key);
-
-// A child line is highlighted if it is focused or has the focused line below it.
-// The heading and the statistics of a node are highlighted if one of its children is focused.
-// The ellipsis is a sibling of the shown children and therefore never highlighted.
-export const isHighlighted = (line: Line, focus: string[]): boolean =>
-  line.hiddenChildrenOf
-    ? false
-    : line.path
-      ? startsWith(focus, line.path)
-      : focus.length > line.nodePath.length && startsWith(focus, line.nodePath);
-
-const getLabel = (statistics: object): string | undefined => {
-  const label = (statistics as { label?: unknown }).label;
-  return typeof label === 'string' && label !== '' ? label : undefined;
-};
-
-export const getDisplayName = (
-  node: OverviewRecursiveStatistics,
-  id: string,
-): string => getLabel(node.statistics) ?? id;
 
 // "forRepeat" -> "for repeat"
 export const camelCaseToWords = (text: string): string =>
@@ -133,7 +107,6 @@ const learningStateShares = (
   ) as Record<LearningState, number>;
 };
 
-// Negative if a is shown before b: highest share of learned, then highest of learning, then lowest of notLearned.
 const compareAggregatedStatistics = (
   a: OverviewAggregatedStatisticsItem,
   b: OverviewAggregatedStatisticsItem,
@@ -147,7 +120,6 @@ const compareAggregatedStatistics = (
   );
 };
 
-// Subjects: highest mastery first. Statistics of different types keep their order.
 export const compareStatistics = (
   a: OverviewStatistics,
   b: OverviewStatistics,
@@ -173,24 +145,3 @@ export const sortChildren = (
   [...entries].sort(([, a], [, b]) =>
     compareStatistics(a.statistics, b.statistics),
   );
-
-export const getNode = (
-  root: OverviewRecursiveStatistics,
-  path: string[],
-): OverviewRecursiveStatistics | undefined =>
-  path.reduce<OverviewRecursiveStatistics | undefined>(
-    (node, key) => node?.children?.[key],
-    root,
-  );
-
-export const getChildren = (
-  node: OverviewRecursiveStatistics,
-):
-  | { childType: string; entries: [string, OverviewRecursiveStatistics][] }
-  | undefined =>
-  node.children !== undefined && node.childType !== undefined
-    ? {
-        childType: node.childType,
-        entries: sortChildren(Object.entries(node.children)),
-      }
-    : undefined;

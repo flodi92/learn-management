@@ -16,11 +16,19 @@ export type OverviewAggregatedStatisticsItem = {
 export type OverviewStatistics =
   OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
 
-export interface OverviewRecursiveStatistics {
-  statistics: OverviewStatistics;
+export interface OverviewRecursiveUndeterminedStatistics<
+  Statistics extends object = object,
+> {
+  statistics: Statistics;
   childType?: string;
-  children?: Record<string | number, OverviewRecursiveStatistics>;
+  children?: Record<
+    string | number,
+    OverviewRecursiveUndeterminedStatistics<Statistics>
+  >;
 }
+
+export type OverviewRecursiveStatistics =
+  OverviewRecursiveUndeterminedStatistics<OverviewStatistics>;
 
 export type SubjectStatisticsTuple<S extends LearnSubject> = [
   string,
