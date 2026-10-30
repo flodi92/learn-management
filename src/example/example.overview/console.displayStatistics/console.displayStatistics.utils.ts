@@ -48,9 +48,9 @@ export const getChildren = <Statistics extends object>(
       entries: [string, OverviewRecursiveUndeterminedStatistics<Statistics>][];
     }
   | undefined =>
-  node.children !== undefined && node.childType !== undefined
+  node.children !== undefined && node.groupType !== undefined
     ? {
-        childType: node.childType,
+        childType: node.groupType,
         entries: sortChildren(Object.entries(node.children)),
       }
     : undefined;

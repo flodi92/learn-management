@@ -14,7 +14,7 @@ const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 const createStatistics = (
   numberOfChildren: number,
 ): OverviewRecursiveUndeterminedStatistics => ({
-  childType: 'subject',
+  groupType: 'subject',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
     notLearned: numberOfChildren,
@@ -123,7 +123,7 @@ describe('ConsoleDisplayStatistics with many children', () => {
 
   it('adds the children of an expanded child when going down from its last shown child', () => {
     const statistics: OverviewRecursiveUndeterminedStatistics = {
-      childType: 'category',
+      groupType: 'category',
       statistics: createStatistics(1).statistics,
       children: { parent: createStatistics(20) },
     };

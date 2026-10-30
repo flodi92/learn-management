@@ -1,26 +1,35 @@
 import { LearnSubject, TimedResult } from '../../model';
-import { getToday } from '../../utils';
 import {
   OverviewRecursiveStatistics,
   SubjectStatisticsTuples,
 } from '../overview.model';
 import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
+import {
+  GetGroups,
+  GroupTypeOrSubject,
+} from './overview.computeStatistics.model';
 import { computeSubjectsStatistics } from './overview.computeSubjectsStatistics';
 
 class StatisticsComputation<
-  S extends LearnSubject,
+  Subject extends LearnSubject,
+  GroupType extends string,
 > implements OverviewRecursiveStatistics {
   constructor(
-    private subjectStatisticsTuples: SubjectStatisticsTuples<S>,
-    private childTypes: ('relevance' | 'category')[],
+    private subjectStatisticsTuples: SubjectStatisticsTuples<Subject>,
+    private groupTypes: GroupType[],
+    private getGroups: GetGroups<Subject, GroupType>,
+    public readonly parentGroups: (readonly [
+      GroupType,
+      string | number,
+    ])[] = [],
   ) {}
 
-  public get childType(): 'relevance' | 'category' | 'subject' {
-    return this.childTypes.length ? this.childTypes[0] : 'subject';
+  public get groupType(): GroupTypeOrSubject<GroupType> {
+    return this.groupTypes.length ? this.groupTypes[0] : 'subject';
   }
 
-  private get childrensChildTypes() {
-    return this.childTypes.slice(1);
+  private get childrensGroupTypes() {
+    return this.groupTypes.slice(1);
   }
 
   public get statistics() {
@@ -32,24 +41,22 @@ class StatisticsComputation<
   }
 
   get children() {
-    const { childType, childrensChildTypes } = this;
+    const { groupType, childrensGroupTypes, subjectStatisticsTuples } = this;
 
-    if (childType === 'subject') {
+    if (groupType === 'subject') {
       return Object.fromEntries(
-        this.subjectStatisticsTuples.map(
+        subjectStatisticsTuples.map(
           ([id, subject, progressItem]) =>
-            [id, { childType: 'subject', statistics: progressItem }] as const,
+            [id, { groupType: 'subject', statistics: progressItem }] as const,
         ),
       );
     }
 
-    const groupedTuples = this.subjectStatisticsTuples.reduce(
+    const groupedTuples = subjectStatisticsTuples.reduce(
       (acc, tuple) => {
         const [id, subject, progressItem] = tuple;
-        const groups =
-          childType === 'category'
-            ? (subject.categories ?? [])
-            : [subject.relevance ?? 1];
+        const groups = this.getGroups(groupType, subject);
+
         groups.forEach((group) => {
           if (!acc[group]) acc[group] = [];
 
@@ -57,23 +64,31 @@ class StatisticsComputation<
         });
         return acc;
       },
-      {} as Record<string | number, SubjectStatisticsTuples<S>>,
+      {} as Record<string | number, SubjectStatisticsTuples<Subject>>,
     );
 
     return Object.fromEntries(
       Object.entries(groupedTuples).map(([group, tuples]) => [
         group,
-        new StatisticsComputation(tuples, childrensChildTypes),
+        new StatisticsComputation(tuples, childrensGroupTypes, this.getGroups, [
+          ...this.parentGroups,
+          [groupType, group],
+        ]),
       ]),
     );
   }
 }
 
-export const computeStatistics = <S extends LearnSubject>(
+export const computeStatistics = <
+  S extends LearnSubject,
+  GroupType extends string,
+>(
   idSubjectMapping: Record<string, S>,
   results: TimedResult[],
-  day: number = getToday(),
+  day: number,
   getLabelFromId: (id: string) => string,
+  groupTypes: GroupType[],
+  getGroups: GetGroups<S, GroupType>,
 ): OverviewRecursiveStatistics => {
   const statistics = computeSubjectsStatistics(
     idSubjectMapping,
@@ -81,5 +96,5 @@ export const computeStatistics = <S extends LearnSubject>(
     day,
     getLabelFromId,
   );
-  return new StatisticsComputation(statistics, ['category', 'relevance']);
+  return new StatisticsComputation(statistics, groupTypes, getGroups);
 };

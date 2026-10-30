@@ -1,6 +1,8 @@
 import { LearnSubject, TimedResult } from '../model';
 import { OverviewRecursiveStatistics } from './overview.model';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
+import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
+import { RelevanceCategoryGroupType } from './overview.utils/overview.computeStatistics.model';
 import { getToday } from '../utils';
 
 export abstract class Overview {
@@ -14,6 +16,8 @@ export abstract class Overview {
       results,
       getToday(),
       this.getLabelFromId,
+      ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
+      getGroupsForRelevanceAndCategory,
     );
     this.displayComputedStatistics(statistics);
   }

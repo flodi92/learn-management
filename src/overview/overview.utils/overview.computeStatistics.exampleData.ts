@@ -1,7 +1,7 @@
 import { OverviewRecursiveStatistics } from '../overview.model';
 
 export const statisticsExample: OverviewRecursiveStatistics = {
-  childType: 'category',
+  groupType: 'category',
   statistics: {
     avgLastRepetitionBeforeDays: 19,
     notLearned: 6,
@@ -11,7 +11,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
   },
   children: {
     Mathematics: {
-      childType: 'relevance',
+      groupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 10.5,
         notLearned: 1,
@@ -21,7 +21,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 2.5,
             notLearned: 0,
@@ -51,7 +51,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 22.5,
             notLearned: 0,
@@ -81,7 +81,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 6.5,
             notLearned: 1,
@@ -113,7 +113,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     Chemistry: {
-      childType: 'relevance',
+      groupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 7.17,
         notLearned: 2,
@@ -123,7 +123,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 6,
             notLearned: 1,
@@ -153,7 +153,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 7.5,
             notLearned: 0,
@@ -183,7 +183,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             notLearned: 1,
@@ -215,7 +215,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     Physics: {
-      childType: 'relevance',
+      groupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 23.33,
         notLearned: 1,
@@ -225,7 +225,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 7,
             notLearned: 0,
@@ -255,7 +255,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             notLearned: 1,
@@ -285,7 +285,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 55,
             notLearned: 0,
@@ -317,7 +317,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     History: {
-      childType: 'relevance',
+      groupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 35,
         notLearned: 2,
@@ -327,7 +327,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 85,
             notLearned: 0,
@@ -357,7 +357,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 17,
             notLearned: 0,
@@ -387,7 +387,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          childType: 'subject',
+          groupType: 'subject',
           statistics: {
             avgLastRepetitionBeforeDays: 3,
             notLearned: 2,

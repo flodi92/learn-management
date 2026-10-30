@@ -20,7 +20,8 @@ export interface OverviewRecursiveUndeterminedStatistics<
   Statistics extends object = object,
 > {
   statistics: Statistics;
-  childType?: string;
+  groupType?: string;
+  parentGroups?: readonly (readonly [string, string | number])[];
   children?: Record<
     string | number,
     OverviewRecursiveUndeterminedStatistics<Statistics>
