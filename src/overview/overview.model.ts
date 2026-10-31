@@ -18,24 +18,26 @@ export type OverviewStatistics =
 
 export interface OverviewRecursiveUndeterminedStatistics<
   Statistics extends object = object,
+  GroupType extends string = string,
 > {
   statistics: Statistics;
-  groupType?: string;
-  parentGroups?: readonly (readonly [string, string | number])[];
+  groupType?: GroupType;
+  parentGroups?: readonly (readonly [GroupType, string | number])[];
   children?: Record<
     string | number,
-    OverviewRecursiveUndeterminedStatistics<Statistics>
+    OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>
   >;
 }
 
 export type OverviewRecursiveStatistics =
   OverviewRecursiveUndeterminedStatistics<OverviewStatistics>;
 
-export type SubjectStatisticsTuple<S extends LearnSubject> = [
-  string,
-  S,
-  OverviewSubjectStatisticsItem,
-];
+export type SubjectStatisticsTuple<
+  S extends LearnSubject,
+  Statistics extends object,
+> = [string, S, Statistics];
 
-export type SubjectStatisticsTuples<S extends LearnSubject> =
-  SubjectStatisticsTuple<S>[];
+export type SubjectStatisticsTuples<
+  S extends LearnSubject,
+  Statistics extends object,
+> = SubjectStatisticsTuple<S, Statistics>[];

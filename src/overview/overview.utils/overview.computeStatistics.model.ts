@@ -11,4 +11,9 @@ export type GetGroups<
   subject: Subject,
 ) => string[] | number[];
 
+export type ComputeAggregatedStatistics<
+  SubjectStatistics extends object,
+  AggregatedStatistics extends object,
+> = (tuples: SubjectStatistics[]) => AggregatedStatistics;
+
 export type RelevanceCategoryGroupType = 'relevance' | 'category';

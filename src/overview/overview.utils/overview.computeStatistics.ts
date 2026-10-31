@@ -1,10 +1,10 @@
 import { LearnSubject, TimedResult } from '../../model';
 import {
-  OverviewRecursiveStatistics,
+  OverviewRecursiveUndeterminedStatistics,
   SubjectStatisticsTuples,
 } from '../overview.model';
-import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
 import {
+  ComputeAggregatedStatistics,
   GetGroups,
   GroupTypeOrSubject,
 } from './overview.computeStatistics.model';
@@ -13,11 +13,23 @@ import { computeSubjectsStatistics } from './overview.computeSubjectsStatistics'
 class StatisticsComputation<
   Subject extends LearnSubject,
   GroupType extends string,
-> implements OverviewRecursiveStatistics {
+  SubjectStatistics extends object,
+  AggregatedStatistics extends object,
+> implements OverviewRecursiveUndeterminedStatistics<
+  SubjectStatistics | AggregatedStatistics,
+  GroupTypeOrSubject<GroupType>
+> {
   constructor(
-    private subjectStatisticsTuples: SubjectStatisticsTuples<Subject>,
+    private subjectStatisticsTuples: SubjectStatisticsTuples<
+      Subject,
+      SubjectStatistics
+    >,
     private groupTypes: GroupType[],
     private getGroups: GetGroups<Subject, GroupType>,
+    private computeAggregatedStatistics: ComputeAggregatedStatistics<
+      SubjectStatistics,
+      AggregatedStatistics
+    >,
     public readonly parentGroups: (readonly [
       GroupType,
       string | number,
@@ -32,8 +44,8 @@ class StatisticsComputation<
     return this.groupTypes.slice(1);
   }
 
-  public get statistics() {
-    return computeAggregatedStatistics(
+  public get statistics(): AggregatedStatistics {
+    return this.computeAggregatedStatistics(
       this.subjectStatisticsTuples.map(
         ([id, subject, progressItem]) => progressItem,
       ),
@@ -47,7 +59,13 @@ class StatisticsComputation<
       return Object.fromEntries(
         subjectStatisticsTuples.map(
           ([id, subject, progressItem]) =>
-            [id, { groupType: 'subject', statistics: progressItem }] as const,
+            [
+              id,
+              {
+                groupType: 'subject',
+                statistics: progressItem,
+              },
+            ] as const,
         ),
       );
     }
@@ -64,16 +82,27 @@ class StatisticsComputation<
         });
         return acc;
       },
-      {} as Record<string | number, SubjectStatisticsTuples<Subject>>,
+      {} as Record<
+        string | number,
+        SubjectStatisticsTuples<Subject, SubjectStatistics>
+      >,
     );
 
     return Object.fromEntries(
       Object.entries(groupedTuples).map(([group, tuples]) => [
         group,
-        new StatisticsComputation(tuples, childrensGroupTypes, this.getGroups, [
-          ...this.parentGroups,
-          [groupType, group],
-        ]),
+        new StatisticsComputation<
+          Subject,
+          GroupType,
+          SubjectStatistics,
+          AggregatedStatistics
+        >(
+          tuples,
+          childrensGroupTypes,
+          this.getGroups,
+          this.computeAggregatedStatistics,
+          [...this.parentGroups, [groupType, group]],
+        ),
       ]),
     );
   }
@@ -82,6 +111,8 @@ class StatisticsComputation<
 export const computeStatistics = <
   S extends LearnSubject,
   GroupType extends string,
+  SubjectStatistics extends object,
+  AggregatedStatistics extends object,
 >(
   idSubjectMapping: Record<string, S>,
   results: TimedResult[],
@@ -89,12 +120,29 @@ export const computeStatistics = <
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
   getGroups: GetGroups<S, GroupType>,
-): OverviewRecursiveStatistics => {
+  aggregateStatistics: ComputeAggregatedStatistics<
+    SubjectStatistics,
+    AggregatedStatistics
+  >,
+): OverviewRecursiveUndeterminedStatistics<
+  SubjectStatistics | AggregatedStatistics,
+  GroupTypeOrSubject<GroupType>
+> => {
   const statistics = computeSubjectsStatistics(
     idSubjectMapping,
     results,
     day,
     getLabelFromId,
   );
-  return new StatisticsComputation(statistics, groupTypes, getGroups);
+  return new StatisticsComputation<
+    S,
+    GroupType,
+    SubjectStatistics,
+    AggregatedStatistics
+  >(
+    statistics as SubjectStatisticsTuples<S, SubjectStatistics>,
+    groupTypes,
+    getGroups,
+    aggregateStatistics,
+  );
 };

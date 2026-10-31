@@ -1,7 +1,9 @@
 ## ConsoleDisplayStatistics
 
 The class `ConsoleDisplayStatistics` displays a recursive
-`OverviewRecursiveUndeterminedStatistics<Statistics>` value on the console.
+`OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>` value on the
+console. `GroupType` describes the string values used by `groupType` and the
+first value in each `parentGroups` tuple.
 The display tree does not know what a statistics item contains. The caller
 provides arrow functions for formatting an item, coloring an item, and sorting
 children.

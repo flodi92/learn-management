@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.model';
+import {
+  OverviewRecursiveUndeterminedStatistics,
+  OverviewStatistics,
+} from '../../../overview/overview.model';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
 import { numberOfInitiallyShownChildren } from '../console.constants';
 import {
@@ -13,7 +16,7 @@ const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 // Children are named "subject 01", "subject 02", ... and sorted by their decreasing mastery
 const createStatistics = (
   numberOfChildren: number,
-): OverviewRecursiveUndeterminedStatistics => ({
+): OverviewRecursiveUndeterminedStatistics<OverviewStatistics> => ({
   groupType: 'subject',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
@@ -122,11 +125,12 @@ describe('ConsoleDisplayStatistics with many children', () => {
   });
 
   it('adds the children of an expanded child when going down from its last shown child', () => {
-    const statistics: OverviewRecursiveUndeterminedStatistics = {
-      groupType: 'category',
-      statistics: createStatistics(1).statistics,
-      children: { parent: createStatistics(20) },
-    };
+    const statistics: OverviewRecursiveUndeterminedStatistics<OverviewStatistics> =
+      {
+        groupType: 'category',
+        statistics: createStatistics(1).statistics,
+        children: { parent: createStatistics(20) },
+      };
     new ConsoleDisplayStatistics(
       formatStatistics,
       getStatisticsColor,
