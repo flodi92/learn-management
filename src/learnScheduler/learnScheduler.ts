@@ -3,17 +3,17 @@ import { getToday } from '../utils';
 import { assembleNextSession } from './learnScheduler.utils/assembleNextSession';
 import { computeSubjectStatisticsAt } from './learnScheduler.utils/computeSubjectStatisticsAt';
 
-export class LearnScheduler<S extends LearnSubject = LearnSubject> {
+export class LearnScheduler<Subject extends LearnSubject = LearnSubject> {
   private _results: TimedResult[] = [];
-  private _idSubjectMapping: Record<string, S>;
+  private _idSubjectMapping: Record<string, Subject>;
 
-  constructor(subjects: S[]) {
+  constructor(subjects: Subject[]) {
     this._idSubjectMapping = Object.fromEntries(
       subjects.map((subject) => [subject.id, subject] as const),
     );
   }
 
-  public nextSession(count: number, day: number = getToday()): S[] {
+  public nextSession(count: number, day: number = getToday()): Subject[] {
     return assembleNextSession({
       count,
       day,

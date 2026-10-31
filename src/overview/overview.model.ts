@@ -33,11 +33,11 @@ export type OverviewRecursiveStatistics =
   OverviewRecursiveUndeterminedStatistics<OverviewStatistics>;
 
 export type SubjectStatisticsTuple<
-  S extends LearnSubject,
+  Subject extends LearnSubject,
   Statistics extends object,
-> = [string, S, Statistics];
+> = [string, Subject, Statistics];
 
 export type SubjectStatisticsTuples<
-  S extends LearnSubject,
+  Subject extends LearnSubject,
   Statistics extends object,
-> = SubjectStatisticsTuple<S, Statistics>[];
+> = SubjectStatisticsTuple<Subject, Statistics>[];

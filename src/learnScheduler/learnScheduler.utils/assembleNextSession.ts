@@ -3,19 +3,19 @@ import { computeSubjectStatisticsAt } from './computeSubjectStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from './determineLearningStateFromStatisticsItem';
 import { prioritizeSubjects } from './prioritizeSubjects';
 
-interface AssembleNextSessionProps<S extends LearnSubject> {
+interface AssembleNextSessionProps<Subject extends LearnSubject> {
   count: number;
   day: number;
-  idSubjectMapping: Record<string, S>;
+  idSubjectMapping: Record<string, Subject>;
   results: TimedResult[];
 }
 
-export const assembleNextSession = <S extends LearnSubject>({
+export const assembleNextSession = <Subject extends LearnSubject>({
   count,
   day,
   idSubjectMapping,
   results,
-}: AssembleNextSessionProps<S>): S[] => {
+}: AssembleNextSessionProps<Subject>): Subject[] => {
   if (count <= 0) {
     return [];
   }
@@ -48,7 +48,7 @@ export const assembleNextSession = <S extends LearnSubject>({
         acc[learningState].push(subject);
         return acc;
       },
-      {} as Record<LearningState, S[] | undefined>,
+      {} as Record<LearningState, Subject[] | undefined>,
     );
 
   const sessionSubjects = [

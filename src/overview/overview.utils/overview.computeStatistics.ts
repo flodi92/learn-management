@@ -109,17 +109,17 @@ class StatisticsComputation<
 }
 
 export const computeStatistics = <
-  S extends LearnSubject,
+  Subject extends LearnSubject,
   GroupType extends string,
   SubjectStatistics extends object,
   AggregatedStatistics extends object,
 >(
-  idSubjectMapping: Record<string, S>,
+  idSubjectMapping: Record<string, Subject>,
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
-  getGroups: GetGroups<S, GroupType>,
+  getGroups: GetGroups<Subject, GroupType>,
   aggregateStatistics: ComputeAggregatedStatistics<
     SubjectStatistics,
     AggregatedStatistics
@@ -135,12 +135,12 @@ export const computeStatistics = <
     getLabelFromId,
   );
   return new StatisticsComputation<
-    S,
+    Subject,
     GroupType,
     SubjectStatistics,
     AggregatedStatistics
   >(
-    statistics as SubjectStatisticsTuples<S, SubjectStatistics>,
+    statistics as SubjectStatisticsTuples<Subject, SubjectStatistics>,
     groupTypes,
     getGroups,
     aggregateStatistics,

@@ -8,12 +8,12 @@ import {
   SubjectStatisticsTuples,
 } from '../overview.model';
 
-export const computeSubjectsStatistics = <S extends LearnSubject>(
-  idSubjectMapping: Record<string, S>,
+export const computeSubjectsStatistics = <Subject extends LearnSubject>(
+  idSubjectMapping: Record<string, Subject>,
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
-): SubjectStatisticsTuples<S, OverviewStatistics> => {
+): SubjectStatisticsTuples<Subject, OverviewStatistics> => {
   const subjectStatistics = computeSubjectStatisticsAt(
     day,
     idSubjectMapping,
@@ -37,6 +37,6 @@ export const computeSubjectsStatistics = <S extends LearnSubject>(
           lastMastery: statisticsItem.lastMastery,
           lastCorrectness: statisticsItem.lastCorrectness,
         },
-      ] satisfies SubjectStatisticsTuple<S, OverviewSubjectStatisticsItem>,
+      ] satisfies SubjectStatisticsTuple<Subject, OverviewSubjectStatisticsItem>,
   );
 };

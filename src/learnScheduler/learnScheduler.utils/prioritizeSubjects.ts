@@ -6,10 +6,10 @@ import {
 import { isNotUndefined } from '../../utils';
 import { determineCategoryAndRelevanceStatistics } from './determineCategoryAndRelevanceStatistics';
 
-export const prioritizeSubjects = <S extends LearnSubject>(
-  subjects: S[],
+export const prioritizeSubjects = <Subject extends LearnSubject>(
+  subjects: Subject[],
   subjectStatistics: SubjectStatistics,
-): S[] => {
+): Subject[] => {
   const idSubjectMapping = Object.fromEntries(
     subjects.map((subject) => [subject.id, subject] as const),
   );
