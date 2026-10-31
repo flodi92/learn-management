@@ -54,7 +54,7 @@ Children are sorted by the sorting arrow function supplied to
 `consoleDisplayStatistics`. Formatting and colors are likewise supplied by the
 caller. This keeps the display tree independent of any particular statistics
 model. The overview-specific sorting and formatting functions are documented
-in `console.displayStatisticsItem.md`.
+in `console.displayStatisticsItem.utils.md`.
 
 ### Opacity
 

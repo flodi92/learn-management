@@ -3,11 +3,9 @@ import { createInterface } from 'node:readline/promises';
 import { OverviewRecursiveStatistics } from '../../overview/overview.model';
 import { Overview } from '../../overview/overview';
 import { consoleDisplayStatistics } from './console.displayStatistics/console.displayStatistics';
-import {
-  formatStatistics,
-  getStatisticsColor,
-  sortChildren,
-} from './console.displayStatisticsItem/console.displayStatisticsItem.utils';
+import { formatStatistics } from './console.displayStatisticsItem.utils/console.formatStatistics';
+import { getStatisticsColor } from './console.displayStatisticsItem.utils/console.getStatisticsColor';
+import { sortChildren } from './console.displayStatisticsItem.utils/console.sortChildren';
 
 export class ConsoleOverview extends Overview {
   constructor(getLabelFromId: (id: string) => string) {

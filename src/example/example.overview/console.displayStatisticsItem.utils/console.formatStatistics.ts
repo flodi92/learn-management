@@ -1,7 +1,6 @@
-import { LearningState, learningStates } from '../../../model';
+import { learningStates } from '../../../model';
 import {
   OverviewAggregatedStatisticsItem,
-  OverviewRecursiveStatistics,
   OverviewSubjectStatisticsItem,
   OverviewStatistics,
 } from '../../../overview/overview.model';
@@ -37,7 +36,7 @@ const formatLabeledValue = (
 
 const neverTrained = 'never trained';
 
-export const formatAggregatedStatistics = (
+const formatAggregatedStatistics = (
   statistics: OverviewAggregatedStatisticsItem,
   isFocused: boolean,
 ): string => {
@@ -53,7 +52,7 @@ export const formatAggregatedStatistics = (
   return [...counts, average].join(separator);
 };
 
-export const formatSubjectStatistics = (
+const formatSubjectStatistics = (
   statistics: OverviewSubjectStatisticsItem,
   isFocused: boolean,
 ): string => {
@@ -81,67 +80,3 @@ export const formatStatistics = (
   isOverviewSubjectStatisticsItem(statistics)
     ? formatSubjectStatistics(statistics, isFocused)
     : formatAggregatedStatistics(statistics, isFocused);
-
-// Subjects use the color of their learning state, aggregated statistics the one of the highest number.
-export const getStatisticsColor = (
-  statistics: OverviewStatistics,
-): ((text: string) => string) => {
-  if (isOverviewSubjectStatisticsItem(statistics)) {
-    return learningStateColors[statistics.learningState];
-  }
-  const dominantState = learningStates.reduce((dominant, state) =>
-    statistics[state] > statistics[dominant] ? state : dominant,
-  );
-  return learningStateColors[dominantState];
-};
-
-const learningStateShares = (
-  statistics: OverviewAggregatedStatisticsItem,
-): Record<LearningState, number> => {
-  const sum = learningStates.reduce((acc, state) => acc + statistics[state], 0);
-  return Object.fromEntries(
-    learningStates.map((state) => [
-      state,
-      sum === 0 ? 0 : statistics[state] / sum,
-    ]),
-  ) as Record<LearningState, number>;
-};
-
-const compareAggregatedStatistics = (
-  a: OverviewAggregatedStatisticsItem,
-  b: OverviewAggregatedStatisticsItem,
-): number => {
-  const sharesA = learningStateShares(a);
-  const sharesB = learningStateShares(b);
-  return (
-    sharesB.learned - sharesA.learned ||
-    sharesB.learning - sharesA.learning ||
-    sharesA.notLearned - sharesB.notLearned
-  );
-};
-
-export const compareStatistics = (
-  a: OverviewStatistics,
-  b: OverviewStatistics,
-): number => {
-  if (
-    isOverviewSubjectStatisticsItem(a) &&
-    isOverviewSubjectStatisticsItem(b)
-  ) {
-    return b.mastery - a.mastery;
-  }
-  if (
-    !isOverviewSubjectStatisticsItem(a) &&
-    !isOverviewSubjectStatisticsItem(b)
-  ) {
-    return compareAggregatedStatistics(a, b);
-  }
-  return 0;
-};
-
-export const sortChildren = (
-  entries: [string, OverviewRecursiveStatistics][],
-): [string, OverviewRecursiveStatistics][] =>
-  [...entries].sort(([, a], [, b]) =>
-    compareStatistics(a.statistics, b.statistics),
-  );

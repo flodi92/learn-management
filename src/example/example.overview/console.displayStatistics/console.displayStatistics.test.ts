@@ -2,11 +2,9 @@ import chalk from 'chalk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { statisticsExample } from '../../../overview/overview.utils/overview.computeStatistics.exampleData';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
-import {
-  formatStatistics,
-  getStatisticsColor,
-  sortChildren,
-} from '../console.displayStatisticsItem/console.displayStatisticsItem.utils';
+import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
+import { getStatisticsColor } from '../console.displayStatisticsItem.utils/console.getStatisticsColor';
+import { sortChildren } from '../console.displayStatisticsItem.utils/console.sortChildren';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 

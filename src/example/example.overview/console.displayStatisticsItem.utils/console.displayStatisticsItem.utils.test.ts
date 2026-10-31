@@ -12,10 +12,10 @@ import {
 import {
   camelCaseToWords,
   formatStatistics,
-  getStatisticsColor,
   isOverviewSubjectStatisticsItem,
-  sortChildren,
-} from './console.displayStatisticsItem.utils';
+} from './console.formatStatistics';
+import { getStatisticsColor } from './console.getStatisticsColor';
+import { sortChildren } from './console.sortChildren';
 
 beforeAll(() => {
   chalk.level = 1;
