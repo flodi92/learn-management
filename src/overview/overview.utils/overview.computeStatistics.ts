@@ -50,7 +50,29 @@ class StatisticsComputation<
     );
   }
 
-  get children() {
+  private _children?: Record<
+    string | number,
+    OverviewRecursiveUndeterminedStatistics<
+      SubjectStatistics | AggregatedStatistics,
+      GroupTypeOrSubject<GroupType>
+    >
+  >;
+
+  get children(): Record<
+    string | number,
+    OverviewRecursiveUndeterminedStatistics<
+      SubjectStatistics | AggregatedStatistics,
+      GroupTypeOrSubject<GroupType>
+    >
+  > {
+    if (this._children === undefined) {
+      this._children = this.computeChildren();
+    }
+
+    return this._children;
+  }
+
+  private computeChildren() {
     const { groupType, childrensGroupTypes, subjectStatisticsTuples } = this;
 
     if (groupType === 'subject') {
