@@ -1,8 +1,6 @@
 import { LearnSubject } from '../../model';
-import {
-  GetGroups,
-  RelevanceCategoryGroupType,
-} from './overview.computeStatistics.model';
+import { GetGroups } from './overview.computeStatistics.model';
+import { RelevanceCategoryGroupType } from '../overview.model';
 
 export const getGroupsForRelevanceAndCategory: GetGroups<
   LearnSubject,

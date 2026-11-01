@@ -1,11 +1,11 @@
 import { computeSubjectStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeSubjectStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/learnScheduler.utils/determineLearningStateFromStatisticsItem';
 import { LearnSubject, TimedResult } from '../../model';
+import { OverviewSubjectStatisticsItem } from '../overview.model';
 import {
-  OverviewSubjectStatisticsItem,
   SubjectStatisticsTuple,
   SubjectStatisticsTuples,
-} from '../overview.model';
+} from './overview.computeStatistics.model';
 
 export const computeSubjectsStatistics = <Subject extends LearnSubject>(
   idSubjectMapping: Record<string, Subject>,

@@ -1,9 +1,11 @@
 import { LearnSubject, TimedResult } from '../model';
 import { getToday } from '../utils';
-import { OverviewRecursiveStatistics } from './overview.model';
+import {
+  OverviewRecursiveStatistics,
+  RelevanceCategoryGroupType,
+} from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
-import { RelevanceCategoryGroupType } from './overview.utils/overview.computeStatistics.model';
 import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 

@@ -1,5 +1,5 @@
 import readline from 'node:readline';
-import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import {
   ellipsis,
   focusPointerColor,

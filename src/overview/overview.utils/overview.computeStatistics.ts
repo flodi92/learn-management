@@ -1,8 +1,6 @@
 import { LearnSubject, TimedResult } from '../../model';
-import {
-  OverviewRecursiveUndeterminedStatistics,
-  SubjectStatisticsTuples,
-} from '../overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from './overview.computeStatistics.model';
+import { SubjectStatisticsTuples } from './overview.computeStatistics.model';
 import {
   ComputeAggregatedStatistics,
   ComputeSubjectStatistics,

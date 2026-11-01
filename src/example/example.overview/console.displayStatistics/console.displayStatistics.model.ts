@@ -1,6 +1,6 @@
 // Child lines (with a path) show their statistics behind the text.
 
-import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 
 // nodePath is the path of the node a line belongs to (a child line or the statistics and heading of a node).
 export type Line<Statistics extends object> = {

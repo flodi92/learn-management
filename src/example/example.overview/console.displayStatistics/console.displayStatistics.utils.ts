@@ -1,4 +1,4 @@
-import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import { Line } from './console.displayStatistics.model';
 
 export const indentation = (depth: number) => '  '.repeat(depth);

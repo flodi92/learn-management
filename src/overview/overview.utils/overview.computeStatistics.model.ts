@@ -1,5 +1,4 @@
 import { LearnSubject, TimedResult } from '../../model';
-import { SubjectStatisticsTuples } from '../overview.model';
 
 export type GroupTypeOrSubject<GroupType extends string> =
   GroupType | 'subject';
@@ -27,4 +26,25 @@ export type ComputeSubjectStatistics<
   getLabelFromId: (id: string) => string,
 ) => SubjectStatisticsTuples<Subject, SubjectStatistics>;
 
-export type RelevanceCategoryGroupType = 'relevance' | 'category';
+export type SubjectStatisticsTuple<
+  Subject extends LearnSubject,
+  Statistics extends object,
+> = [string, Subject, Statistics];
+
+export type SubjectStatisticsTuples<
+  Subject extends LearnSubject,
+  Statistics extends object,
+> = SubjectStatisticsTuple<Subject, Statistics>[];
+
+export interface OverviewRecursiveUndeterminedStatistics<
+  Statistics extends object = object,
+  GroupType extends string = string,
+> {
+  statistics: Statistics;
+  groupType?: GroupType;
+  parentGroups?: readonly (readonly [GroupType, string | number])[];
+  children?: Record<
+    string | number,
+    OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>
+  >;
+}

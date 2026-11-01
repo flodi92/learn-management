@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  OverviewRecursiveUndeterminedStatistics,
-  OverviewStatistics,
-} from '../../../overview/overview.model';
+import { OverviewStatistics } from '../../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
 import { numberOfInitiallyShownChildren } from '../console.constants';
 import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
