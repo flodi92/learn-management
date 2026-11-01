@@ -11,8 +11,9 @@ for the current group and subject selections. The display reads those
 observables while rendering; it does not store selection state itself.
 
 One layer is displayed in the following way. Only the root layer starts with a
-line containing its own statistics. All other layers show their statistics in
-the line of the child that represents them.
+line containing its own statistics. The root statistics use the detailed
+format and can start with the number of selected items. All other layers show
+their statistics in the line of the child that represents them.
 
 Each layer contains a `${childType} statistics` line followed by one line per
 child. Children are indented one level deeper than that heading. A child line

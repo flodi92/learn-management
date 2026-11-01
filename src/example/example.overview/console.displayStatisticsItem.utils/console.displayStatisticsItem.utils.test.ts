@@ -72,6 +72,13 @@ describe('formatStatistics', () => {
     );
   });
 
+  it('adds the number of selected items to the detailed aggregated statistics', () => {
+    const label = statisticsLabelColor;
+    expect(formatStatistics(aggregated, true, 3)).toBe(
+      `selected: 3, ${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
+    );
+  });
+
   it('shows "never trained" instead of an infinite average', () => {
     const neverTrained = {
       ...aggregated,

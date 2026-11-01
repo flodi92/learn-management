@@ -29,6 +29,10 @@ describe('ConsoleDisplayStatistics', () => {
       formatStatistics,
       getStatisticsColor,
       sortChildren,
+      undefined,
+      undefined,
+      undefined,
+      () => 3,
     ).display(statisticsExample);
   });
 
@@ -39,7 +43,7 @@ describe('ConsoleDisplayStatistics', () => {
 
   it('shows only the first layer initially with the first child focused', () => {
     expect(view()).toEqual([
-      '  6 5 9 4 ⌀ 19 days before',
+      '  selected: 3, not learned: 6, learning: 5, learned: 9, for repeat: 4, ⌀ 19 days before',
       '  category statistics',
       '  > Mathematics: not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 10.5 days before',
       '    Physics: 1 1 3 1 ⌀ 23.33 days before',

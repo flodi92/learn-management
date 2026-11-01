@@ -39,6 +39,7 @@ const neverTrained = 'never trained';
 const formatAggregatedStatistics = (
   statistics: OverviewAggregatedStatisticsItem,
   isFocused: boolean,
+  numberOfSelectedItems?: number,
 ): string => {
   const counts = learningStates.map((state) =>
     isFocused
@@ -49,7 +50,10 @@ const formatAggregatedStatistics = (
     ? `⌀ ${statistics.avgLastRepetitionBeforeDays} days before`
     : neverTrained;
   const separator = isFocused ? ', ' : ' ';
-  return [...counts, average].join(separator);
+  const formatted = [...counts, average].join(separator);
+  return numberOfSelectedItems === undefined
+    ? formatted
+    : `selected: ${numberOfSelectedItems}, ${formatted}`;
 };
 
 const formatSubjectStatistics = (
@@ -76,7 +80,8 @@ const formatSubjectStatistics = (
 export const formatStatistics = (
   statistics: OverviewStatistics,
   isFocused: boolean,
+  numberOfSelectedItems?: number,
 ): string =>
   isOverviewSubjectStatisticsItem(statistics)
     ? formatSubjectStatistics(statistics, isFocused)
-    : formatAggregatedStatistics(statistics, isFocused);
+    : formatAggregatedStatistics(statistics, isFocused, numberOfSelectedItems);

@@ -38,6 +38,7 @@ export abstract class Overview {
       this.toggleSelection.bind(this),
       () => this.groupSelection,
       () => this.subjectSelection,
+      () => this.numberOfSelectedItems,
     );
   }
 
@@ -46,7 +47,12 @@ export abstract class Overview {
     toggleSelection: (path: [string, string | number][]) => void,
     groupSelection: () => Record<string, boolean | undefined>,
     subjectSelection: () => Record<string, true | undefined>,
+    numberOfSelectedItems: () => number,
   ): Promise<void>;
+
+  private get numberOfSelectedItems() {
+    return Object.values(this.subjectSelection).filter((value) => value).length;
+  }
 
   private toggleSelection(path: [string, string | number][]) {
     const pathStr = JSON.stringify(path);

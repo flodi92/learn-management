@@ -47,6 +47,7 @@ export class ConsoleOverview extends Overview {
     toggleSelection: (path: [string, string | number][]) => void,
     groupSelection: () => Record<string, boolean | undefined>,
     subjectSelection: () => Record<string, true | undefined>,
+    numberOfSelectedItems: () => number,
   ): Promise<void> {
     consoleDisplayStatistics(
       statistics,
@@ -56,6 +57,7 @@ export class ConsoleOverview extends Overview {
       toggleSelection,
       groupSelection,
       subjectSelection,
+      numberOfSelectedItems,
     );
   }
 }

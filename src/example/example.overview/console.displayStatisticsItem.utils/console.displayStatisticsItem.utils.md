@@ -4,7 +4,8 @@ This module supplies the overview-specific arrow functions used by
 `ConsoleDisplayStatistics`:
 
 - `formatStatistics` formats `OverviewStatistics`, using the short form for
-  unfocused lines and the detailed form for the focused line.
+  unfocused lines and the detailed form for the focused line. The root line is
+  rendered in the detailed form and may include the number of selected items.
 - `getStatisticsColor` colors a subject by its learning state and aggregated
   statistics by their dominant learning state.
 - `compareStatistics` sorts subjects by decreasing mastery and aggregated
@@ -15,9 +16,10 @@ This module supplies the overview-specific arrow functions used by
 
 The formatter determines the item type with `isOverviewSubjectStatisticsItem`
 and delegates to `formatSubjectStatistics` or
-`formatAggregatedStatistics`. Only a focused line shows additional details;
-the root line is never focused and therefore uses the short form. A child's id
-or label is followed by a colon colored by `getStatisticsColor`.
+`formatAggregatedStatistics`. Only a focused line shows additional details, except for the root line, which
+always uses the detailed form. When supplied, the root line starts with
+`selected: ${numberOfSelectedItems}`. A child's id or label is followed by a
+colon colored by `getStatisticsColor`.
 
 ### OverviewAggregatedStatisticsItem
 
