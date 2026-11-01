@@ -5,10 +5,10 @@ import {
 } from '../overview.model';
 import {
   ComputeAggregatedStatistics,
+  ComputeSubjectStatistics,
   GetGroups,
   GroupTypeOrSubject,
 } from './overview.computeStatistics.model';
-import { computeSubjectsStatistics } from './overview.computeSubjectsStatistics';
 
 class StatisticsComputation<
   Subject extends LearnSubject,
@@ -120,6 +120,10 @@ export const computeStatistics = <
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
   getGroups: GetGroups<Subject, GroupType>,
+  computeSubjectsStatistics: ComputeSubjectStatistics<
+    Subject,
+    SubjectStatistics
+  >,
   aggregateStatistics: ComputeAggregatedStatistics<
     SubjectStatistics,
     AggregatedStatistics
@@ -139,10 +143,5 @@ export const computeStatistics = <
     GroupType,
     SubjectStatistics,
     AggregatedStatistics
-  >(
-    statistics as SubjectStatisticsTuples<Subject, SubjectStatistics>,
-    groupTypes,
-    getGroups,
-    aggregateStatistics,
-  );
+  >(statistics, groupTypes, getGroups, aggregateStatistics);
 };

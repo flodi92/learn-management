@@ -3,7 +3,6 @@ import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/l
 import { LearnSubject, TimedResult } from '../../model';
 import {
   OverviewSubjectStatisticsItem,
-  OverviewStatistics,
   SubjectStatisticsTuple,
   SubjectStatisticsTuples,
 } from '../overview.model';
@@ -13,7 +12,7 @@ export const computeSubjectsStatistics = <Subject extends LearnSubject>(
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
-): SubjectStatisticsTuples<Subject, OverviewStatistics> => {
+): SubjectStatisticsTuples<Subject, OverviewSubjectStatisticsItem> => {
   const subjectStatistics = computeSubjectStatisticsAt(
     day,
     idSubjectMapping,
@@ -37,6 +36,9 @@ export const computeSubjectsStatistics = <Subject extends LearnSubject>(
           lastMastery: statisticsItem.lastMastery,
           lastCorrectness: statisticsItem.lastCorrectness,
         },
-      ] satisfies SubjectStatisticsTuple<Subject, OverviewSubjectStatisticsItem>,
+      ] satisfies SubjectStatisticsTuple<
+        Subject,
+        OverviewSubjectStatisticsItem
+      >,
   );
 };

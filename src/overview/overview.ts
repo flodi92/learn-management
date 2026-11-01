@@ -4,6 +4,7 @@ import {
   OverviewSubjectStatisticsItem,
 } from './overview.model';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
+import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 import { RelevanceCategoryGroupType } from './overview.utils/overview.computeStatistics.model';
@@ -27,6 +28,7 @@ export abstract class Overview {
       this.getLabelFromId,
       ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
       getGroupsForRelevanceAndCategory,
+      computeSubjectsStatistics,
       computeAggregatedStatistics,
     );
     this.displayComputedStatistics(statistics);
