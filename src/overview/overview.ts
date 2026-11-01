@@ -1,14 +1,11 @@
 import { LearnSubject, TimedResult } from '../model';
-import {
-  OverviewRecursiveStatistics,
-  OverviewSubjectStatisticsItem,
-} from './overview.model';
-import { computeStatistics } from './overview.utils/overview.computeStatistics';
-import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
-import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
-import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
-import { RelevanceCategoryGroupType } from './overview.utils/overview.computeStatistics.model';
 import { getToday } from '../utils';
+import { OverviewRecursiveStatistics } from './overview.model';
+import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
+import { computeStatistics } from './overview.utils/overview.computeStatistics';
+import { RelevanceCategoryGroupType } from './overview.utils/overview.computeStatistics.model';
+import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
+import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 
 export abstract class Overview {
   constructor(public getLabelFromId: (id: string) => string) {}
@@ -16,12 +13,7 @@ export abstract class Overview {
     idSubjectMapping: Record<string, LearnSubject>,
     results: TimedResult[],
   ): Promise<void> {
-    const statistics = computeStatistics<
-      LearnSubject,
-      RelevanceCategoryGroupType,
-      OverviewSubjectStatisticsItem,
-      ReturnType<typeof computeAggregatedStatistics>
-    >(
+    const statistics = computeStatistics(
       idSubjectMapping,
       results,
       getToday(),

@@ -91,12 +91,7 @@ class StatisticsComputation<
     return Object.fromEntries(
       Object.entries(groupedTuples).map(([group, tuples]) => [
         group,
-        new StatisticsComputation<
-          Subject,
-          GroupType,
-          SubjectStatistics,
-          AggregatedStatistics
-        >(
+        new StatisticsComputation(
           tuples,
           childrensGroupTypes,
           this.getGroups,
@@ -138,10 +133,10 @@ export const computeStatistics = <
     day,
     getLabelFromId,
   );
-  return new StatisticsComputation<
-    Subject,
-    GroupType,
-    SubjectStatistics,
-    AggregatedStatistics
-  >(statistics, groupTypes, getGroups, aggregateStatistics);
+  return new StatisticsComputation(
+    statistics,
+    groupTypes,
+    getGroups,
+    aggregateStatistics,
+  );
 };
