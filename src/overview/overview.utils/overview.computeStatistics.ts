@@ -99,6 +99,36 @@ class StatisticsComputation<
       ]),
     );
   }
+
+  public getChildrenIds(
+    path: [GroupTypeOrSubject<GroupType>, string | number][],
+  ): string[] {
+    if (path.length === 0) {
+      return this.subjectStatisticsTuples.map(([id]) => id);
+    }
+
+    const [[expectedGroupType, group], ...restPath] = path;
+
+    const children: Record<
+      string | number,
+      OverviewRecursiveUndeterminedStatistics<
+        SubjectStatistics | AggregatedStatistics,
+        GroupTypeOrSubject<GroupType>
+      >
+    > = this.children;
+
+    if (this.groupType !== expectedGroupType) {
+      throw new Error(
+        `Expected group type "${this.groupType}" but got "${expectedGroupType}"`,
+      );
+    }
+
+    if (children[group] === undefined) {
+      throw new Error(`No child "${group}" for group type "${this.groupType}"`);
+    }
+
+    return children[group].getChildrenIds!(restPath);
+  }
 }
 
 export const computeStatistics = <

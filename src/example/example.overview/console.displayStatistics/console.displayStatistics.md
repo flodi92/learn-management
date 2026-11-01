@@ -5,8 +5,10 @@ The class `ConsoleDisplayStatistics` displays a recursive
 console. `GroupType` describes the string values used by `groupType` and the
 first value in each `parentGroups` tuple.
 The display tree does not know what a statistics item contains. The caller
-provides arrow functions for formatting an item, coloring an item, and sorting
-children.
+provides arrow functions for formatting an item, coloring an item, sorting
+children, and toggling a group selection. The caller also provides observables
+for the current group and subject selections. The display reads those
+observables while rendering; it does not store selection state itself.
 
 One layer is displayed in the following way. Only the root layer starts with a
 line containing its own statistics. All other layers show their statistics in
@@ -25,7 +27,17 @@ child. This can be repeated for deeper layers; pressing right on a child
 without children has no effect. The left arrow moves the focus to the parent
 child (the child expanded to show the focused child) and collapses its
 expansion. In the first layer there is no parent, so pressing left has no
-effect. Up and down do not expand or collapse anything.
+effect. Up and down do not expand or collapse anything. Pressing space toggles
+the selection of the focused group. The toggle cycles through explicitly
+selected (`true`), explicitly unselected (`false`), and unspecified
+(`undefined`).
+
+Every child line starts with a three-character selection indicator. Group
+layers use the group selection observable: `[+]` means explicitly selected,
+`[-]` means explicitly unselected, and three spaces mean unspecified. Subject
+layers use the subject selection observable; a selected subject is marked
+`[+]`, while an unspecified subject has three spaces. Selection indicators
+come from the current observables and are not retained by the display.
 
 All lines that appear when expanding are indented one level deeper than the
 line that triggered the expansion. The layers are therefore indicated by an

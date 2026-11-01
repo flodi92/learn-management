@@ -44,12 +44,18 @@ export class ConsoleOverview extends Overview {
 
   protected async displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
+    toggleSelection: (path: [string, string | number][]) => void,
+    groupSelection: () => Record<string, boolean | undefined>,
+    subjectSelection: () => Record<string, true | undefined>,
   ): Promise<void> {
     consoleDisplayStatistics(
       statistics,
       formatStatistics,
       getStatisticsColor,
       sortChildren,
+      toggleSelection,
+      groupSelection,
+      subjectSelection,
     );
   }
 }

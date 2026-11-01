@@ -1,9 +1,9 @@
 import { LearningState, learningStates } from '../../../model';
 import {
   OverviewAggregatedStatisticsItem,
-  OverviewRecursiveStatistics,
   OverviewStatistics,
 } from '../../../overview/overview.model';
+import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import { isOverviewSubjectStatisticsItem } from './console.formatStatistics';
 
 const learningStateShares = (
@@ -50,9 +50,15 @@ const compareStatistics = (
   return 0;
 };
 
-export const sortChildren = (
-  entries: [string, OverviewRecursiveStatistics][],
-): [string, OverviewRecursiveStatistics][] =>
+export const sortChildren = <
+  Statistics extends OverviewStatistics,
+  GroupType extends string,
+>(
+  entries: [
+    string,
+    OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>,
+  ][],
+): [string, OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>][] =>
   [...entries].sort(([, a], [, b]) =>
     compareStatistics(a.statistics, b.statistics),
   );

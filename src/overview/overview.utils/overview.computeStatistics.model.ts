@@ -47,4 +47,5 @@ export interface OverviewRecursiveUndeterminedStatistics<
     string | number,
     OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>
   >;
+  getChildrenIds?(path: [GroupType, string | number][]): string[];
 }

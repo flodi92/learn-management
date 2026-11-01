@@ -1,5 +1,8 @@
 import { LearningState, SubjectStatisticsItem } from '../model';
-import { OverviewRecursiveUndeterminedStatistics } from './overview.utils/overview.computeStatistics.model';
+import {
+  GroupTypeOrSubject,
+  OverviewRecursiveUndeterminedStatistics,
+} from './overview.utils/overview.computeStatistics.model';
 
 export interface OverviewSubjectStatisticsItem extends Omit<
   SubjectStatisticsItem,
@@ -18,6 +21,9 @@ export type OverviewStatistics =
   OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
 
 export type OverviewRecursiveStatistics =
-  OverviewRecursiveUndeterminedStatistics<OverviewStatistics>;
+  OverviewRecursiveUndeterminedStatistics<
+    OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem,
+    GroupTypeOrSubject<RelevanceCategoryGroupType>
+  >;
 
 export type RelevanceCategoryGroupType = 'relevance' | 'category';
