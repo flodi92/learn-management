@@ -10,9 +10,16 @@ import { computeSubjectsStatistics } from './overview.utils/overview.computeSubj
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 
 export abstract class Overview {
+  private statistics: OverviewRecursiveStatistics | undefined;
+  private groupSelection: Record<string, boolean | undefined> = {};
+  private subjectSelection: Record<string, true | undefined> = {};
+
   constructor(public getLabelFromId: (id: string) => string) {}
 
-  async displayStatistics(
+  abstract askForNumberOfTasks(): Promise<number>;
+  abstract showSessionFinishedView(): Promise<void>;
+
+  public async displayStatistics(
     idSubjectMapping: Record<string, LearnSubject>,
     results: TimedResult[],
   ): Promise<void> {
@@ -33,8 +40,7 @@ export abstract class Overview {
       () => this.subjectSelection,
     );
   }
-  abstract askForNumberOfTasks(): Promise<number>;
-  abstract showSessionFinishedView(): Promise<void>;
+
   protected abstract displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
     toggleSelection: (path: [string, string | number][]) => void,
@@ -42,11 +48,7 @@ export abstract class Overview {
     subjectSelection: () => Record<string, true | undefined>,
   ): Promise<void>;
 
-  statistics: OverviewRecursiveStatistics | undefined;
-  groupSelection: Record<string, boolean | undefined> = {};
-  subjectSelection: Record<string, true | undefined> = {};
-
-  toggleSelection(path: [string, string | number][]) {
+  private toggleSelection(path: [string, string | number][]) {
     const pathStr = JSON.stringify(path);
     this.groupSelection[pathStr] =
       this.groupSelection[pathStr] === undefined
@@ -58,7 +60,7 @@ export abstract class Overview {
     this.updateSubjectSelection();
   }
 
-  updateSubjectSelection() {
+  private updateSubjectSelection() {
     if (!this.statistics) return;
 
     const entries = Object.entries(this.groupSelection)
