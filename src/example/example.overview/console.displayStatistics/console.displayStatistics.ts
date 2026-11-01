@@ -153,7 +153,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     if (this.showSelectionIndicators) {
       console.log(helpColor('space: toggle the focused group selection'));
     }
-    console.log(helpColor('q or Ctrl+C: quit'));
+    console.log(helpColor('enter: quit or accept current selection'));
     console.log();
 
     const focusId = this.focus && pathId(this.focus);
@@ -268,7 +268,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     this.onKeypress(str, key);
 
   private onKeypress(str: string | undefined, key?: readline.Key) {
-    if ((key?.ctrl && key.name === 'c') || str === 'q') {
+    if (key?.name === 'return') {
       this.stopListening();
       this.resolveDisplay?.();
       this.resolveDisplay = undefined;

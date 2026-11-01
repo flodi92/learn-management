@@ -6,10 +6,11 @@ import {
 } from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
+import { GroupTypeOrSubject } from './overview.utils/overview.computeStatistics.model';
 import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 
-export abstract class Overview {
+export abstract class Overview<Subject extends LearnSubject> {
   private statistics: OverviewRecursiveStatistics | undefined;
   private groupSelection: Record<string, boolean | undefined> = {};
   private subjectSelection: Record<string, true | undefined> = {};
@@ -20,9 +21,17 @@ export abstract class Overview {
   abstract showSessionFinishedView(): Promise<void>;
 
   public async displayStatistics(
-    idSubjectMapping: Record<string, LearnSubject>,
+    idSubjectMapping: Record<string, Subject>,
     results: TimedResult[],
-  ): Promise<void> {
+    preselectedSubjects: Subject[],
+  ): Promise<Subject[]> {
+    this.groupSelection = Object.fromEntries(
+      preselectedSubjects.map(({ id }) => [
+        JSON.stringify([['subject', id]]),
+        true,
+      ]),
+    );
+
     this.statistics = computeStatistics(
       idSubjectMapping,
       results,
@@ -33,6 +42,7 @@ export abstract class Overview {
       computeSubjectsStatistics,
       computeAggregatedStatistics,
     );
+    this.updateSubjectSelection();
     await this.displayComputedStatistics(
       this.statistics,
       this.toggleSelection.bind(this),
@@ -40,6 +50,8 @@ export abstract class Overview {
       () => this.subjectSelection,
       () => this.numberOfSelectedItems,
     );
+
+    return this.selectedItems.map((id) => idSubjectMapping[id]);
   }
 
   protected abstract displayComputedStatistics(
@@ -50,8 +62,14 @@ export abstract class Overview {
     numberOfSelectedItems: () => number,
   ): Promise<void>;
 
+  private get selectedItems() {
+    return Object.entries(this.subjectSelection)
+      .filter(([, selected]) => selected)
+      .map(([id]) => id);
+  }
+
   private get numberOfSelectedItems() {
-    return Object.values(this.subjectSelection).filter((value) => value).length;
+    return this.selectedItems.length;
   }
 
   private toggleSelection(path: [string, string | number][]) {
@@ -74,7 +92,7 @@ export abstract class Overview {
         ([pathStr, selected]) =>
           [
             JSON.parse(pathStr) as [
-              RelevanceCategoryGroupType,
+              GroupTypeOrSubject<RelevanceCategoryGroupType>,
               string | number,
             ][],
             selected,
@@ -84,11 +102,25 @@ export abstract class Overview {
 
     this.subjectSelection = entries.reduce(
       (acc, [path, selected]) => {
-        const childrenIds = this.statistics!.getChildrenIds!(path);
+        const [lastGroupType, lastId] = path[path.length - 1];
 
-        childrenIds.forEach((id) => {
-          acc[id] = selected ? true : undefined;
-        });
+        if (lastGroupType === 'subject') {
+          acc[lastId] = selected
+            ? true
+            : selected === false
+              ? undefined
+              : acc[lastId];
+        } else {
+          const childrenIds = this.statistics!.getChildrenIds!(path);
+
+          childrenIds.forEach((id) => {
+            acc[id] = selected
+              ? true
+              : selected === false
+                ? undefined
+                : acc[id];
+          });
+        }
 
         return acc;
       },

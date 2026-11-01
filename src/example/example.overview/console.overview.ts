@@ -6,8 +6,9 @@ import { consoleDisplayStatistics } from './console.displayStatistics/console.di
 import { formatStatistics } from './console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from './console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from './console.displayStatisticsItem.utils/console.sortChildren';
+import { LearnSubject } from '../../model';
 
-export class ConsoleOverview extends Overview {
+export class ConsoleOverview extends Overview<LearnSubject> {
   constructor(getLabelFromId: (id: string) => string) {
     super(getLabelFromId);
   }
@@ -49,7 +50,7 @@ export class ConsoleOverview extends Overview {
     subjectSelection: () => Record<string, true | undefined>,
     numberOfSelectedItems: () => number,
   ): Promise<void> {
-    consoleDisplayStatistics(
+    await consoleDisplayStatistics(
       statistics,
       formatStatistics,
       getStatisticsColor,
