@@ -87,44 +87,70 @@ export abstract class Overview<Subject extends LearnSubject> {
   private updateSubjectSelection() {
     if (!this.statistics) return;
 
-    const entries = Object.entries(this.groupSelection)
-      .map(
-        ([pathStr, selected]) =>
-          [
-            JSON.parse(pathStr) as [
-              GroupTypeOrSubject<RelevanceCategoryGroupType>,
-              string | number,
-            ][],
-            selected,
-          ] as const,
-      )
-      .sort(([pathA], [pathB]) => pathA.length - pathB.length);
+    const entries = Object.entries(this.groupSelection).map(
+      ([pathStr, selected]) =>
+        [
+          JSON.parse(pathStr) as [
+            GroupTypeOrSubject<RelevanceCategoryGroupType>,
+            string | number,
+          ][],
+          selected,
+        ] as const,
+    );
 
-    this.subjectSelection = entries.reduce(
+    const [subjectSelection, pureGroupSelection] = entries.reduce(
+      (acc, entry): [typeof entries, typeof entries] => {
+        const [subjectSelection, pureGroupSelection] = acc;
+        const [path] = entry;
+        const [lastGroupType] = path[path.length - 1];
+
+        return lastGroupType === 'subject'
+          ? [[...subjectSelection, entry], pureGroupSelection]
+          : [subjectSelection, [...pureGroupSelection, entry]];
+      },
+      [[], []] as [typeof entries, typeof entries],
+    );
+
+    const sortedPureGroupSelection = pureGroupSelection.sort(
+      ([pathA], [pathB]) => pathA.length - pathB.length,
+    );
+
+    this.subjectSelection = subjectSelection.reduce(
       (acc, [path, selected]) => {
-        const [lastGroupType, lastId] = path[path.length - 1];
-
-        if (lastGroupType === 'subject') {
-          acc[lastId] = selected
-            ? true
-            : selected === false
-              ? undefined
-              : acc[lastId];
-        } else {
-          const childrenIds = this.statistics!.getChildrenIds!(path);
-
-          childrenIds.forEach((id) => {
-            acc[id] = selected
-              ? true
-              : selected === false
-                ? undefined
-                : acc[id];
-          });
-        }
-
+        const [, lastId] = path[path.length - 1];
+        acc[lastId] = selected ? true : undefined;
         return acc;
       },
       {} as Record<string, true | undefined>,
     );
+
+    this.subjectSelection = sortedPureGroupSelection.reduce(
+      (acc, [path, selected]) => {
+        const childrenIds = this.statistics!.getChildrenIds!(path);
+
+        childrenIds.forEach((id) => {
+          if (selected === true) {
+            acc[id] = true;
+          }
+        });
+
+        return acc;
+      },
+      this.subjectSelection,
+    );
+
+    this.subjectSelection = sortedPureGroupSelection
+      .reverse()
+      .reduce((acc, [path, selected]) => {
+        const childrenIds = this.statistics!.getChildrenIds!(path);
+
+        childrenIds.forEach((id) => {
+          if (selected === false) {
+            acc[id] = undefined;
+          }
+        });
+
+        return acc;
+      }, this.subjectSelection);
   }
 }
