@@ -115,15 +115,6 @@ export abstract class Overview<Subject extends LearnSubject> {
       ([pathA], [pathB]) => pathA.length - pathB.length,
     );
 
-    this.subjectSelection = subjectSelection.reduce(
-      (acc, [path, selected]) => {
-        const [, lastId] = path[path.length - 1];
-        acc[lastId] = selected ? true : undefined;
-        return acc;
-      },
-      {} as Record<string, true | undefined>,
-    );
-
     this.subjectSelection = sortedPureGroupSelection.reduce(
       (acc, [path, selected]) => {
         const childrenIds = this.statistics!.getChildrenIds!(path);
@@ -136,8 +127,14 @@ export abstract class Overview<Subject extends LearnSubject> {
 
         return acc;
       },
-      this.subjectSelection,
+      {} as Record<string, true | undefined>,
     );
+
+    this.subjectSelection = subjectSelection.reduce((acc, [path, selected]) => {
+      const [, lastId] = path[path.length - 1];
+      acc[lastId] = selected ? true : undefined;
+      return acc;
+    }, this.subjectSelection);
 
     this.subjectSelection = sortedPureGroupSelection
       .reverse()
