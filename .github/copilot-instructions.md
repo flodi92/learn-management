@@ -5,9 +5,27 @@ TypeScript (ESM, `strict`) project for generating learning tasks and scheduling 
 ## Code Style
 
 - Formatting is handled by Prettier (`.prettierrc`: single quotes, one attribute per line). Run `npm run prettify` after larger edits.
-- Files are named `<module>.<topic>.ts`, e.g. `overview.computeStatistics.ts`, with types in `<module>.<topic>.model.ts` and tests in `<module>.test.ts`.
 - Shared domain types live in [src/model.ts](../src/model.ts); shared helpers in [src/utils.ts](../src/utils.ts).
 - Do not write comments unless explicitly asked
+
+## Naming Conventions
+
+Follow the style of the surrounding files.
+
+**Files and folders**
+
+- camelCase with dot-separated segments: `<module>.<name>[.<kind>].<ext>`. Kinds are e.g. `model`, `constants`, `utils`, `main`, `test`.
+- One main export per file, the file is named like it. Tests, docs and folders are named after what they cover and sit next to it.
+- Folders are `<module>.<topic>/`, those in `src/example/` start with `example.`.
+
+**Identifiers**
+
+- PascalCase for classes, interfaces, types and type parameters (descriptive words, `T` only for pass-through helpers); camelCase for everything else, including constants and string-literal values. No enums, no UPPER_SNAKE_CASE, no default exports.
+- Functions are arrow functions with verb-first names (`compute…`, `get…`, `determine…`, `is…` for predicates).
+- Prefix a module's types with the module name (`RegExpTask`); parameter-object types are `<FunctionName>Props`.
+- Collections are plural, counts are `numberOf…`, booleans read as statements (`isFocused`), units are part of the name (`…Days`), backing fields of accessors start with `_`.
+- Spell it `regExp` and `dataBase`.
+- Tests: `describe` names the unit under test, `it` describes behavior in third person.
 
 ## Architecture
 
