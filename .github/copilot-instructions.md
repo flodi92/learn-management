@@ -11,10 +11,16 @@ TypeScript (ESM, `strict`) project for generating learning tasks and scheduling 
 
 ## Architecture
 
+Everything in `src/` except `src/example/` is generic: it makes no assumptions about how things are visualized, which tasks or subjects are learned, or which database is used. Those concerns are injected through abstractions such as `TaskPresenter`, `SaveDataBase` and `Overview<Subject>`.
+
 - `src/learnScheduler/` – scheduling of learn sessions.
 - `src/overview/` – learning progress statistics, grouped by relevance/category.
-- `src/userInterface/` – presentation of tasks.
-- `src/example/` – runnable examples and sample data.
+- `src/userInterface/` – abstract presentation of tasks.
+- `src/example/` – examples of how the generic implementations can be used, runnable via the npm scripts below. Every choice made there is just one possible way and can be replaced, e.g. a web app could display things differently and tasks for other subjects could be created:
+  - `example.dataBase/` – how a database is created (SQLite).
+  - `example.overview/` – how statistics are displayed on the console.
+  - `example.tasks/regExp/` – which tasks could be used (regular expressions) and how they are displayed on the console.
+- Put anything specific to visualization, a task subject or a database into `src/example/`, never into generic code. Generic code must not import from `src/example/`.
 
 ## Build and Test
 
