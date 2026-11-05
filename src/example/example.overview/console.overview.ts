@@ -1,6 +1,11 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
-import { OverviewRecursiveStatistics } from '../../overview/overview.model';
+import {
+  OverviewGroupSelection,
+  OverviewRecursiveStatistics,
+  OverviewSelectionPath,
+  OverviewSubjectSelection,
+} from '../../overview/overview.model';
 import { Overview } from '../../overview/overview';
 import { consoleDisplayStatistics } from './console.displayStatistics/console.displayStatistics';
 import { formatStatistics } from './console.displayStatisticsItem.utils/console.formatStatistics';
@@ -45,9 +50,9 @@ export class ConsoleOverview extends Overview<LearnSubject> {
 
   protected async displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
-    toggleSelection: (path: [string, string | number][]) => void,
-    groupSelection: () => Record<string, boolean | undefined>,
-    subjectSelection: () => Record<string, true | undefined>,
+    toggleSelection: (path: OverviewSelectionPath) => void,
+    groupSelection: () => OverviewGroupSelection,
+    subjectSelection: () => OverviewSubjectSelection,
     numberOfSelectedItems: () => number,
   ): Promise<void> {
     await consoleDisplayStatistics(

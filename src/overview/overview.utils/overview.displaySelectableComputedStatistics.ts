@@ -1,13 +1,16 @@
 import {
   DisplayComputedStatistics,
+  OverviewGroupSelection,
   OverviewRecursiveStatistics,
-  RelevanceCategoryGroupType,
+  OverviewSelectionKey,
+  OverviewSelectionPath,
+  OverviewSubjectSelection,
 } from '../overview.model';
-import { GroupTypeOrSubject } from './overview.computeStatistics.model';
+import { getSelectionKey } from './overview.getSelectionKey';
 
 export class OverviewDisplaySelectableComputedStatistics {
-  private groupSelection: Record<string, boolean | undefined>;
-  private subjectSelection: Record<string, true | undefined> = {};
+  private groupSelection: OverviewGroupSelection;
+  private subjectSelection: OverviewSubjectSelection = {};
 
   constructor(
     private statistics: OverviewRecursiveStatistics,
@@ -16,7 +19,7 @@ export class OverviewDisplaySelectableComputedStatistics {
   ) {
     this.groupSelection = Object.fromEntries(
       preselectedSubjectIds.map((id) => [
-        JSON.stringify([['subject', id]]),
+        getSelectionKey([['subject', id]]),
         true,
       ]),
     );
@@ -45,8 +48,8 @@ export class OverviewDisplaySelectableComputedStatistics {
     return this.selectedItems.length;
   }
 
-  private toggleSelection(path: [string, string | number][]) {
-    const pathStr = JSON.stringify(path);
+  private toggleSelection(path: OverviewSelectionPath) {
+    const pathStr = getSelectionKey(path);
     this.groupSelection[pathStr] =
       this.groupSelection[pathStr] === undefined
         ? true
@@ -58,15 +61,14 @@ export class OverviewDisplaySelectableComputedStatistics {
   }
 
   private updateSubjectSelection() {
-    const entries = Object.entries(this.groupSelection).map(
+    const entries = (
+      Object.entries(this.groupSelection) as [
+        OverviewSelectionKey,
+        boolean | undefined,
+      ][]
+    ).map(
       ([pathStr, selected]) =>
-        [
-          JSON.parse(pathStr) as [
-            GroupTypeOrSubject<RelevanceCategoryGroupType>,
-            string | number,
-          ][],
-          selected,
-        ] as const,
+        [JSON.parse(pathStr) as OverviewSelectionPath, selected] as const,
     );
 
     const [subjectSelection, pureGroupSelection] = entries.reduce(
@@ -98,7 +100,7 @@ export class OverviewDisplaySelectableComputedStatistics {
 
         return acc;
       },
-      {} as Record<string, true | undefined>,
+      {} as OverviewSubjectSelection,
     );
 
     this.subjectSelection = subjectSelection.reduce((acc, [path, selected]) => {

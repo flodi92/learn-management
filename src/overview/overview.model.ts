@@ -28,10 +28,27 @@ export type OverviewRecursiveStatistics =
 
 export type RelevanceCategoryGroupType = 'relevance' | 'category';
 
+export type OverviewGroupTypeOrSubject =
+  GroupTypeOrSubject<RelevanceCategoryGroupType>;
+
+export type OverviewSelectionPath = [
+  OverviewGroupTypeOrSubject,
+  string | number,
+][];
+
+export type OverviewSelectionKey =
+  `[["${OverviewGroupTypeOrSubject}",${string}`;
+
+export type OverviewGroupSelection = Partial<
+  Record<OverviewSelectionKey, boolean>
+>;
+
+export type OverviewSubjectSelection = Partial<Record<string, true>>;
+
 export type DisplayComputedStatistics = (
   statistics: OverviewRecursiveStatistics,
-  toggleSelection: (path: [string, string | number][]) => void,
-  groupSelection: () => Record<string, boolean | undefined>,
-  subjectSelection: () => Record<string, true | undefined>,
+  toggleSelection: (path: OverviewSelectionPath) => void,
+  groupSelection: () => OverviewGroupSelection,
+  subjectSelection: () => OverviewSubjectSelection,
   numberOfSelectedItems: () => number,
 ) => Promise<void>;

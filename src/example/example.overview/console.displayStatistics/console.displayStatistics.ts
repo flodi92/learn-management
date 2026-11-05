@@ -1,4 +1,11 @@
 import readline from 'node:readline';
+import {
+  OverviewGroupSelection,
+  OverviewGroupTypeOrSubject,
+  OverviewSelectionPath,
+  OverviewSubjectSelection,
+} from '../../../overview/overview.model';
+import { getSelectionKey } from '../../../overview/overview.utils/overview.getSelectionKey';
 import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import {
   ellipsis,
@@ -24,8 +31,8 @@ import {
 } from './console.displayStatistics.utils';
 
 type SelectionState = boolean | undefined;
-type GroupSelection = () => Record<string, SelectionState>;
-type SubjectSelection = () => Record<string, true | undefined>;
+type GroupSelection = () => OverviewGroupSelection;
+type SubjectSelection = () => OverviewSubjectSelection;
 
 export class ConsoleDisplayStatistics<Statistics extends object> {
   private root?: OverviewRecursiveUndeterminedStatistics<Statistics>;
@@ -43,7 +50,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     private readonly getStatisticsColor: StatisticsColorer<Statistics>,
     private readonly sortChildren: StatisticsSorter<Statistics>,
     private readonly toggleSelection: (
-      path: [string, string | number][],
+      path: OverviewSelectionPath,
     ) => void = () => {},
     groupSelection?: GroupSelection,
     subjectSelection?: SubjectSelection,
@@ -183,7 +190,14 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     if (!line.path || !line.statistics) return undefined;
     const node = getNode(this.root!, line.path);
     if (node?.parentGroups) {
-      return this.groupSelection()[JSON.stringify(node.parentGroups)];
+      return this.groupSelection()[
+        getSelectionKey(
+          node.parentGroups as readonly (readonly [
+            OverviewGroupTypeOrSubject,
+            string | number,
+          ])[],
+        )
+      ];
     }
     return this.subjectSelection()[line.path[line.path.length - 1]];
   }
@@ -244,7 +258,8 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     if (!node?.parentGroups) return;
     this.toggleSelection(
       node.parentGroups.map(
-        ([type, key]) => [type, key] as [string, string | number],
+        ([type, key]) =>
+          [type, key] as [OverviewGroupTypeOrSubject, string | number],
       ),
     );
     this.update();
@@ -299,7 +314,7 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
   formatStatistics: StatisticsFormatter<Statistics>,
   getStatisticsColor: StatisticsColorer<Statistics>,
   sortChildren: StatisticsSorter<Statistics>,
-  toggleSelection: (path: [string, string | number][]) => void = () => {},
+  toggleSelection: (path: OverviewSelectionPath) => void = () => {},
   groupSelection?: GroupSelection,
   subjectSelection?: SubjectSelection,
   numberOfSelectedItems?: () => number,
