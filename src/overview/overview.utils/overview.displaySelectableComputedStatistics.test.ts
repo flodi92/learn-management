@@ -7,6 +7,7 @@ import { displaySelectableComputedStatistics } from './overview.displaySelectabl
 
 const subjectStatistics = {
   avgLastRepetitionBeforeDays: 1,
+  selected: 0,
   notLearned: 0,
   learning: 0,
   learned: 0,
@@ -34,7 +35,7 @@ const selectAfterToggles = (
         toggleSelection(subjectPath),
       );
     },
-    statistics,
+    () => statistics,
     preselectedSubjectIds,
   );
 

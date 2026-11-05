@@ -16,6 +16,7 @@ const createStatistics = (
   groupType: 'subject',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
+    selected: 0,
     notLearned: numberOfChildren,
     learning: 0,
     learned: 0,
@@ -29,6 +30,7 @@ const createStatistics = (
         {
           statistics: {
             label,
+            id: label,
             mastery: 1 - index / 100,
             lastRepetitionBeforeDays: 1,
             numberOfRepetitions: 1,
@@ -70,7 +72,7 @@ describe('ConsoleDisplayStatistics with many children', () => {
   });
 
   afterEach(() => {
-    process.stdin.emit('keypress', 'q', { name: 'q' });
+    process.stdin.emit('keypress', 'return', { name: 'return' });
     vi.restoreAllMocks();
   });
 

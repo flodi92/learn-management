@@ -32,23 +32,22 @@ describe('ConsoleDisplayStatistics', () => {
       undefined,
       undefined,
       undefined,
-      () => 3,
     ).display(statisticsExample);
   });
 
   afterEach(() => {
-    process.stdin.emit('keypress', 'q', { name: 'q' });
+    process.stdin.emit('keypress', 'return', { name: 'return' });
     vi.restoreAllMocks();
   });
 
   it('shows only the first layer initially with the first child focused', () => {
     expect(view()).toEqual([
-      '  selected: 3, not learned: 6, learning: 5, learned: 9, for repeat: 4, ⌀ 19 days before',
+      '  selected: 0, not learned: 6, learning: 5, learned: 9, for repeat: 4, ⌀ 19 days before',
       '  category statistics',
-      '  > Mathematics: not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 10.5 days before',
-      '    Physics: 1 1 3 1 ⌀ 23.33 days before',
-      '    History: 2 1 2 1 ⌀ 35 days before',
-      '    Chemistry: 2 2 1 1 ⌀ 7.17 days before',
+      '  > Mathematics: selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 10.5 days before',
+      '    Physics: selected: 0, 1 1 3 1 ⌀ 23.33 days before',
+      '    History: selected: 0, 2 1 2 1 ⌀ 35 days before',
+      '    Chemistry: selected: 0, 2 2 1 1 ⌀ 7.17 days before',
     ]);
   });
 
@@ -59,14 +58,14 @@ describe('ConsoleDisplayStatistics', () => {
   it('expands the focused child with the right arrow key and focuses its first child', () => {
     press('right');
     expect(view().slice(2)).toEqual([
-      '    Mathematics: 1 1 3 1 ⌀ 10.5 days before',
+      '    Mathematics: selected: 0, 1 1 3 1 ⌀ 10.5 days before',
       '      relevance statistics',
-      '      > 1: not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
-      '        3: 1 0 1 0 ⌀ 6.5 days before',
-      '        2: 0 1 0 1 ⌀ 22.5 days before',
-      '    Physics: 1 1 3 1 ⌀ 23.33 days before',
-      '    History: 2 1 2 1 ⌀ 35 days before',
-      '    Chemistry: 2 2 1 1 ⌀ 7.17 days before',
+      '      > 1: selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
+      '        3: selected: 0, 1 0 1 0 ⌀ 6.5 days before',
+      '        2: selected: 0, 0 1 0 1 ⌀ 22.5 days before',
+      '    Physics: selected: 0, 1 1 3 1 ⌀ 23.33 days before',
+      '    History: selected: 0, 2 1 2 1 ⌀ 35 days before',
+      '    Chemistry: selected: 0, 2 2 1 1 ⌀ 7.17 days before',
     ]);
   });
 
@@ -89,16 +88,18 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     press('down');
     expect(view()).toContain(
-      '      > 3: not learned: 1, learning: 0, learned: 1, for repeat: 0, ⌀ 6.5 days before',
+      '      > 3: selected: 0, not learned: 1, learning: 0, learned: 1, for repeat: 0, ⌀ 6.5 days before',
     );
-    expect(view()).toContain('    Mathematics: 1 1 3 1 ⌀ 10.5 days before');
+    expect(view()).toContain(
+      '    Mathematics: selected: 0, 1 1 3 1 ⌀ 10.5 days before',
+    );
   });
 
   it('shows the statistics of leaves without expanding them', () => {
     press('right');
     press('right');
     expect(view().slice(4, 8)).toEqual([
-      '        1: 0 0 2 0 ⌀ 2.5 days before',
+      '        1: selected: 0, 0 0 2 0 ⌀ 2.5 days before',
       '          subject statistics',
       '          > Fractions: learned (95%) 5x 2 days before',
       '            Solving equations: 90%',
@@ -172,10 +173,10 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     press('left');
     expect(view().slice(2, 6)).toEqual([
-      '    Mathematics: 1 1 3 1 ⌀ 10.5 days before',
+      '    Mathematics: selected: 0, 1 1 3 1 ⌀ 10.5 days before',
       '      relevance statistics',
-      '      > 1: not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
-      '        3: 1 0 1 0 ⌀ 6.5 days before',
+      '      > 1: selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
+      '        3: selected: 0, 1 0 1 0 ⌀ 6.5 days before',
     ]);
   });
 
@@ -185,7 +186,7 @@ describe('ConsoleDisplayStatistics', () => {
     press('down');
     expect(view()).toHaveLength(before.length);
     expect(view()).toContain(
-      '  > Physics: not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 23.33 days before',
+      '  > Physics: selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 23.33 days before',
     );
   });
 
@@ -207,7 +208,7 @@ describe('ConsoleDisplayStatistics selection with space', () => {
   });
 
   afterEach(() => {
-    process.stdin.emit('keypress', 'q', { name: 'q' });
+    process.stdin.emit('keypress', 'return', { name: 'return' });
     vi.restoreAllMocks();
   });
 
@@ -220,7 +221,6 @@ describe('ConsoleDisplayStatistics selection with space', () => {
       toggleSelection,
       () => ({}),
       () => ({}),
-      () => 0,
     ).display(statisticsExample);
 
     press('right');

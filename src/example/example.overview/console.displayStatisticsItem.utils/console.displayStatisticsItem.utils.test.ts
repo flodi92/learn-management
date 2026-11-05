@@ -23,6 +23,7 @@ beforeAll(() => {
 
 const aggregated: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 19,
+  selected: 3,
   notLearned: 6,
   learning: 5,
   learned: 9,
@@ -30,6 +31,7 @@ const aggregated: OverviewAggregatedStatisticsItem = {
 };
 
 const subject: OverviewSubjectStatisticsItem = {
+  id: 'Fractions',
   label: 'Fractions',
   mastery: 0.95,
   lastRepetitionBeforeDays: 2,
@@ -61,20 +63,13 @@ describe('formatStatistics', () => {
 
   it('shows only the colored numbers of aggregated statistics, the average last', () => {
     expect(formatStatistics(aggregated, false)).toBe(
-      `${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
+      `selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
     );
   });
 
   it('adds the learning states to aggregated statistics when focused', () => {
     const label = statisticsLabelColor;
     expect(formatStatistics(aggregated, true)).toBe(
-      `${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
-    );
-  });
-
-  it('adds the number of selected items to the detailed aggregated statistics', () => {
-    const label = statisticsLabelColor;
-    expect(formatStatistics(aggregated, true, 3)).toBe(
       `selected: 3, ${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
     );
   });
@@ -85,7 +80,7 @@ describe('formatStatistics', () => {
       avgLastRepetitionBeforeDays: Infinity,
     };
     expect(formatStatistics(neverTrained, false)).toBe(
-      `${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
+      `selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
     );
     expect(formatStatistics(neverTrained, true)).toMatch(/, never trained$/);
     expect(formatStatistics(neverTrained, true)).not.toContain('Infinity');
@@ -136,6 +131,7 @@ describe('sortChildren', () => {
   ): OverviewRecursiveStatistics => ({
     statistics: {
       avgLastRepetitionBeforeDays: 0,
+      selected: 0,
       notLearned: counts[0],
       learning: counts[1],
       learned: counts[2],
