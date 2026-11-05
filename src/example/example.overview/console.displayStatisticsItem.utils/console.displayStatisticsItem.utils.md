@@ -23,8 +23,9 @@ colon colored by `getStatisticsColor`.
 ### OverviewAggregatedStatisticsItem
 
 - Every aggregated line starts with a selection indicator derived from
-  `selectionState`, followed by `selected: ${selected}, `, the number of
-  subjects whose ids are selected. The indicator is a three-character text
+  `selectionState`, followed by the number of subjects whose ids are
+  selected, shown in italics (`selectedColor`). Only the focused form
+  precedes the number with the likewise italic `selected: `. The indicator is a three-character text
   taken from `selectionStateIndicators` in `console.constants.ts`:
   `implicitNoSelection` is three spaces, `implicitSelection` and
   `implicitFullSelection` are `[*]`, `explicitSelectionUnselections` and
@@ -41,7 +42,8 @@ colon colored by `getStatisticsColor`.
   shown as `never trained` instead of `⌀ Infinity days before`.
 - In the focused form, every number is preceded by its learning state in
   separate words, for example `not learned: 153`. All data is separated by
-  commas.
+  commas. Labels and all other text without a color of its own are displayed
+  normally, never dimmed.
 
 ### OverviewSubjectStatisticsItem
 

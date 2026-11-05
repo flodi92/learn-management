@@ -7,9 +7,9 @@ import {
 } from '../../../overview/overview.model';
 import {
   learningStateColors,
+  selectedColor,
   selectionHighlightColor,
   selectionStateIndicators,
-  statisticsLabelColor,
   unfocusedSelectionColor,
 } from '../console.constants';
 
@@ -36,7 +36,7 @@ const formatLabeledValue = (
   color?: (text: string) => string,
 ) => {
   const text = String(value);
-  return `${statisticsLabelColor(`${camelCaseToWords(key)}:`)} ${color ? color(text) : text}`;
+  return `${camelCaseToWords(key)}: ${color ? color(text) : text}`;
 };
 
 const neverTrained = 'never trained';
@@ -63,8 +63,13 @@ const formatAggregatedStatistics = (
     ? `⌀ ${statistics.avgLastRepetitionBeforeDays} days before`
     : neverTrained;
   const separator = isFocused ? ', ' : ' ';
-  const formatted = [...counts, average].join(separator);
-  return `${formatSelectionState(statistics.selectionState, isFocused)} selected: ${statistics.selected}, ${formatted}`;
+  const selected = selectedColor(String(statistics.selected));
+  const formatted = [
+    isFocused ? `${selectedColor('selected: ')}${selected}` : selected,
+    ...counts,
+    average,
+  ].join(separator);
+  return `${formatSelectionState(statistics.selectionState, isFocused)} ${formatted}`;
 };
 
 const formatSubjectStatistics = (

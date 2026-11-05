@@ -12,7 +12,6 @@ export const learningStateColors: Record<
   forRepeat: chalk.cyan,
 };
 
-export const statisticsLabelColor = chalk.dim;
 export const headingColor = chalk.bold;
 export const focusPointerColor = chalk.yellow;
 export const helpColor = chalk.gray;
@@ -30,6 +29,7 @@ export const selectionStateIndicators: Record<
 };
 
 export const selectionHighlightColor = chalk.bgHex('#4a4827');
+export const selectedColor = chalk.italic;
 export const unfocusedSelectionColor = chalk.gray;
 
 // Number of children shown for each element, further children are loaded in steps of this size.
