@@ -1,13 +1,10 @@
-I want you to create another file overview.displaySelectableComputedStatistics.ts in overview/utils folder.
+I want the statistics "selected" to be rendered everywhere where OverviewAggregatedStatisticsItem is rendered.
 
-That file implements a class of that name. Migrate all the behaviour that refers to selection from Overview to that class but keep displayStatistics and displayComputedStatistics.
+This should be achieved in the following way.
 
-Write an arrow function in that file of the same name that creates an instance of that class and invokes the display function so that that class does not necessarily need to be referenced from outsite.
+- OverviewSubjectStatisticsItem should have another required parameter id. That should be set on the appropriate place.
 
-That arrow function is invoked in the Overview class in displayStatistics in the place where currently this.displayComputedStatistics is invoked.
+- The computeAggregatedStatistics function takes another parameter selectedIds that is a string array. So hand that parameter down from overview and overview.computeStatistics It evaluates based on statisticsItems how many of the statisticsItems ids are in the array selectedIds. That value is used for the new parameter of the output object "selected". So OverviewAggregatedStatisticsItem should specify that parameter.
 
-It takes as parameter a reference to this.displayComputedStatistics and this.statistics but nothing else.
-
-It returns an array of selected items.
-
-This is a refactoring. It is very important that the behaviour of that program does not change.
+- formatAggregatedStastistics must implicitly render the new value selected from AggregatedStatisticsItem
+- so formatAggregatedStatistics does not need the optional parameter numberOfSelectedItems anymore. Remove that and also recursively remove that in the client files if not need on another place.
