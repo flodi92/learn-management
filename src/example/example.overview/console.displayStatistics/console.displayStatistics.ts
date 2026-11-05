@@ -268,6 +268,10 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     this.onKeypress(str, key);
 
   private onKeypress(str: string | undefined, key?: readline.Key) {
+    if (key?.ctrl && key.name === 'c') {
+      this.stopListening();
+      process.exit(0);
+    }
     if (key?.name === 'return') {
       this.stopListening();
       this.resolveDisplay?.();

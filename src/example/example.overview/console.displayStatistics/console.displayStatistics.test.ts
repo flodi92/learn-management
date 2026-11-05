@@ -50,6 +50,14 @@ describe('ConsoleDisplayStatistics', () => {
     ]);
   });
 
+  it('exits the process on Ctrl+C', () => {
+    const exit = vi
+      .spyOn(process, 'exit')
+      .mockImplementation((() => undefined) as never);
+    process.stdin.emit('keypress', '\u0003', { name: 'c', ctrl: true });
+    expect(exit).toHaveBeenCalledWith(0);
+  });
+
   it('explains the keys', () => {
     expect(output.slice(0, 4).join('\n')).toMatch(/↑\/↓.*\n.*→.*\n.*←.*\n.*q/);
   });
