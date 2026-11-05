@@ -6,7 +6,8 @@ TypeScript (ESM, `strict`) project for generating learning tasks and scheduling 
 
 - Formatting is handled by Prettier (`.prettierrc`: single quotes, one attribute per line). Run `npm run prettify` after larger edits.
 - Shared domain types live in [src/model.ts](../src/model.ts); shared helpers in [src/utils.ts](../src/utils.ts).
-- Do not write comments unless explicitly asked
+- Do not write comments unless explicitly asked.
+- Everything must be type-safe, but add type annotations only where TypeScript cannot infer the type. Let types be inferred otherwise, e.g. do not annotate the return type of a function that returns an already typed value, or the type of a variable assigned an already typed value.
 
 ## Naming Conventions
 
