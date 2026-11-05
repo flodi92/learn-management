@@ -1,4 +1,5 @@
 import { LearningState, SubjectStatisticsItem } from '../model';
+import { OverviewRecursiveStatistics } from './overview.model';
 import {
   GroupTypeOrSubject,
   OverviewRecursiveUndeterminedStatistics,
@@ -27,3 +28,11 @@ export type OverviewRecursiveStatistics =
   >;
 
 export type RelevanceCategoryGroupType = 'relevance' | 'category';
+
+export type DisplayComputedStatistics = (
+  statistics: OverviewRecursiveStatistics,
+  toggleSelection: (path: [string, string | number][]) => void,
+  groupSelection: () => Record<string, boolean | undefined>,
+  subjectSelection: () => Record<string, true | undefined>,
+  numberOfSelectedItems: () => number,
+) => Promise<void>;

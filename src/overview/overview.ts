@@ -7,10 +7,8 @@ import {
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
 import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
-import {
-  DisplayComputedStatistics,
-  displaySelectableComputedStatistics,
-} from './overview.utils/overview.displaySelectableComputedStatistics';
+import { displaySelectableComputedStatistics } from './overview.utils/overview.displaySelectableComputedStatistics';
+import { DisplayComputedStatistics } from './overview.model';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 
 export abstract class Overview<Subject extends LearnSubject> {
