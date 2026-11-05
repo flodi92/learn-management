@@ -1,11 +1,9 @@
 import readline from 'node:readline';
 import {
-  OverviewGroupSelection,
   OverviewGroupTypeOrSubject,
   OverviewSelectionPath,
   OverviewSubjectSelection,
 } from '../../../overview/overview.model';
-import { getSelectionKey } from '../../../overview/overview.utils/overview.getSelectionKey';
 import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import {
   ellipsis,
@@ -14,6 +12,7 @@ import {
   helpColor,
   inactiveColor,
   numberOfInitiallyShownChildren,
+  selectionStateIndicators,
 } from '../console.constants';
 import {
   Line,
@@ -30,8 +29,6 @@ import {
   pathId,
 } from './console.displayStatistics.utils';
 
-type SelectionState = boolean | undefined;
-type GroupSelection = () => OverviewGroupSelection;
 type SubjectSelection = () => OverviewSubjectSelection;
 
 export class ConsoleDisplayStatistics<Statistics extends object> {
@@ -42,7 +39,6 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   private focus?: string[];
   private resolveDisplay?: () => void;
   private readonly showSelectionIndicators: boolean;
-  private readonly groupSelection: GroupSelection;
   private readonly subjectSelection: SubjectSelection;
 
   constructor(
@@ -52,12 +48,9 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     private readonly toggleSelection: (
       path: OverviewSelectionPath,
     ) => void = () => {},
-    groupSelection?: GroupSelection,
     subjectSelection?: SubjectSelection,
   ) {
-    this.showSelectionIndicators =
-      groupSelection !== undefined || subjectSelection !== undefined;
-    this.groupSelection = groupSelection ?? (() => ({}));
+    this.showSelectionIndicators = subjectSelection !== undefined;
     this.subjectSelection = subjectSelection ?? (() => ({}));
   }
 
@@ -164,9 +157,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     for (const line of this.lines) {
       const isFocused = !!line.path && pathId(line.path) === focusId;
       const pointer = isFocused ? focusPointerColor('> ') : '  ';
-      const selection = this.getSelectionState(line);
-      const selectionIndicator =
-        selection === true ? '[+]' : selection === false ? '[-]' : '   ';
+      const selectionIndicator = this.getSubjectSelectionIndicator(line);
       const text = line.statistics
         ? `${this.getStatisticsColor(line.statistics)(`${line.text}:`)} ${this.formatStatistics(line.statistics, isFocused)}`
         : line.text;
@@ -174,29 +165,24 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
         this.focus !== undefined && !isHighlighted(line, this.focus);
       console.log(
         indentation(line.depth) +
-          (line.path && this.showSelectionIndicators
-            ? selectionIndicator
-            : '') +
+          selectionIndicator +
           pointer +
           (isInactive ? inactiveColor(text) : text),
       );
     }
   }
 
-  private getSelectionState(line: Line<Statistics>): SelectionState {
-    if (!line.path || !line.statistics) return undefined;
-    const node = getNode(this.root!, line.path);
-    if (node?.parentGroups) {
-      return this.groupSelection()[
-        getSelectionKey(
-          node.parentGroups as readonly (readonly [
-            OverviewGroupTypeOrSubject,
-            string | number,
-          ])[],
-        )
-      ];
+  private getSubjectSelectionIndicator(line: Line<Statistics>): string {
+    if (!this.showSelectionIndicators || !line.path || !line.statistics) {
+      return '';
     }
-    return this.subjectSelection()[line.path[line.path.length - 1]];
+    const node = getNode(this.root!, line.path);
+    if (!node || node.parentGroups) return '';
+    const isSelected =
+      this.subjectSelection()[line.path[line.path.length - 1]] === true;
+    return selectionStateIndicators[
+      isSelected ? 'explicitSelectionUnselections' : 'implicitNoSelection'
+    ].text;
   }
 
   private showMoreChildrenBelowFocus(): boolean {
@@ -314,7 +300,6 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
   getStatisticsColor: StatisticsColorer<Statistics>,
   sortChildren: StatisticsSorter<Statistics>,
   toggleSelection: (path: OverviewSelectionPath) => void = () => {},
-  groupSelection?: GroupSelection,
   subjectSelection?: SubjectSelection,
 ): Promise<void> => {
   const overview = new ConsoleDisplayStatistics(
@@ -322,7 +307,6 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
     getStatisticsColor,
     sortChildren,
     toggleSelection,
-    groupSelection,
     subjectSelection,
   );
   await overview.display(statistics);

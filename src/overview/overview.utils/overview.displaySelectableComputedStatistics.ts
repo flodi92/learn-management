@@ -20,7 +20,10 @@ export class OverviewDisplaySelectableComputedStatistics {
     private displayComputedStatistics: DisplayComputedStatistics,
     preselectedSubjectIds: string[],
   ) {
-    this.statistics = createStatistics(() => this.selectedItems);
+    this.statistics = createStatistics(
+      () => this.selectedItems,
+      () => this.groupSelection,
+    );
     this.groupSelection = Object.fromEntries(
       preselectedSubjectIds.map((id) => [
         getSelectionKey([['subject', id]]),
@@ -34,7 +37,6 @@ export class OverviewDisplaySelectableComputedStatistics {
     await this.displayComputedStatistics(
       this.statistics,
       this.toggleSelection.bind(this),
-      () => this.groupSelection,
       () => this.subjectSelection,
     );
 

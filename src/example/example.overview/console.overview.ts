@@ -1,7 +1,6 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import {
-  OverviewGroupSelection,
   OverviewRecursiveStatistics,
   OverviewSelectionPath,
   OverviewSubjectSelection,
@@ -51,7 +50,6 @@ export class ConsoleOverview extends Overview<LearnSubject> {
   protected async displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
     toggleSelection: (path: OverviewSelectionPath) => void,
-    groupSelection: () => OverviewGroupSelection,
     subjectSelection: () => OverviewSubjectSelection,
   ): Promise<void> {
     await consoleDisplayStatistics(
@@ -60,7 +58,6 @@ export class ConsoleOverview extends Overview<LearnSubject> {
       getStatisticsColor,
       sortChildren,
       toggleSelection,
-      groupSelection,
       subjectSelection,
     );
   }

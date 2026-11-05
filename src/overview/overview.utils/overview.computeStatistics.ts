@@ -29,6 +29,9 @@ class StatisticsComputation<
       AggregatedStatistics
     >,
     private getSelectedIds: () => string[],
+    private getGroupSelection: (
+      parentGroups: readonly (readonly [GroupType, string | number])[],
+    ) => boolean | undefined,
     public readonly parentGroups: (readonly [
       GroupType,
       string | number,
@@ -49,6 +52,7 @@ class StatisticsComputation<
         ([id, subject, progressItem]) => progressItem,
       ),
       this.getSelectedIds(),
+      this.getGroupSelection(this.parentGroups),
     );
   }
 
@@ -119,6 +123,7 @@ class StatisticsComputation<
           this.getGroups,
           this.computeAggregatedStatistics,
           this.getSelectedIds,
+          this.getGroupSelection,
           [...this.parentGroups, [groupType, group]],
         ),
       ]),
@@ -177,6 +182,9 @@ export const computeStatistics = <
     AggregatedStatistics
   >,
   getSelectedIds: () => string[],
+  getGroupSelection: (
+    parentGroups: readonly (readonly [GroupType, string | number])[],
+  ) => boolean | undefined,
 ): OverviewRecursiveUndeterminedStatistics<
   SubjectStatistics | AggregatedStatistics,
   GroupTypeOrSubject<GroupType>
@@ -193,5 +201,6 @@ export const computeStatistics = <
     getGroups,
     aggregateStatistics,
     getSelectedIds,
+    getGroupSelection,
   );
 };

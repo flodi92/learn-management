@@ -4,10 +4,13 @@ import {
   OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
   OverviewSubjectStatisticsItem,
+  SelectionState,
 } from '../../../overview/overview.model';
 import {
   learningStateColors,
+  selectionHighlightColor,
   statisticsLabelColor,
+  unfocusedSelectionColor,
 } from '../console.constants';
 import {
   camelCaseToWords,
@@ -24,6 +27,7 @@ beforeAll(() => {
 const aggregated: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 19,
   selected: 3,
+  selectionState: 'implicitSelection',
   notLearned: 6,
   learning: 5,
   learned: 9,
@@ -60,17 +64,18 @@ describe('isOverviewSubjectStatisticsItem', () => {
 
 describe('formatStatistics', () => {
   const { notLearned, learning, learned, forRepeat } = learningStateColors;
+  const unfocusedSelection = (text: string) => unfocusedSelectionColor(text);
 
   it('shows only the colored numbers of aggregated statistics, the average last', () => {
     expect(formatStatistics(aggregated, false)).toBe(
-      `selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
+      `${unfocusedSelection('[*]')} selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
     );
   });
 
   it('adds the learning states to aggregated statistics when focused', () => {
     const label = statisticsLabelColor;
     expect(formatStatistics(aggregated, true)).toBe(
-      `selected: 3, ${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
+      `[*] selected: 3, ${label('not learned:')} ${notLearned('6')}, ${label('learning:')} ${learning('5')}, ${label('learned:')} ${learned('9')}, ${label('for repeat:')} ${forRepeat('4')}, ⌀ 19 days before`,
     );
   });
 
@@ -80,10 +85,43 @@ describe('formatStatistics', () => {
       avgLastRepetitionBeforeDays: Infinity,
     };
     expect(formatStatistics(neverTrained, false)).toBe(
-      `selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
+      `${unfocusedSelection('[*]')} selected: 3, ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
     );
     expect(formatStatistics(neverTrained, true)).toMatch(/, never trained$/);
     expect(formatStatistics(neverTrained, true)).not.toContain('Infinity');
+  });
+
+  it.each([
+    ['implicitNoSelection', '   ', false],
+    ['implicitSelection', '[*]', false],
+    ['implicitFullSelection', '[*]', true],
+    ['explicitSelectionUnselections', '[+]', false],
+    ['explicitSelection', '[+]', true],
+    ['explicitUnselection', '[-]', true],
+  ] as const)(
+    'shows the selection state %s as "%s" (highlighted: %s) when focused',
+    (selectionState, text, isHighlighted) => {
+      const [indicator] = formatStatistics(
+        { ...aggregated, selectionState },
+        true,
+      ).split(' selected:');
+      expect(indicator).toBe(
+        isHighlighted ? selectionHighlightColor(text) : text,
+      );
+    },
+  );
+
+  it('colors the selection state text gray when not focused but keeps the highlight', () => {
+    const format = (selectionState: SelectionState) =>
+      formatStatistics({ ...aggregated, selectionState }, false).split(
+        ' selected:',
+      )[0];
+    expect(format('explicitSelection')).toBe(
+      unfocusedSelectionColor(selectionHighlightColor('[+]')),
+    );
+    expect(format('explicitSelectionUnselections')).toBe(
+      unfocusedSelectionColor('[+]'),
+    );
   });
 
   it('shows only the colored mastery of a subject when not focused', () => {
@@ -132,6 +170,7 @@ describe('sortChildren', () => {
     statistics: {
       avgLastRepetitionBeforeDays: 0,
       selected: 0,
+      selectionState: 'implicitNoSelection',
       notLearned: counts[0],
       learning: counts[1],
       learned: counts[2],

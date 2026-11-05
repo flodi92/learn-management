@@ -5,6 +5,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
   statistics: {
     avgLastRepetitionBeforeDays: 19,
     selected: 0,
+    selectionState: 'implicitNoSelection',
     notLearned: 6,
     learning: 5,
     learned: 9,
@@ -16,6 +17,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       statistics: {
         avgLastRepetitionBeforeDays: 10.5,
         selected: 0,
+        selectionState: 'implicitNoSelection',
         notLearned: 1,
         learning: 1,
         learned: 3,
@@ -27,6 +29,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 2.5,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 0,
             learned: 2,
@@ -60,6 +63,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 22.5,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 1,
             learned: 0,
@@ -93,6 +97,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 6.5,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 1,
             learning: 0,
             learned: 1,
@@ -128,6 +133,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       statistics: {
         avgLastRepetitionBeforeDays: 7.17,
         selected: 0,
+        selectionState: 'implicitNoSelection',
         notLearned: 2,
         learning: 2,
         learned: 1,
@@ -139,6 +145,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 6,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 1,
             learning: 0,
             learned: 0,
@@ -172,6 +179,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 7.5,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 1,
             learned: 1,
@@ -205,6 +213,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 1,
             learning: 1,
             learned: 0,
@@ -240,6 +249,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       statistics: {
         avgLastRepetitionBeforeDays: 23.33,
         selected: 0,
+        selectionState: 'implicitNoSelection',
         notLearned: 1,
         learning: 1,
         learned: 3,
@@ -251,6 +261,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 7,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 0,
             learned: 2,
@@ -284,6 +295,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 1,
             learning: 1,
             learned: 0,
@@ -317,6 +329,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 55,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 0,
             learned: 1,
@@ -352,6 +365,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       statistics: {
         avgLastRepetitionBeforeDays: 35,
         selected: 0,
+        selectionState: 'implicitNoSelection',
         notLearned: 2,
         learning: 1,
         learned: 2,
@@ -363,6 +377,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 85,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 0,
             learned: 1,
@@ -396,6 +411,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 17,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 0,
             learning: 1,
             learned: 1,
@@ -429,6 +445,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           statistics: {
             avgLastRepetitionBeforeDays: 3,
             selected: 0,
+            selectionState: 'implicitNoSelection',
             notLearned: 2,
             learning: 0,
             learned: 0,

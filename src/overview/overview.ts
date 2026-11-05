@@ -7,6 +7,7 @@ import { computeSubjectsStatistics } from './overview.utils/overview.computeSubj
 import { displaySelectableComputedStatistics } from './overview.utils/overview.displaySelectableComputedStatistics';
 import { DisplayComputedStatistics } from './overview.model';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
+import { getSelectionKey } from './overview.utils/overview.getSelectionKey';
 
 export abstract class Overview<Subject extends LearnSubject> {
   constructor(public getLabelFromId: (id: string) => string) {}
@@ -21,7 +22,7 @@ export abstract class Overview<Subject extends LearnSubject> {
   ): Promise<Subject[]> {
     const selectedItems = await displaySelectableComputedStatistics(
       this.displayComputedStatistics.bind(this),
-      (getSelectedIds) =>
+      (getSelectedIds, getGroupSelection) =>
         computeStatistics(
           idSubjectMapping,
           results,
@@ -32,6 +33,7 @@ export abstract class Overview<Subject extends LearnSubject> {
           computeSubjectsStatistics,
           computeAggregatedStatistics,
           getSelectedIds,
+          (parentGroups) => getGroupSelection()[getSelectionKey(parentGroups)],
         ),
       preselectedSubjects.map(({ id }) => id),
     );

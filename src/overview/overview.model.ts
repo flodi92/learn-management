@@ -14,9 +14,18 @@ export interface OverviewSubjectStatisticsItem extends Omit<
   learningState: LearningState;
 }
 
+export type SelectionState =
+  | 'implicitNoSelection'
+  | 'implicitSelection'
+  | 'implicitFullSelection'
+  | 'explicitSelectionUnselections'
+  | 'explicitSelection'
+  | 'explicitUnselection';
+
 export type OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: number;
   selected: number;
+  selectionState: SelectionState;
 } & Record<LearningState, number>;
 
 export type OverviewStatistics =
@@ -50,10 +59,10 @@ export type OverviewSubjectSelection = Partial<Record<string, true>>;
 export type DisplayComputedStatistics = (
   statistics: OverviewRecursiveStatistics,
   toggleSelection: (path: OverviewSelectionPath) => void,
-  groupSelection: () => OverviewGroupSelection,
   subjectSelection: () => OverviewSubjectSelection,
 ) => Promise<void>;
 
 export type CreateComputedStatistics = (
   getSelectedIds: () => string[],
+  getGroupSelection: () => OverviewGroupSelection,
 ) => OverviewRecursiveStatistics;

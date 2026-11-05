@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { LearningState } from '../../model';
+import { SelectionState } from '../../overview/overview.model';
 
 export const learningStateColors: Record<
   LearningState,
@@ -15,6 +16,21 @@ export const statisticsLabelColor = chalk.dim;
 export const headingColor = chalk.bold;
 export const focusPointerColor = chalk.yellow;
 export const helpColor = chalk.gray;
+
+export const selectionStateIndicators: Record<
+  SelectionState,
+  { text: string; isHighlighted: boolean }
+> = {
+  implicitNoSelection: { text: '   ', isHighlighted: false },
+  implicitSelection: { text: '[*]', isHighlighted: false },
+  implicitFullSelection: { text: '[*]', isHighlighted: true },
+  explicitSelectionUnselections: { text: '[+]', isHighlighted: false },
+  explicitSelection: { text: '[+]', isHighlighted: true },
+  explicitUnselection: { text: '[-]', isHighlighted: true },
+};
+
+export const selectionHighlightColor = chalk.bgHex('#4a4827');
+export const unfocusedSelectionColor = chalk.gray;
 
 // Number of children shown for each element, further children are loaded in steps of this size.
 export const numberOfInitiallyShownChildren = 15;

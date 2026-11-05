@@ -3,10 +3,14 @@ import {
   OverviewAggregatedStatisticsItem,
   OverviewSubjectStatisticsItem,
   OverviewStatistics,
+  SelectionState,
 } from '../../../overview/overview.model';
 import {
   learningStateColors,
+  selectionHighlightColor,
+  selectionStateIndicators,
   statisticsLabelColor,
+  unfocusedSelectionColor,
 } from '../console.constants';
 
 const summarizedSubjectKeys = new Set<string>([
@@ -37,6 +41,15 @@ const formatLabeledValue = (
 
 const neverTrained = 'never trained';
 
+const formatSelectionState = (
+  selectionState: SelectionState,
+  isFocused: boolean,
+): string => {
+  const { text, isHighlighted } = selectionStateIndicators[selectionState];
+  const highlighted = isHighlighted ? selectionHighlightColor(text) : text;
+  return isFocused ? highlighted : unfocusedSelectionColor(highlighted);
+};
+
 const formatAggregatedStatistics = (
   statistics: OverviewAggregatedStatisticsItem,
   isFocused: boolean,
@@ -51,7 +64,7 @@ const formatAggregatedStatistics = (
     : neverTrained;
   const separator = isFocused ? ', ' : ' ';
   const formatted = [...counts, average].join(separator);
-  return `selected: ${statistics.selected}, ${formatted}`;
+  return `${formatSelectionState(statistics.selectionState, isFocused)} selected: ${statistics.selected}, ${formatted}`;
 };
 
 const formatSubjectStatistics = (

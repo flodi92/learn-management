@@ -22,8 +22,18 @@ colon colored by `getStatisticsColor`.
 
 ### OverviewAggregatedStatisticsItem
 
-- Every aggregated line starts with `selected: ${selected}, `, the number of
-  subjects whose ids are selected.
+- Every aggregated line starts with a selection indicator derived from
+  `selectionState`, followed by `selected: ${selected}, `, the number of
+  subjects whose ids are selected. The indicator is a three-character text
+  taken from `selectionStateIndicators` in `console.constants.ts`:
+  `implicitNoSelection` is three spaces, `implicitSelection` and
+  `implicitFullSelection` are `[*]`, `explicitSelectionUnselections` and
+  `explicitSelection` are `[+]`, and `explicitUnselection` is `[-]`. The
+  states `implicitFullSelection`, `explicitSelection` and
+  `explicitUnselection` are weakly highlighted with a slight yellow
+  background (`selectionHighlightColor`). Unfocused lines show the indicator
+  text in gray (`unfocusedSelectionColor`) whatever the state is; the
+  background highlight is kept.
 - The short form contains the numbers of `notLearned`, `learning`, `learned`
   and `forRepeat`, followed by
   `⌀ ${avgLastRepetitionBeforeDays} days before`. Each number has the color of

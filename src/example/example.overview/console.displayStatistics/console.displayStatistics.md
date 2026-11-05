@@ -6,13 +6,13 @@ console. `GroupType` describes the string values used by `groupType` and the
 first value in each `parentGroups` tuple.
 The display tree does not know what a statistics item contains. The caller
 provides arrow functions for formatting an item, coloring an item, sorting
-children, and toggling a group selection. The caller also provides observables
-for the current group and subject selections. The display reads those
-observables while rendering; it does not store selection state itself.
+children, and toggling a group selection. The caller also provides an observable
+for the current subject selection. The display reads it while rendering; it
+does not store selection state itself.
 
 One layer is displayed in the following way. Only the root layer starts with a
 line containing its own statistics. The root statistics use the detailed
-format. Every aggregated line starts with the number of selected items. All
+format. Every aggregated line starts with a selection indicator and the number of selected items. All
 other layers show their statistics in the line of the child that represents
 them.
 
@@ -35,12 +35,12 @@ selected (`true`), explicitly unselected (`false`), and unspecified
 (`undefined`). A subject only toggles between selected (`true`) and unspecified
 (`undefined`), it never becomes explicitly unselected.
 
-Every child line starts with a three-character selection indicator. Group
-layers use the group selection observable: `[+]` means explicitly selected,
-`[-]` means explicitly unselected, and three spaces mean unspecified. Subject
-layers use the subject selection observable; a selected subject is marked
-`[+]`, while an unspecified subject has three spaces. Selection indicators
-come from the current observables and are not retained by the display.
+Subject lines start with a three-character selection indicator that uses the
+subject selection observable: a selected subject is marked `[+]`, while an
+unspecified subject has three spaces. The indicator of group lines is part of
+their formatted statistics (see `console.displayStatisticsItem.utils.md`).
+Selection indicators come from the current observables and are not retained by
+the display.
 
 All lines that appear when expanding are indented one level deeper than the
 line that triggered the expansion. The layers are therefore indicated by an

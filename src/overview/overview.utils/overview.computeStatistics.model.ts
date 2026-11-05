@@ -17,6 +17,7 @@ export type ComputeAggregatedStatistics<
 > = (
   tuples: SubjectStatistics[],
   selectedIds: string[],
+  groupSelection: boolean | undefined,
 ) => AggregatedStatistics;
 
 export type ComputeSubjectStatistics<

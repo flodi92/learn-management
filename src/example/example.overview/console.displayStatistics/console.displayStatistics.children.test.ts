@@ -17,6 +17,7 @@ const createStatistics = (
   statistics: {
     avgLastRepetitionBeforeDays: 1,
     selected: 0,
+    selectionState: 'implicitNoSelection',
     notLearned: numberOfChildren,
     learning: 0,
     learned: 0,

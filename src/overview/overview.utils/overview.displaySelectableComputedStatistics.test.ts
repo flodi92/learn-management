@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
   OverviewSelectionPath,
 } from '../overview.model';
 import { displaySelectableComputedStatistics } from './overview.displaySelectableComputedStatistics';
 
-const subjectStatistics = {
+const subjectStatistics: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 1,
   selected: 0,
+  selectionState: 'implicitNoSelection',
   notLearned: 0,
   learning: 0,
   learned: 0,
