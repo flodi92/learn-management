@@ -53,6 +53,7 @@ Everything in `src/` except `src/example/` is generic: it makes no assumptions a
 - Prefer arrow functions. Try to avoid the function key word.
 - Keep the language of an existing file when editing it. Code and identifiers are English.
 - Never stage or commit changes (no `git add`, `git commit`, `git stash` or similar), not even when a task seems finished. Leave all changes uncommitted in the working tree for the user to review.
+- Prefer whitelisted terminal commands (see `chat.tools.terminal.autoApprove` in `.vscode/settings.json`). Use a command that is not whitelisted, and therefore needs the user's permission, only if the task cannot be done with whitelisted commands or other tools.
 - `python3` is auto-approved in the terminal. Use it only to read or edit files of this project that you could also read or edit with other tools, never files or folders on the Context Blacklist below, and never for anything else (no network access, no files outside the project, no other commands).
 - Whenever you change, rename, move or delete a file or symbol that is mentioned in a markdown file, update that markdown file accordingly (search the markdown files for its name). Markdown files on the Context Blacklist are excluded.
 - Whenever you add a markdown file, link it with a one-line description in the Documentation Index below, in the matching group (create a group if none fits). Update or remove the entry when the file is changed in purpose, renamed or deleted. Exception: files covered by the Context Blacklist are not linked.
