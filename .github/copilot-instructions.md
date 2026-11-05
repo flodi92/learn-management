@@ -39,6 +39,7 @@ Everything in `src/` except `src/example/` is generic: it makes no assumptions a
   - `example.overview/` – how statistics are displayed on the console.
   - `example.tasks/regExp/` – which tasks could be used (regular expressions) and how they are displayed on the console.
 - Put anything specific to visualization, a task subject or a database into `src/example/`, never into generic code. Generic code must not import from `src/example/`.
+- Import direction for `src/example/`: files inside `src/example/` may import from anywhere else, but nothing outside `src/example/` may import from it. The only reference to `src/example/` from outside can be commands in `package.json`.
 
 ## Build and Test
 
