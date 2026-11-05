@@ -1,5 +1,4 @@
 import { LearningState, SubjectStatisticsItem } from '../model';
-import { OverviewRecursiveStatistics } from './overview.model';
 import {
   GroupTypeOrSubject,
   OverviewRecursiveUndeterminedStatistics,
