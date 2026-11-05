@@ -22,7 +22,7 @@ export type OverviewStatistics =
 
 export type OverviewRecursiveStatistics =
   OverviewRecursiveUndeterminedStatistics<
-    OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem,
+    OverviewStatistics,
     GroupTypeOrSubject<RelevanceCategoryGroupType>
   >;
 
