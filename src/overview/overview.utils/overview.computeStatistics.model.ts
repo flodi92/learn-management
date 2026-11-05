@@ -14,7 +14,10 @@ export type GetGroups<
 export type ComputeAggregatedStatistics<
   SubjectStatistics extends object,
   AggregatedStatistics extends object,
-> = (tuples: SubjectStatistics[]) => AggregatedStatistics;
+> = (
+  tuples: SubjectStatistics[],
+  selectedIds: string[],
+) => AggregatedStatistics;
 
 export type ComputeSubjectStatistics<
   Subject extends LearnSubject,

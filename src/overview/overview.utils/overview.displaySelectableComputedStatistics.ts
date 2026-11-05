@@ -1,4 +1,5 @@
 import {
+  CreateComputedStatistics,
   DisplayComputedStatistics,
   OverviewGroupSelection,
   OverviewRecursiveStatistics,
@@ -10,14 +11,16 @@ import { getSelectionKey } from './overview.getSelectionKey';
 import { isSubjectSelectionPath } from './overview.isSubjectSelectionPath';
 
 export class OverviewDisplaySelectableComputedStatistics {
+  private statistics: OverviewRecursiveStatistics;
   private groupSelection: OverviewGroupSelection;
   private subjectSelection: OverviewSubjectSelection = {};
 
   constructor(
-    private statistics: OverviewRecursiveStatistics,
+    createStatistics: CreateComputedStatistics,
     private displayComputedStatistics: DisplayComputedStatistics,
     preselectedSubjectIds: string[],
   ) {
+    this.statistics = createStatistics(() => this.selectedItems);
     this.groupSelection = Object.fromEntries(
       preselectedSubjectIds.map((id) => [
         getSelectionKey([['subject', id]]),
@@ -33,7 +36,6 @@ export class OverviewDisplaySelectableComputedStatistics {
       this.toggleSelection.bind(this),
       () => this.groupSelection,
       () => this.subjectSelection,
-      () => this.numberOfSelectedItems,
     );
 
     return this.selectedItems;
@@ -43,10 +45,6 @@ export class OverviewDisplaySelectableComputedStatistics {
     return Object.entries(this.subjectSelection)
       .filter(([, selected]) => selected)
       .map(([id]) => id);
-  }
-
-  private get numberOfSelectedItems() {
-    return this.selectedItems.length;
   }
 
   private toggleSelection(path: OverviewSelectionPath) {
@@ -130,11 +128,11 @@ export class OverviewDisplaySelectableComputedStatistics {
 
 export const displaySelectableComputedStatistics = (
   displayComputedStatistics: DisplayComputedStatistics,
-  statistics: OverviewRecursiveStatistics,
+  createStatistics: CreateComputedStatistics,
   preselectedSubjectIds: string[],
 ) =>
   new OverviewDisplaySelectableComputedStatistics(
-    statistics,
+    createStatistics,
     displayComputedStatistics,
     preselectedSubjectIds,
   ).display();

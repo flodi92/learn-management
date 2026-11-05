@@ -54,7 +54,6 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     ) => void = () => {},
     groupSelection?: GroupSelection,
     subjectSelection?: SubjectSelection,
-    private readonly numberOfSelectedItems?: () => number,
   ) {
     this.showSelectionIndicators =
       groupSelection !== undefined || subjectSelection !== undefined;
@@ -127,11 +126,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
       {
         depth: 0,
         nodePath: [],
-        text: this.formatStatistics(
-          this.root.statistics,
-          true,
-          this.numberOfSelectedItems?.(),
-        ),
+        text: this.formatStatistics(this.root.statistics, true),
       },
       ...this.buildLines(this.root, [], 0),
     ];
@@ -321,7 +316,6 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
   toggleSelection: (path: OverviewSelectionPath) => void = () => {},
   groupSelection?: GroupSelection,
   subjectSelection?: SubjectSelection,
-  numberOfSelectedItems?: () => number,
 ): Promise<void> => {
   const overview = new ConsoleDisplayStatistics(
     formatStatistics,
@@ -330,7 +324,6 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
     toggleSelection,
     groupSelection,
     subjectSelection,
-    numberOfSelectedItems,
   );
   await overview.display(statistics);
 };

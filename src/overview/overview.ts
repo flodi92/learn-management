@@ -1,9 +1,6 @@
 import { LearnSubject, TimedResult } from '../model';
 import { getToday } from '../utils';
-import {
-  OverviewRecursiveStatistics,
-  RelevanceCategoryGroupType,
-} from './overview.model';
+import { RelevanceCategoryGroupType } from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
 import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
@@ -12,8 +9,6 @@ import { DisplayComputedStatistics } from './overview.model';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 
 export abstract class Overview<Subject extends LearnSubject> {
-  private statistics: OverviewRecursiveStatistics | undefined;
-
   constructor(public getLabelFromId: (id: string) => string) {}
 
   abstract askForNumberOfTasks(): Promise<number>;
@@ -24,20 +19,20 @@ export abstract class Overview<Subject extends LearnSubject> {
     results: TimedResult[],
     preselectedSubjects: Subject[],
   ): Promise<Subject[]> {
-    this.statistics = computeStatistics(
-      idSubjectMapping,
-      results,
-      getToday(),
-      this.getLabelFromId,
-      ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
-      getGroupsForRelevanceAndCategory,
-      computeSubjectsStatistics,
-      computeAggregatedStatistics,
-    );
-
     const selectedItems = await displaySelectableComputedStatistics(
       this.displayComputedStatistics.bind(this),
-      this.statistics,
+      (getSelectedIds) =>
+        computeStatistics(
+          idSubjectMapping,
+          results,
+          getToday(),
+          this.getLabelFromId,
+          ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
+          getGroupsForRelevanceAndCategory,
+          computeSubjectsStatistics,
+          computeAggregatedStatistics,
+          getSelectedIds,
+        ),
       preselectedSubjects.map(({ id }) => id),
     );
 

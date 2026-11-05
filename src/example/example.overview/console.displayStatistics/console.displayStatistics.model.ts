@@ -16,7 +16,6 @@ export type Line<Statistics extends object> = {
 export type StatisticsFormatter<Statistics extends object> = (
   statistics: Statistics,
   isFocused: boolean,
-  numberOfSelectedItems?: number,
 ) => string;
 
 export type StatisticsColorer<Statistics extends object> = (

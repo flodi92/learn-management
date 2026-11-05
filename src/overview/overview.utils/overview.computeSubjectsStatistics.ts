@@ -25,6 +25,7 @@ export const computeSubjectsStatistics = <Subject extends LearnSubject>(
         id,
         idSubjectMapping[id],
         {
+          id,
           label: getLabelFromId(id),
           mastery: statisticsItem.mastery,
           lastRepetitionBeforeDays: statisticsItem.lastRepetition

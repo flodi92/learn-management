@@ -10,6 +10,7 @@ import {
 } from '../console.constants';
 
 const summarizedSubjectKeys = new Set<string>([
+  'id',
   'label',
   'mastery',
   'lastRepetitionBeforeDays',
@@ -39,7 +40,6 @@ const neverTrained = 'never trained';
 const formatAggregatedStatistics = (
   statistics: OverviewAggregatedStatisticsItem,
   isFocused: boolean,
-  numberOfSelectedItems?: number,
 ): string => {
   const counts = learningStates.map((state) =>
     isFocused
@@ -51,9 +51,7 @@ const formatAggregatedStatistics = (
     : neverTrained;
   const separator = isFocused ? ', ' : ' ';
   const formatted = [...counts, average].join(separator);
-  return numberOfSelectedItems === undefined
-    ? formatted
-    : `selected: ${numberOfSelectedItems}, ${formatted}`;
+  return `selected: ${statistics.selected}, ${formatted}`;
 };
 
 const formatSubjectStatistics = (
@@ -80,8 +78,7 @@ const formatSubjectStatistics = (
 export const formatStatistics = (
   statistics: OverviewStatistics,
   isFocused: boolean,
-  numberOfSelectedItems?: number,
 ): string =>
   isOverviewSubjectStatisticsItem(statistics)
     ? formatSubjectStatistics(statistics, isFocused)
-    : formatAggregatedStatistics(statistics, isFocused, numberOfSelectedItems);
+    : formatAggregatedStatistics(statistics, isFocused);

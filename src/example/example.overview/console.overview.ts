@@ -53,7 +53,6 @@ export class ConsoleOverview extends Overview<LearnSubject> {
     toggleSelection: (path: OverviewSelectionPath) => void,
     groupSelection: () => OverviewGroupSelection,
     subjectSelection: () => OverviewSubjectSelection,
-    numberOfSelectedItems: () => number,
   ): Promise<void> {
     await consoleDisplayStatistics(
       statistics,
@@ -63,7 +62,6 @@ export class ConsoleOverview extends Overview<LearnSubject> {
       toggleSelection,
       groupSelection,
       subjectSelection,
-      numberOfSelectedItems,
     );
   }
 }

@@ -8,6 +8,7 @@ export interface OverviewSubjectStatisticsItem extends Omit<
   SubjectStatisticsItem,
   'lastRepetition'
 > {
+  id: string;
   label: string;
   lastRepetitionBeforeDays: number;
   learningState: LearningState;
@@ -15,6 +16,7 @@ export interface OverviewSubjectStatisticsItem extends Omit<
 
 export type OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: number;
+  selected: number;
 } & Record<LearningState, number>;
 
 export type OverviewStatistics =
@@ -50,5 +52,8 @@ export type DisplayComputedStatistics = (
   toggleSelection: (path: OverviewSelectionPath) => void,
   groupSelection: () => OverviewGroupSelection,
   subjectSelection: () => OverviewSubjectSelection,
-  numberOfSelectedItems: () => number,
 ) => Promise<void>;
+
+export type CreateComputedStatistics = (
+  getSelectedIds: () => string[],
+) => OverviewRecursiveStatistics;
