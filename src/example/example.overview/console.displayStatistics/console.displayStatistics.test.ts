@@ -196,3 +196,38 @@ describe('ConsoleDisplayStatistics', () => {
     expect(view()[5]).toMatch(/^ {2}> Chemistry: /);
   });
 });
+
+describe('ConsoleDisplayStatistics selection with space', () => {
+  const press = (name: string, sequence?: string) =>
+    process.stdin.emit('keypress', sequence, { name });
+
+  beforeEach(() => {
+    vi.spyOn(console, 'clear').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.stdin.emit('keypress', 'q', { name: 'q' });
+    vi.restoreAllMocks();
+  });
+
+  it('toggles the focused subject with its subject path', () => {
+    const toggleSelection = vi.fn();
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+      toggleSelection,
+      () => ({}),
+      () => ({}),
+      () => 0,
+    ).display(statisticsExample);
+
+    press('right');
+    press('right');
+    press('space', ' ');
+
+    expect(toggleSelection).toHaveBeenCalledTimes(1);
+    expect(toggleSelection).toHaveBeenCalledWith([['subject', 'Fractions']]);
+  });
+});

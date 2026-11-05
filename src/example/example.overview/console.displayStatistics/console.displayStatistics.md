@@ -29,9 +29,10 @@ without children has no effect. The left arrow moves the focus to the parent
 child (the child expanded to show the focused child) and collapses its
 expansion. In the first layer there is no parent, so pressing left has no
 effect. Up and down do not expand or collapse anything. Pressing space toggles
-the selection of the focused group. The toggle cycles through explicitly
+the selection of the focused group or subject. A group cycles through explicitly
 selected (`true`), explicitly unselected (`false`), and unspecified
-(`undefined`).
+(`undefined`). A subject only toggles between selected (`true`) and unspecified
+(`undefined`), it never becomes explicitly unselected.
 
 Every child line starts with a three-character selection indicator. Group
 layers use the group selection observable: `[+]` means explicitly selected,

@@ -158,7 +158,9 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
       helpColor('←: jump to the parent entry and collapse its expansion'),
     );
     if (this.showSelectionIndicators) {
-      console.log(helpColor('space: toggle the focused group selection'));
+      console.log(
+        helpColor('space: toggle the focused group or subject selection'),
+      );
     }
     console.log(helpColor('enter: quit or accept current selection'));
     console.log();
@@ -255,9 +257,11 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   private toggleFocusedSelection() {
     if (!this.focus) return;
     const node = getNode(this.root!, this.focus);
-    if (!node?.parentGroups) return;
+    if (!node) return;
+    const parentGroups: readonly (readonly [string, string | number])[] =
+      node.parentGroups ?? [['subject', this.focus[this.focus.length - 1]]];
     this.toggleSelection(
-      node.parentGroups.map(
+      parentGroups.map(
         ([type, key]) =>
           [type, key] as [OverviewGroupTypeOrSubject, string | number],
       ),

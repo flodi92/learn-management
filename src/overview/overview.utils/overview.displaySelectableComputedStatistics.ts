@@ -7,6 +7,7 @@ import {
   OverviewSubjectSelection,
 } from '../overview.model';
 import { getSelectionKey } from './overview.getSelectionKey';
+import { isSubjectSelectionPath } from './overview.isSubjectSelectionPath';
 
 export class OverviewDisplaySelectableComputedStatistics {
   private groupSelection: OverviewGroupSelection;
@@ -50,12 +51,14 @@ export class OverviewDisplaySelectableComputedStatistics {
 
   private toggleSelection(path: OverviewSelectionPath) {
     const pathStr = getSelectionKey(path);
-    this.groupSelection[pathStr] =
-      this.groupSelection[pathStr] === undefined
-        ? true
-        : this.groupSelection[pathStr] === true
-          ? false
-          : undefined;
+    const selected = this.groupSelection[pathStr];
+
+    if (isSubjectSelectionPath(path)) {
+      this.groupSelection[pathStr] = selected === true ? undefined : true;
+    } else {
+      this.groupSelection[pathStr] =
+        selected === undefined ? true : selected === true ? false : undefined;
+    }
 
     this.updateSubjectSelection();
   }
