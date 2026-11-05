@@ -50,6 +50,7 @@ Everything in `src/` except `src/example/` is generic: it makes no assumptions a
 
 - Add or update vitest tests when changing scheduler or statistics logic.
 - Keep changes small and focused; don't refactor unrelated code.
+- Prefer arrow functions. Try to avoid the function key word.
 - Keep the language of an existing file when editing it. Code and identifiers are English.
 - Never stage or commit changes (no `git add`, `git commit`, `git stash` or similar), not even when a task seems finished. Leave all changes uncommitted in the working tree for the user to review.
 - Whenever you change, rename, move or delete a file or symbol that is mentioned in a markdown file, update that markdown file accordingly (search the markdown files for its name). Markdown files on the Context Blacklist are excluded.
