@@ -1,21 +1,13 @@
-displayComputedStatistics should have three additional parameters:
+I want you to create another file overview.displaySelectableComputedStatistics.ts in overview/utils folder.
 
-- one arrow function that should be bounded to toggleSelection
-- one observable for groupSelection and
-- one observable for subjectSelection
+That file implements a class of that name. Migrate all the behaviour that refers to selection from Overview to that class but keep displayStatistics and displayComputedStatistics.
 
-Toggle selection should be invoked in the following way:
+Write an arrow function in that file of the same name that creates an instance of that class and invokes the display function so that that class does not necessarily need to be referenced from outsite.
 
-Pressing on space I want to toggle the selection of the currently focused group. There is a three value toggle between explicit selected (true), explicit unselected (false) or not specified(undefined) which means some of the items might be selected due to other specifications.
+That arrow function is invoked in the Overview class in displayStatistics in the place where currently this.displayComputedStatistics is invoked.
 
-The state is indicated to the user (console.displayStatistics.ts) in the following way:
-Explicitly selected groups have [+], unselected groups have [-],
-if the selection is not defined then there are just three spaces
+It takes as parameter a reference to this.displayComputedStatistics and this.statistics but nothing else.
 
-The state is not stored in console.displayStatistics.ts but only comes from groupSelection or subjectSelection from Overview.
+It returns an array of selected items.
 
-groupSelection is applied to layers representing groups.
-
-subjectSelection is applied to layers representing a single subject.
-
-Update the markdown console.displayStatistics.md accordingly.
+This is a refactoring. It is very important that the behaviour of that program does not change.
