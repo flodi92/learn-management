@@ -7,6 +7,7 @@
     "npx tsc": true,
     "npx tsx": true,
     "python3": true,
+    "node": true,
     "npm run start-overview": true,
     "npm run start-regExp": true,
     "git status": true,
