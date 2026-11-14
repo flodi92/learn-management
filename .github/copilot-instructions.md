@@ -45,11 +45,13 @@ Everything in `src/` except `src/example/` is generic: it makes no assumptions a
 ## Build and Test
 
 - Tests: `npx vitest run` (vitest with globals; auto-approved in `.vscode/settings.json`). `npm test` starts watch mode, so avoid it.
+- Type-check: `npx tsc` (uses `noEmit` in `tsconfig.json`; auto-approved in `.vscode/settings.json`).
 - Run examples: `npm run start-overview`, `npm run start-regExp`.
 - Format: `npm run prettify`.
 
 ## Conventions
 
+- Run `npx tsc` after every code change to verify there are no type errors in the whole project.
 - Add or update vitest tests when changing scheduler or statistics logic.
 - Keep changes small and focused; don't refactor unrelated code.
 - Prefer arrow functions. Try to avoid the function key word.
