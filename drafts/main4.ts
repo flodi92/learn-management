@@ -112,10 +112,11 @@ class Library {
 }
 
 class UserManager<L extends Library> {
-  readonly library: L;
   currentSequence: Sequence = [];
   focusedAspects: Aspect[] = [];
-  results: AspectsResults;
+  results: AspectsResults = new Map();
+
+  constructor(readonly library: L) {}
 
   // long term planning
 
@@ -184,15 +185,11 @@ class UserManager<L extends Library> {
       aspectWithPriority: [Aspect, Priority][],
       numberOfTasks: number,
     ) => {
-      const sortedAspectsPriority: Map<Priority, Aspect[]> =
-        aspectWithPriority.reduce(
-          (acc, [aspect, priority]) => ({
-            ...acc,
-            [priority]: [...(acc[priority] ?? [aspect])],
-            priority,
-          }),
-          new Map<Priority, Aspect[]>(), // TODO fix
-        );
+      const sortedAspectsPriority = aspectWithPriority.reduce(
+        (acc, [aspect, priority]) =>
+          acc.set(priority, [...(acc.get(priority) ?? []), aspect]),
+        new Map<Priority, Aspect[]>(),
+      );
 
       const buffer: Aspect[] = [];
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2024",
     "types": ["node", "vitest/globals"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

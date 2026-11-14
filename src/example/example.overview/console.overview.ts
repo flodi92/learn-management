@@ -12,7 +12,9 @@ import { getStatisticsColor } from './console.displayStatisticsItem.utils/consol
 import { sortChildren } from './console.displayStatisticsItem.utils/console.sortChildren';
 import { LearnSubject } from '../../model';
 
-export class ConsoleOverview extends Overview<LearnSubject> {
+export class ConsoleOverview<
+  Subject extends LearnSubject = LearnSubject,
+> extends Overview<Subject> {
   constructor(getLabelFromId: (id: string) => string) {
     super(getLabelFromId);
   }

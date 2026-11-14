@@ -32,6 +32,7 @@
     "tr": true,
     "echo": true,
     "pwd": true,
+    "cd": true,
     "diff": true,
     "grep": true,
     "rg": true,
