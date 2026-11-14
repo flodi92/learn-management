@@ -43,6 +43,12 @@ export interface RegExpObjectInterface {
 }
 
 export const regExpObjects = {
+  ['x']: {
+    category: 'characterClass',
+    relevance: 1,
+    description:
+      'Matches specific a character like x if that character is not used for regExp syntax.',
+  },
   ['[xyz]']: {
     category: 'characterClass',
     relevance: 1,
