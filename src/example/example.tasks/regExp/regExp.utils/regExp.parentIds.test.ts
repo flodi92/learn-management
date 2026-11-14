@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { setParentIds } from './regExp.parentIds';
 import { RegExpTask } from '../regExp.model';
 
-type TaskWithElements = Omit<RegExpTask, 'parentIds'>;
+type TaskWithElements = Pick<RegExpTask, 'id' | 'expression' | 'elements'>;
 
 const task = (
   id: string,

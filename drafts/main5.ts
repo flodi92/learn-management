@@ -39,6 +39,8 @@ const suggestTestableSkills1: SuggestTestableSkills = (
   };
 
   const hierarchy = getLearnHierarchy(targetSkill, userResults);
+
+  throw 'not implemented';
 };
 const suggestTestableSkills2: SuggestTestableSkills = (
   targetSkill,
@@ -47,6 +49,8 @@ const suggestTestableSkills2: SuggestTestableSkills = (
   // 1. bestimme zu wiederholende Skills, zu trainierende Skills, neu zu lernende Skills
   // 2. wäge anhand der verfügbaren Zeit ab
   const determineRepetitionSkills = () => {};
+
+  throw 'not implemented';
 };
 
 type generateTasks = (skill: Skill) => Task;
