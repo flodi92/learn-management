@@ -17,7 +17,7 @@
 - Ähnliche Fälle mit Gefahr der gegenseitigen Verwechslung zeitlich eng beieinander
 - Aspekte zunächst isoliert, dann schrittweise Kombination
 - Einige Aspekte zusätzlich mit Skalierungsparametern
-- Bei Bedarf wieder neue einfacherer Kombinationen, um Problemstellen zu isolieren
+- Bei Bedarf wieder neue einfachere Kombinationen, um Problemstellen zu isolieren
 - Diese Problemstellen anhand Fehler bei automatischer Auswertung identifizieren
 - Auswahl der neu zu lernenden bzw. zu wiederholenden Aspekte sowohl selbständig als auch durch Vorgabe
 - Übersicht über Lernfortschritt
