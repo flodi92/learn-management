@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { regExpSubjectDefinitions } from './regExp.model';
 import { regExpTasks } from './regExp.taskDescriptions';
+import { getComplexityOfExpression } from './regExp.utils/regExp.complexity';
 import { getParentExpressions } from './regExp.utils/regExp.parentIds';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
@@ -211,6 +212,17 @@ describe('regExpTasks', () => {
         });
       },
     );
+  });
+
+  describe('check complexity', () => {
+    describe.each(regExpTasks)('$expression', ({ expression, complexity }) => {
+      it('has the complexity of its expression', () => {
+        expect(
+          complexity,
+          `${expression} should have the complexity of its expression`,
+        ).toBe(getComplexityOfExpression(expression));
+      });
+    });
   });
 
   describe('check parentRegExps', () => {

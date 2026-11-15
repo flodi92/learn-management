@@ -7,6 +7,7 @@ const task = (expression: RegExp, subjects: RegExpSubject[]) => ({
   subjects,
   categories: [],
   relevance: 1 as const,
+  complexity: 1 as const,
   parentRegExps: [],
 });
 

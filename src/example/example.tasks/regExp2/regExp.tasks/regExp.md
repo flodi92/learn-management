@@ -65,5 +65,11 @@ Prompt example: `Check regExp.taskDescriptions.ts for consistency.`
     - `relevance` is a required attribute of every task description; it must equal the maximum of the `relevance` of the definitions of all entries of `subjects` and of the optional `extraSubjects`, e.g. `/^[xyz][^xyz]$/` has `2` because `[^xyz]` has `2` while `[xyz]` has `1`; the maximum is the numerically highest value
     - run it with the same command as check 1
     - on failure the test names the task description with its `relevance` and the expected one; adopt the maximum, and when `subjects` or `extraSubjects` of a task description change or the `relevance` of a subject definition is changed, update the `relevance` of all task descriptions affected
+11. `complexity` is derived from the expression – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+    - principle: the `complexity` of a task description is not authored freely, it is exactly what [getComplexityOfExpression](./regExp.utils/regExp.complexity.ts) returns for its `expression`; the function is the single definition of how complex an expression is
+    - `complexity` is a required attribute of every task description; it must equal `getComplexityOfExpression(expression)`
+    - consequences of the function's rules: the complexity depends on the number of subjects that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) finds in the expression, so `extraSubjects` do not count: up to 2 subjects give `1`, 3 or 4 subjects give `2`, more give `3`, e.g. `/^xyz$/` with no subjects has `1` and `/^((xy)|z)+$/` with the 3 subjects `x|y`, `(x)` and `x+` has `2`
+    - run it with the same command as check 1
+    - on failure the test names the task description with its `complexity` and the expected one; adopt the derived one, and when the `expression` of a task description changes, update its `complexity` as well; if a derived complexity is wrong, fix [regExp.complexity.ts](./regExp.utils/regExp.complexity.ts) instead of the task description
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.taskDescriptions.ts](./regExp.taskDescriptions.ts) and gets an entry here with its test file, what it asserts and its run command.
