@@ -3,10 +3,10 @@ export interface InitialRegExpTaskDescription {
   positiveExamples?: string[];
   negativeExamples?: string[];
   confusedWith?: RegExp[];
-  elements?: RegExpElement[];
+  subjects?: RegExpSubject[];
   category?: RegExpCategory;
   relevance?: RegExpRelevance;
-  complexity?: 1 | 2 | 3;
+  complexity?: RegExpComplexity;
   parentRegExps?: RegExp[];
 }
 
@@ -35,19 +35,19 @@ export const regExpComplexities = [1, 2, 3] as const;
 
 export type RegExpComplexity = (typeof regExpComplexities)[number];
 
-export interface RegExpObjectInterface {
+export interface RegExpSubjectDefinitionInterface {
   category: RegExpCategory;
   relevance: RegExpRelevance;
   description: string;
 }
 
-export type RegExpObjects = typeof regExpObjects;
+export type RegExpSubjectDefinitions = typeof regExpSubjectDefinitions;
 
-export type RegExpElement = keyof RegExpObjects;
+export type RegExpSubject = keyof RegExpSubjectDefinitions;
 
-export type RegExpObject = RegExpObjects[RegExpElement];
+export type RegExpSubjectDefinition = RegExpSubjectDefinitions[RegExpSubject];
 
-export const regExpObjects = {
+export const regExpSubjectDefinitions = {
   ['x']: {
     category: 'characterClass',
     relevance: 1,
@@ -330,4 +330,4 @@ export const regExpObjects = {
     description:
       'Flag y (sticky): matches only starting exactly at the lastIndex position.',
   },
-} as const satisfies Record<string, RegExpObjectInterface>;
+} as const satisfies Record<string, RegExpSubjectDefinitionInterface>;
