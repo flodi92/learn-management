@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { regExpTasks } from './regExp.tasks';
 
 describe('regExpTasks', () => {
-  describe('check for positive and negative examples', () => {
+  describe('check examples', () => {
     describe.each(regExpTasks)(
       '$expression',
       ({ expression, positiveExamples = [], negativeExamples = [] }) => {
@@ -24,6 +24,20 @@ describe('regExpTasks', () => {
             matchedExamples,
             `${expression} should not match any negative example`,
           ).toEqual([]);
+        });
+
+        it('has at least one positive example', () => {
+          expect(
+            positiveExamples.length,
+            `${expression} should have at least one positive example`,
+          ).toBeGreaterThanOrEqual(1);
+        });
+
+        it('has at least one negative example', () => {
+          expect(
+            negativeExamples.length,
+            `${expression} should have at least one negative example`,
+          ).toBeGreaterThanOrEqual(1);
         });
       },
     );
