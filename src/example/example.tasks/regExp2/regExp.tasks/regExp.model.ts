@@ -1,7 +1,8 @@
 export interface InitialRegExpTaskDescription {
   expression: RegExp;
-  positiveExamples?: string[];
-  negativeExamples?: string[];
+  positiveExamples: string[];
+  negativeExamples: string[];
+  parentRegExps: RegExp[];
   confusedWith?: RegExp[];
   equalTo?: RegExp[];
   subjects: RegExpSubject[];
@@ -9,7 +10,6 @@ export interface InitialRegExpTaskDescription {
   categories: RegExpCategory[];
   relevance: RegExpRelevance;
   complexity: RegExpComplexity;
-  parentRegExps: RegExp[];
 }
 
 export interface TaskDescription {

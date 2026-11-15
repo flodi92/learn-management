@@ -5,6 +5,8 @@ import { RegExpSubject } from '../regExp.model';
 const task = (expression: RegExp, subjects: RegExpSubject[]) => ({
   expression,
   subjects,
+  positiveExamples: [],
+  negativeExamples: [],
   categories: [],
   relevance: 1 as const,
   complexity: 1 as const,
