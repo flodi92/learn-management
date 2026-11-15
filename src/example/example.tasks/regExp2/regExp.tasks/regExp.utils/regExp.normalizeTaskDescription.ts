@@ -13,7 +13,7 @@ export const normalizeTaskDescription = (
   parents: input.parents.map(String),
   confusedWith: input.confusedWith?.map(String) ?? [],
   equalTo: input.equalTo?.map(String) ?? [],
-  subjects: input.subjects,
+  subjects: [...input.subjects, ...(input.extraSubjects ?? [])],
   categories: input.categories,
   relevance: input.relevance,
   complexity: input.complexity,
