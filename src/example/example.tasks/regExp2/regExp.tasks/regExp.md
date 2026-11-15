@@ -55,5 +55,10 @@ Prompt example: `Check regExp.tasks.ts for consistency.`
    - consequences of the function's rules: a parent is a task whose `subjects` are a proper subset of the `subjects` of the task, tasks with identical `subjects` are not parents of each other, and only direct parents are listed, i.e. a parent is left out if another parent already contains its `subjects`; only `subjects` count, `extraSubjects` are ignored; the task with `subjects: []`, e.g. `/^xyz$/`, is the parent of every task that has no more specific parent
    - run it with the same command as check 1
    - on failure the test shows the `parentRegExps` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^[xyz]+$/` has `[/^[xyz]$/, /^x+$/, /^[0-9]$/]`; when the `subjects` of a task change or a task is added or removed, update the `parentRegExps` of all tasks affected; if a derived parent is wrong, fix [regExp.parentIds.ts](./regExp.utils/regExp.parentIds.ts) and its test [regExp.parentIds.test.ts](./regExp.utils/regExp.parentIds.test.ts) instead of the task
+9. Expressions are unique – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
+   - principle: the `expression` identifies a task; `confusedWith`, `equalTo` and `parentRegExps` refer to other tasks by their expression, so no two tasks may share one
+   - no expression (same source and flags) is the `expression` of more than one task; this is checked first in the test file, before the checks of the single tasks
+   - run it with the same command as check 1
+   - on failure the test lists all duplicated expressions at once; remove the duplicate task, or merge its examples and attributes into the other task if they differ, or change the expression if the tasks are meant to teach different things
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.tasks.ts](./regExp.tasks.ts) and gets an entry here with its test file, what it asserts and its run command.

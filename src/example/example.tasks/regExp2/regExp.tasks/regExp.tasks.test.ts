@@ -5,6 +5,25 @@ import { getParentExpressions } from './regExp.utils/regExp.parentIds';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
 describe('regExpTasks', () => {
+  describe('check expressions', () => {
+    it('has a unique expression for every task description', () => {
+      const expressions = regExpTasks.map(({ expression }) =>
+        String(expression),
+      );
+      const duplicateExpressions = [
+        ...new Set(
+          expressions.filter(
+            (expression, index) => expressions.indexOf(expression) !== index,
+          ),
+        ),
+      ];
+      expect(
+        duplicateExpressions,
+        'expressions should be the expression of exactly one task description',
+      ).toEqual([]);
+    });
+  });
+
   describe('check examples', () => {
     describe.each(regExpTasks)(
       '$expression',
