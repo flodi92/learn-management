@@ -3,6 +3,7 @@ export interface InitialRegExpTaskDescription {
   positiveExamples?: string[];
   negativeExamples?: string[];
   confusedWith?: RegExp[];
+  equalTo?: RegExp[];
   subjects?: RegExpSubject[];
   category?: RegExpCategory;
   relevance?: RegExpRelevance;
