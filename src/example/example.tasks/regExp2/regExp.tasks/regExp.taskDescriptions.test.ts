@@ -74,6 +74,16 @@ describe('regExpTasks', () => {
   });
 
   describe('check confusedWith attribute', () => {
+    it('is used by at least 75% of the task descriptions', () => {
+      const numberOfTaskDescriptionsWithConfusedWith = regExpTasks.filter(
+        ({ confusedWith = [] }) => confusedWith.length > 0,
+      ).length;
+      expect(
+        numberOfTaskDescriptionsWithConfusedWith / regExpTasks.length,
+        `at least 75% of the task descriptions should use confusedWith, but only ${numberOfTaskDescriptionsWithConfusedWith} of ${regExpTasks.length} do`,
+      ).toBeGreaterThanOrEqual(0.75);
+    });
+
     describe.each(regExpTasks)('$expression', (task) => {
       it('only contains expressions of other task descriptions', () => {
         const otherExpressions = regExpTasks

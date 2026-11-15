@@ -72,5 +72,10 @@ Prompt example: `Check regExp.taskDescriptions.ts for consistency.`
     - consequences of the function's rules: the complexity depends on the number of subjects that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) finds in the expression, so `extraSubjects` do not count: up to 2 subjects give `1`, 3 or 4 subjects give `2`, more give `3`, e.g. `/^xyz$/` with no subjects has `1` and `/^((xy)|z)+$/` with the 3 subjects `x|y`, `(x)` and `x+` has `2`
     - run it with the same command as check 1
     - on failure the test names the task description with its `complexity` and the expected one; adopt the derived one, and when the `expression` of a task description changes, update its `complexity` as well; if a derived complexity is wrong, fix [regExp.complexity.ts](./regExp.utils/regExp.complexity.ts) instead of the task description
+12. `confusedWith` is widely used – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+    - principle: `confusedWith` only helps the learner if it is maintained for most of the task descriptions, so it must not be left out as an optional extra
+    - at least 75% of all task descriptions have a non-empty `confusedWith`; this is a share of the whole list, so a single task description without `confusedWith` is fine, and the test is not run per task description
+    - run it with the same command as check 1
+    - on failure the test names how many of the task descriptions use `confusedWith`; add `confusedWith` to further task descriptions, in both directions as required by checks 3 and 4, until the share is reached
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.taskDescriptions.ts](./regExp.taskDescriptions.ts) and gets an entry here with its test file, what it asserts and its run command.
