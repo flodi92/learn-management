@@ -1,17 +1,6 @@
-import { RegExpElement } from '../../regExp/regExp.model';
+import { InitialRegExpTaskDescription } from './regExp.model';
 
-export type RegExpExample = string | { value: string; alternative: string };
-
-export type InitialRegExpTask = {
-  expression: RegExp;
-  positiveExamples?: RegExpExample[];
-  negativeExamples?: RegExpExample[];
-  nots?: RegExp[];
-  confusedWith?: RegExp[];
-  elements?: RegExpElement[];
-};
-
-export const initialTasks: InitialRegExpTask[] = [
+export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^xyz$/,
     elements: ['^', '$', 'x'],
