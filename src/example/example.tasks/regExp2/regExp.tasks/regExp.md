@@ -1,64 +1,64 @@
 ## consistency checks
 
-[regExp.tasks.ts](./regExp.tasks.ts) contains the authored regExp tasks. When asked to check it for consistency, run every check listed here (use the `npx vitest run <file>` commands, never `npm test`, which starts watch mode), report each failing task by its expression, and do not change the task data unless asked to.
+[regExp.taskDescriptions.ts](./regExp.taskDescriptions.ts) contains the authored regExp task descriptions. When asked to check it for consistency, run every check listed here (use the `npx vitest run <file>` commands, never `npm test`, which starts watch mode), report each failing task description by its expression, and do not change the task descriptions unless asked to.
 
-Prompt example: `Check regExp.tasks.ts for consistency.`
+Prompt example: `Check regExp.taskDescriptions.ts for consistency.`
 
 ### checks
 
-1. Examples fulfill their expression – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
+1. Examples fulfill their expression – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
    - every entry of `positiveExamples` is matched by `expression`
    - no entry of `negativeExamples` is matched by `expression`
-   - every task has at least one positive and at least one negative example
-   - run it with `npx vitest run src/example/example.tasks/regExp2/regExp.tasks/regExp.tasks.test.ts`
-   - on failure the test reports all offending examples of a task at once; decide per task whether the expression or the examples are wrong, e.g. alternation has the lowest precedence, so `/^x|y$/` means `^x` or `y$`, not `^(x|y)$`
-2. `confusedWith` references existing tasks – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - `confusedWith` lists expressions a learner could mistake for the task's own expression, so each of them must itself be the `expression` of another task; otherwise the confusion could never be practiced
-   - every entry of `confusedWith` equals (same source and flags) the `expression` of a different task; a task listing its own expression fails
-   - tasks without `confusedWith` are not checked
+   - every task description has at least one positive and at least one negative example
+   - run it with `npx vitest run src/example/example.tasks/regExp2/regExp.tasks/regExp.taskDescriptions.test.ts`
+   - on failure the test reports all offending examples of a task description at once; decide per task description whether the expression or the examples are wrong, e.g. alternation has the lowest precedence, so `/^x|y$/` means `^x` or `y$`, not `^(x|y)$`
+2. `confusedWith` references existing task descriptions – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - `confusedWith` lists expressions a learner could mistake for the task description's own expression, so each of them must itself be the `expression` of another task description; otherwise the confusion could never be practiced
+   - every entry of `confusedWith` equals (same source and flags) the `expression` of a different task description; a task description listing its own expression fails
+   - task descriptions without `confusedWith` are not checked
    - run it with the same command as check 1
-   - on failure the test reports all unknown expressions of a task at once; either add a task for the missing expression, fix a typo in the entry, or remove the entry
-3. `confusedWith` is symmetric – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: confusing two expressions is a relation between both of them, not a property of one. If task A lists the expression of task B in `confusedWith`, task B must list the expression of task A as well; e.g. `/^x|y$/` and `/^(x|y)$/` are listed in each other's `confusedWith`
-   - this also holds for a task without `confusedWith`: as soon as another task lists its expression, it needs a `confusedWith` that lists the other task back
-   - a task fails if it lists an expression of another task whose `confusedWith` does not contain the task's own expression; the failure is reported on the task with the one-way entry and names the tasks that do not list it back
+   - on failure the test reports all unknown expressions of a task description at once; either add a task description for the missing expression, fix a typo in the entry, or remove the entry
+3. `confusedWith` is symmetric – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: confusing two expressions is a relation between both of them, not a property of one. If task description A lists the expression of task description B in `confusedWith`, task description B must list the expression of task description A as well; e.g. `/^x|y$/` and `/^(x|y)$/` are listed in each other's `confusedWith`
+   - this also holds for a task description without `confusedWith`: as soon as another task description lists its expression, it needs a `confusedWith` that lists the other task description back
+   - a task description fails if it lists an expression of another task description whose `confusedWith` does not contain the task description's own expression; the failure is reported on the task description with the one-way entry and names the task descriptions that do not list it back
    - run it with the same command as check 1
-   - on failure add the missing reverse entry to the named tasks, or remove the one-way entry if the confusion is not plausible in both directions
-4. Confused tasks are distinguishable by examples – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: two tasks linked via `confusedWith` are only worth practicing against each other if their examples show the difference. For every such pair at least one of the following holds: an example is a `positiveExamples` entry of one task and a `negativeExamples` entry of the other, or an example is a `negativeExamples` entry of one task and a `positiveExamples` entry of the other
-   - the examples are compared as listed in the tasks (exact string equality), not evaluated against the other expression, so the distinguishing example has to be written into both tasks; reuse the same example in both tasks to make the commonalities and differences visible
-   - the condition is symmetric, so a failing pair is reported on both tasks
+   - on failure add the missing reverse entry to the named task descriptions, or remove the one-way entry if the confusion is not plausible in both directions
+4. Confused task descriptions are distinguishable by examples – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: two task descriptions linked via `confusedWith` are only worth practicing against each other if their examples show the difference. For every such pair at least one of the following holds: an example is a `positiveExamples` entry of one task description and a `negativeExamples` entry of the other, or an example is a `negativeExamples` entry of one task description and a `positiveExamples` entry of the other
+   - the examples are compared as listed in the task descriptions (exact string equality), not evaluated against the other expression, so the distinguishing example has to be written into both task descriptions; reuse the same example in both task descriptions to make the commonalities and differences visible
+   - the condition is symmetric, so a failing pair is reported on both task descriptions
    - run it with the same command as check 1
-   - on failure add a distinguishing example to one of the two tasks, e.g. `'x'` as a negative example of `/^xyz$/`, because it is a positive example of `/^x|y|z$/`; if the two expressions match exactly the same strings, e.g. `/^((xy)|z)$/` and `/^(xy|z)$/` (the extra group is redundant), no example can distinguish them, so link them via `equalTo` (check 5) instead of `confusedWith`
-5. `equalTo` tasks share their examples – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: `equalTo` is parallel to `confusedWith` and lists expressions of other tasks that match exactly the same strings as the task's own expression but are written differently, e.g. `/^((xy)|z)$/` and `/^(xy|z)$/` (the extra group is redundant). Because they match the same strings, no example can distinguish them, so they are not linked via `confusedWith` and are not checked by check 4
-   - for every task that lists the expression of another task in `equalTo`, the sets of `positiveExamples` and the sets of `negativeExamples` of both tasks must be equal (order and duplicates are ignored); an example that is valid for one of them is valid for the other, so both tasks should show the same examples
-   - link both tasks in each other's `equalTo`; the test only compares the examples of the pairs that are listed and does not check that the link is symmetric or that the listed expression exists
-   - tasks without `equalTo` are not checked
+   - on failure add a distinguishing example to one of the two task descriptions, e.g. `'x'` as a negative example of `/^xyz$/`, because it is a positive example of `/^x|y|z$/`; if the two expressions match exactly the same strings, e.g. `/^((xy)|z)$/` and `/^(xy|z)$/` (the extra group is redundant), no example can distinguish them, so link them via `equalTo` (check 5) instead of `confusedWith`
+5. `equalTo` task descriptions share their examples – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: `equalTo` is parallel to `confusedWith` and lists expressions of other task descriptions that match exactly the same strings as the task description's own expression but are written differently, e.g. `/^((xy)|z)$/` and `/^(xy|z)$/` (the extra group is redundant). Because they match the same strings, no example can distinguish them, so they are not linked via `confusedWith` and are not checked by check 4
+   - for every task description that lists the expression of another task description in `equalTo`, the sets of `positiveExamples` and the sets of `negativeExamples` of both task descriptions must be equal (order and duplicates are ignored); an example that is valid for one of them is valid for the other, so both task descriptions should show the same examples
+   - link both task descriptions in each other's `equalTo`; the test only compares the examples of the pairs that are listed and does not check that the link is symmetric or that the listed expression exists
+   - task descriptions without `equalTo` are not checked
    - run it with the same command as check 1
-   - on failure the test names the expressions whose examples differ; adopt the missing examples in the task that lacks them (check 1 ensures they are valid), e.g. `'x'` was added as a negative example of `/^(xy|z)$/`
-6. `subjects` are derived from the expression – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: the `subjects` of a task are not authored freely, they are exactly the subjects that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) finds in its `expression`; the function is the single definition of which subject an expression part belongs to
-   - the `subjects` of a task and the result of `getSubjectsFromExpression(expression)` must contain the same entries (order is ignored); `subjects` is a required attribute of every task, so a task without subjects in its expression has `subjects: []`
+   - on failure the test names the expressions whose examples differ; adopt the missing examples in the task description that lacks them (check 1 ensures they are valid), e.g. `'x'` was added as a negative example of `/^(xy|z)$/`
+6. `subjects` are derived from the expression – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: the `subjects` of a task description are not authored freely, they are exactly the subjects that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) finds in its `expression`; the function is the single definition of which subject an expression part belongs to
+   - the `subjects` of a task description and the result of `getSubjectsFromExpression(expression)` must contain the same entries (order is ignored); `subjects` is a required attribute of every task description, so a task description without subjects in its expression has `subjects: []`
    - consequences of the function's rules: a literal character like `x` is never a subject, `^` and `$` are only subjects if just one of them is used (an expression anchored on both ends has neither, e.g. `/^xyz$/` has `subjects: []`), `anywhere` is a subject if neither is used, and flags like `g` or `i` are subjects too
    - run it with the same command as check 1
-   - on failure the test shows the `subjects` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^(x|y)$/` has `['x|y', '(x)']`; if a derived subject is wrong for the expression, fix [regExp.subjects.ts](./regExp.utils/regExp.subjects.ts) and its test [regExp.subjects.test.ts](./regExp.utils/regExp.subjects.test.ts) instead of the task
-7. `categories` cover the subjects – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: every subject has a category in `regExpSubjectDefinitions` in [regExp.model.ts](./regExp.model.ts); the `categories` of a task list the categories of everything it teaches, so no category of one of its subjects may be missing
-   - `categories` is a required attribute of every task; for each entry of `subjects` and of the optional `extraSubjects` (subjects a task teaches that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) does not derive from the expression, e.g. the literal `x` or the anchors of `/^xyz$/`) the category of its definition must be contained in `categories`; the order is ignored and a category is listed once, e.g. `/^[xyz]+$/` has `['characterClass', 'quantifier']`
+   - on failure the test shows the `subjects` of the task description and the derived ones; adopt the derived ones in the task description, e.g. `/^(x|y)$/` has `['x|y', '(x)']`; if a derived subject is wrong for the expression, fix [regExp.subjects.ts](./regExp.utils/regExp.subjects.ts) and its test [regExp.subjects.test.ts](./regExp.utils/regExp.subjects.test.ts) instead of the task description
+7. `categories` cover the subjects – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: every subject has a category in `regExpSubjectDefinitions` in [regExp.model.ts](./regExp.model.ts); the `categories` of a task description list the categories of everything it teaches, so no category of one of its subjects may be missing
+   - `categories` is a required attribute of every task description; for each entry of `subjects` and of the optional `extraSubjects` (subjects a task description teaches that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) does not derive from the expression, e.g. the literal `x` or the anchors of `/^xyz$/`) the category of its definition must be contained in `categories`; the order is ignored and a category is listed once, e.g. `/^[xyz]+$/` has `['characterClass', 'quantifier']`
    - the test only reports missing categories, so adopt exactly the categories of the subjects and extra subjects and do not add others
    - run it with the same command as check 1
-   - on failure the test names the missing categories of a task; add them to `categories`, and when `subjects` or `extraSubjects` of a task change, update its `categories` as well
-8. `parentRegExps` are derived from the subjects – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: a task builds on the tasks that teach only a part of its subjects, so the learning order follows from the `subjects` of the tasks; the `parentRegExps` of a task are the expressions that [getParentExpressions](./regExp.utils/regExp.parentIds.ts) finds among all tasks, they are not authored freely
-   - `parentRegExps` is a required attribute of every task; it must contain the same expressions as `getParentExpressions(task, regExpTasks)` (order is ignored and expressions are compared by source and flags); a task without parents has `parentRegExps: []`
-   - consequences of the function's rules: a parent is a task whose `subjects` are a proper subset of the `subjects` of the task, tasks with identical `subjects` are not parents of each other, and only direct parents are listed, i.e. a parent is left out if another parent already contains its `subjects`; only `subjects` count, `extraSubjects` are ignored; the task with `subjects: []`, e.g. `/^xyz$/`, is the parent of every task that has no more specific parent
+   - on failure the test names the missing categories of a task description; add them to `categories`, and when `subjects` or `extraSubjects` of a task description change, update its `categories` as well
+8. `parentRegExps` are derived from the subjects – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: a task description builds on the task descriptions that teach only a part of its subjects, so the learning order follows from the `subjects` of the task descriptions; the `parentRegExps` of a task description are the expressions that [getParentExpressions](./regExp.utils/regExp.parentIds.ts) finds among all task descriptions, they are not authored freely
+   - `parentRegExps` is a required attribute of every task description; it must contain the same expressions as `getParentExpressions(task, regExpTasks)` (order is ignored and expressions are compared by source and flags); a task description without parents has `parentRegExps: []`
+   - consequences of the function's rules: a parent is a task description whose `subjects` are a proper subset of the `subjects` of the task description, task descriptions with identical `subjects` are not parents of each other, and only direct parents are listed, i.e. a parent is left out if another parent already contains its `subjects`; only `subjects` count, `extraSubjects` are ignored; the task description with `subjects: []`, e.g. `/^xyz$/`, is the parent of every task description that has no more specific parent
    - run it with the same command as check 1
-   - on failure the test shows the `parentRegExps` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^[xyz]+$/` has `[/^[xyz]$/, /^x+$/, /^[0-9]$/]`; when the `subjects` of a task change or a task is added or removed, update the `parentRegExps` of all tasks affected; if a derived parent is wrong, fix [regExp.parentIds.ts](./regExp.utils/regExp.parentIds.ts) and its test [regExp.parentIds.test.ts](./regExp.utils/regExp.parentIds.test.ts) instead of the task
-9. Expressions are unique – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
-   - principle: the `expression` identifies a task; `confusedWith`, `equalTo` and `parentRegExps` refer to other tasks by their expression, so no two tasks may share one
-   - no expression (same source and flags) is the `expression` of more than one task; this is checked first in the test file, before the checks of the single tasks
+   - on failure the test shows the `parentRegExps` of the task description and the derived ones; adopt the derived ones in the task description, e.g. `/^[xyz]+$/` has `[/^[xyz]$/, /^x+$/, /^[0-9]$/]`; when the `subjects` of a task description change or a task description is added or removed, update the `parentRegExps` of all task descriptions affected; if a derived parent is wrong, fix [regExp.parentIds.ts](./regExp.utils/regExp.parentIds.ts) and its test [regExp.parentIds.test.ts](./regExp.utils/regExp.parentIds.test.ts) instead of the task description
+9. Expressions are unique – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+   - principle: the `expression` identifies a task description; `confusedWith`, `equalTo` and `parentRegExps` refer to other task descriptions by their expression, so no two task descriptions may share one
+   - no expression (same source and flags) is the `expression` of more than one task description; this is checked first in the test file, before the checks of the single task descriptions
    - run it with the same command as check 1
-   - on failure the test lists all duplicated expressions at once; remove the duplicate task, or merge its examples and attributes into the other task if they differ, or change the expression if the tasks are meant to teach different things
+   - on failure the test lists all duplicated expressions at once; remove the duplicate task description, or merge its examples and attributes into the other task description if they differ, or change the expression if the task descriptions are meant to teach different things
 
-More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.tasks.ts](./regExp.tasks.ts) and gets an entry here with its test file, what it asserts and its run command.
+More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.taskDescriptions.ts](./regExp.taskDescriptions.ts) and gets an entry here with its test file, what it asserts and its run command.

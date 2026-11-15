@@ -1,6 +1,6 @@
 import { InitialRegExpTaskDescription } from './regExp.model';
 
-export const initialTasks: InitialRegExpTaskDescription[] = [
+export const initialTaskDescriptions: InitialRegExpTaskDescription[] = [
   {
     expression: /xyz/,
     subjects: ['anywhere'],
@@ -277,4 +277,4 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
 ];
 
-export const regExpTasks = initialTasks;
+export const regExpTasks = initialTaskDescriptions;

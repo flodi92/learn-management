@@ -94,5 +94,5 @@ Read the relevant file before working in the corresponding area.
 **RegExp tasks**
 
 - [src/example/example.tasks/regExp/regExp.md](../src/example/example.tasks/regExp/regExp.md) – **guidelines for authoring regExp tasks and examples; follow when adding or editing them.**
-- [src/example/example.tasks/regExp2/regExp.tasks/regExp.md](../src/example/example.tasks/regExp2/regExp.tasks/regExp.md) – **consistency checks for `regExp.tasks.ts`; follow when asked to check it for consistency.**
+- [src/example/example.tasks/regExp2/regExp.tasks/regExp.md](../src/example/example.tasks/regExp2/regExp.tasks/regExp.md) – **consistency checks for `regExp.taskDescriptions.ts`; follow when asked to check it for consistency.**
 - [src/example/example.tasks/regExp/regExp.taskPresenter/regExp.taskPresenter.md](../src/example/example.tasks/regExp/regExp.taskPresenter/regExp.taskPresenter.md) – `RegExpTaskPresenter`: console interaction for classifying examples.

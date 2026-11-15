@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { regExpSubjectDefinitions } from './regExp.model';
-import { regExpTasks } from './regExp.tasks';
+import { regExpTasks } from './regExp.taskDescriptions';
 import { getParentExpressions } from './regExp.utils/regExp.parentIds';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
@@ -67,7 +67,7 @@ describe('regExpTasks', () => {
 
   describe('check confusedWith attribute', () => {
     describe.each(regExpTasks)('$expression', (task) => {
-      it('only contains expressions of other tasks', () => {
+      it('only contains expressions of other task descriptions', () => {
         const otherExpressions = regExpTasks
           .filter((otherTask) => otherTask !== task)
           .map(({ expression }) => String(expression));
@@ -77,11 +77,11 @@ describe('regExpTasks', () => {
         );
         expect(
           unknownExpressions,
-          `${task.expression} is confused with expressions that do not exist as expression of another task`,
+          `${task.expression} is confused with expressions that do not exist as expression of another task description`,
         ).toEqual([]);
       });
 
-      it('is listed in confusedWith of every task it is confused with', () => {
+      it('is listed in confusedWith of every task description it is confused with', () => {
         const confusedExpressions = (task.confusedWith ?? []).map(String);
         const tasksNotConfusedBack = regExpTasks
           .filter(
@@ -101,7 +101,7 @@ describe('regExpTasks', () => {
         ).toEqual([]);
       });
 
-      it('has an example that distinguishes it from every task it is confused with', () => {
+      it('has an example that distinguishes it from every task description it is confused with', () => {
         const { positiveExamples = [], negativeExamples = [] } = task;
         const confusedExpressions = (task.confusedWith ?? []).map(String);
         const indistinguishableTasks = regExpTasks
@@ -137,7 +137,7 @@ describe('regExpTasks', () => {
     describe.each(regExpTasks.filter((regExpTasks) => regExpTasks.equalTo))(
       '$expression',
       (task) => {
-        it('has the same positive and negative examples as every task it is equal to', () => {
+        it('has the same positive and negative examples as every task description it is equal to', () => {
           const equalExpressions = (task.equalTo ?? []).map(String);
           const tasksWithOtherExamples = regExpTasks
             .filter(
@@ -198,7 +198,7 @@ describe('regExpTasks', () => {
       it('has the parents derived from its subjects', () => {
         expect(
           task.parentRegExps.map(String).sort(),
-          `${task.expression} should have exactly the parents found among the tasks`,
+          `${task.expression} should have exactly the parents found among the task descriptions`,
         ).toEqual(getParentExpressions(task, regExpTasks).map(String).sort());
       });
     });
