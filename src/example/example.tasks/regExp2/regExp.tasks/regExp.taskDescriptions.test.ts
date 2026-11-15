@@ -62,6 +62,13 @@ describe('regExpTasks', () => {
             `${expression} should have at least one negative example`,
           ).toBeGreaterThanOrEqual(1);
         });
+
+        it('has at least four examples in total', () => {
+          expect(
+            positiveExamples.length + negativeExamples.length,
+            `${expression} should have at least four positive and negative examples in total`,
+          ).toBeGreaterThanOrEqual(4);
+        });
       },
     );
   });
