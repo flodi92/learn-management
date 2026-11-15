@@ -37,5 +37,11 @@ Prompt example: `Check regExp.tasks.ts for consistency.`
    - tasks without `equalTo` are not checked
    - run it with the same command as check 1
    - on failure the test names the expressions whose examples differ; adopt the missing examples in the task that lacks them (check 1 ensures they are valid), e.g. `'x'` was added as a negative example of `/^(xy|z)$/`
+6. `subjects` are derived from the expression – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
+   - principle: the `subjects` of a task are not authored freely, they are exactly the subjects that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) finds in its `expression`; the function is the single definition of which subject an expression part belongs to
+   - the `subjects` of a task and the result of `getSubjectsFromExpression(expression)` must contain the same entries (order is ignored); `subjects` is a required attribute of every task, so a task without subjects in its expression has `subjects: []`
+   - consequences of the function's rules: a literal character like `x` is never a subject, `^` and `$` are only subjects if just one of them is used (an expression anchored on both ends has neither, e.g. `/^xyz$/` has `subjects: []`), `anywhere` is a subject if neither is used, and flags like `g` or `i` are subjects too
+   - run it with the same command as check 1
+   - on failure the test shows the `subjects` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^(x|y)$/` has `['x|y', '(x)']`; if a derived subject is wrong for the expression, fix [regExp.subjects.ts](./regExp.utils/regExp.subjects.ts) and its test [regExp.subjects.test.ts](./regExp.utils/regExp.subjects.test.ts) instead of the task
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.tasks.ts](./regExp.tasks.ts) and gets an entry here with its test file, what it asserts and its run command.

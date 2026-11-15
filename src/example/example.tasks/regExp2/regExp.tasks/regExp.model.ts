@@ -4,7 +4,8 @@ export interface InitialRegExpTaskDescription {
   negativeExamples?: string[];
   confusedWith?: RegExp[];
   equalTo?: RegExp[];
-  subjects?: RegExpSubject[];
+  subjects: RegExpSubject[];
+  extraSubjects?: RegExpSubject[];
   category?: RegExpCategory;
   relevance?: RegExpRelevance;
   complexity?: RegExpComplexity;

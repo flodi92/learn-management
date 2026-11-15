@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { regExpTasks } from './regExp.tasks';
+import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
 describe('regExpTasks', () => {
   describe('check examples', () => {
@@ -137,5 +138,16 @@ describe('regExpTasks', () => {
         });
       },
     );
+  });
+
+  describe('check subjects', () => {
+    describe.each(regExpTasks)('$expression', ({ expression, subjects }) => {
+      it('has the subjects contained in its expression', () => {
+        expect(
+          [...subjects].sort(),
+          `${expression} should have exactly the subjects found in the expression`,
+        ).toEqual(getSubjectsFromExpression(expression).sort());
+      });
+    });
   });
 });

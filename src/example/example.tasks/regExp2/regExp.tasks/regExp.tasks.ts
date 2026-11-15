@@ -2,11 +2,20 @@ import { InitialRegExpTaskDescription } from './regExp.model';
 
 export const initialTasks: InitialRegExpTaskDescription[] = [
   {
+    expression: /xyz/,
+    subjects: ['anywhere'],
+    extraSubjects: ['x'],
+    positiveExamples: ['xyz', 'xyzab', 'abxyz'],
+    negativeExamples: ['x', 'xy', 'XYZ'],
+    confusedWith: [/^xyz$/],
+  },
+  {
     expression: /^xyz$/,
-    subjects: ['^', '$', 'x'],
+    subjects: [],
+    extraSubjects: ['x', '^', '$'],
     positiveExamples: ['xyz'],
     negativeExamples: ['x', 'xy', 'xyzab', 'abxyz', 'XYZ'],
-    confusedWith: [/^x|y|z$/],
+    confusedWith: [/xyz/, /^x|y|z$/],
   },
   {
     expression: /^xyz/,
@@ -44,7 +53,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     confusedWith: [/^(x|y)$/],
   },
   {
-    subjects: ['x|y'],
+    subjects: ['x|y', '(x)'],
     expression: /^(x|y)$/,
     confusedWith: [/^x|y$/],
     positiveExamples: ['x', 'y'],
@@ -70,36 +79,43 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     expression: /^.$/,
+    subjects: ['.'],
     positiveExamples: ['x', '1', '\t', ' ', '$'],
     negativeExamples: ['\n', '\r'],
   },
   {
     expression: /^\s$/,
+    subjects: ['\\s'],
     positiveExamples: ['\t', ' '],
     negativeExamples: ['x', '1', '$'],
   },
   {
     expression: /^\S$/,
+    subjects: ['\\S'],
     positiveExamples: ['x', '1', '$'],
     negativeExamples: ['\t', ' '],
   },
   {
     expression: /^\w$/,
+    subjects: ['\\w'],
     positiveExamples: ['1', '7', 'a', 'x', '_'],
     negativeExamples: ['$', '\t', ' '],
   },
   {
     expression: /^\W$/,
+    subjects: ['\\W'],
     positiveExamples: ['$', '\t', ' '],
     negativeExamples: ['1', '7', 'a', 'x', '_'],
   },
   {
     expression: /^\d$/,
+    subjects: ['\\d'],
     positiveExamples: ['1', '7'],
     negativeExamples: ['x', '$', '\t', ' '],
   },
   {
     expression: /^\D$/,
+    subjects: ['\\D'],
     positiveExamples: ['x', '$', '\t', ' '],
     negativeExamples: ['1', '7'],
   },
@@ -119,14 +135,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     expression: /^[xyz]+a$/,
-    subjects: ['[xyz]', 'x+', 'x'],
+    subjects: ['[xyz]', 'x+'],
     positiveExamples: ['xa', 'xya', 'yxa'],
     negativeExamples: ['a', 'ab', 'x', 'xy'],
     confusedWith: [/^([xyz]a)+$/],
   },
   {
     expression: /^([xyz]a)+$/,
-    subjects: ['[xyz]', 'x', '(x)', 'x+'],
+    subjects: ['[xyz]', '(x)', 'x+'],
     positiveExamples: ['xa', 'xaya'],
     negativeExamples: ['x', 'a', 'xya', 'ax', 'axay', ''],
     confusedWith: [/^[xyz]+a$/],
@@ -140,14 +156,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     expression: /^xy|z$/,
-    subjects: ['x|y', 'x'],
+    subjects: ['x|y'],
     confusedWith: [/^(xy|z)$/, /^((xy)|z)$/],
     positiveExamples: ['xy', 'z', 'xyz', 'xz'],
     negativeExamples: ['x', 'zx', 'yx', ''],
   },
   {
     expression: /^((xy)|z)$/,
-    subjects: ['(x)', 'x|y', 'x'],
+    subjects: ['(x)', 'x|y'],
     confusedWith: [/^xy|z$/],
     equalTo: [/^(xy|z)$/],
     positiveExamples: ['xy', 'z'],
@@ -155,7 +171,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     expression: /^(xy|z)$/,
-    subjects: ['x|y', 'x'],
+    subjects: ['(x)', 'x|y'],
     confusedWith: [/^xy|z$/],
     equalTo: [/^((xy)|z)$/],
     positiveExamples: ['xy', 'z'],
@@ -163,21 +179,21 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     expression: /^x|y|z$/,
-    subjects: ['x', 'x|y'],
+    subjects: ['x|y'],
     confusedWith: [/^xyz$/],
     positiveExamples: ['x', 'y', 'z', 'xyz', 'zyx'],
     negativeExamples: [''],
   },
   {
     expression: /^((xy)|z)+$/,
-    subjects: ['x', 'x|y', '(x)', 'x+'],
+    subjects: ['x|y', '(x)', 'x+'],
     confusedWith: [/^((xy)+|z+)$/],
     positiveExamples: ['xy', 'z', 'xyz', 'xyxy', 'zxy', 'xyzxy'],
     negativeExamples: ['xz', 'xzy', 'yxz'],
   },
   {
     expression: /^((xy)+|z+)$/,
-    subjects: ['x', 'x|y', '(x)', 'x+'],
+    subjects: ['x|y', '(x)', 'x+'],
     confusedWith: [/^((xy)|z)+$/],
     positiveExamples: ['xy', 'z', 'xyxy', 'zz'],
     negativeExamples: ['xyz', 'xyzxy', 'xyzz', ''],
