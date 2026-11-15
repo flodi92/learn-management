@@ -135,6 +135,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     subjects: ['\\d'],
     categories: ['characterClass'],
     confusedWith: [/^\D$/, /^\w$/],
+    equalTo: [/^[0-9]$/],
     positiveExamples: ['1', '7'],
     negativeExamples: ['x', '$', '\t', ' '],
   },
@@ -147,6 +148,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     negativeExamples: ['1', '7'],
   },
 
+  {
+    expression: /^[0-9]$/,
+    subjects: ['[xyz]'],
+    categories: ['characterClass'],
+    equalTo: [/^\d$/],
+    positiveExamples: ['1', '7'],
+    negativeExamples: ['x', '$', '\t', ' '],
+  },
   {
     expression: /^[xyz][^xyz]$/,
     subjects: ['[xyz]', '[^xyz]'],
