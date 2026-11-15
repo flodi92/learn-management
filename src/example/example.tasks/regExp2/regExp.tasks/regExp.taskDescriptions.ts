@@ -1,4 +1,5 @@
 import { InitialRegExpTaskDescription } from './regExp.model';
+import { normalizeTaskDescription } from './regExp.utils/regExp.normalizeTaskDescription';
 
 export const initialTaskDescriptions: InitialRegExpTaskDescription[] = [
   {
@@ -337,4 +338,6 @@ export const initialTaskDescriptions: InitialRegExpTaskDescription[] = [
   },
 ];
 
-export const regExpTasks = initialTaskDescriptions;
+export const taskDescriptions = initialTaskDescriptions.map(
+  normalizeTaskDescription,
+);

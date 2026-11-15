@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { regExpSubjectDefinitions } from './regExp.model';
-import { regExpTasks } from './regExp.taskDescriptions';
+import { initialTaskDescriptions } from './regExp.taskDescriptions';
 import { getComplexityOfExpression } from './regExp.utils/regExp.complexity';
 import { getParentExpressions } from './regExp.utils/regExp.parentIds';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
-describe('regExpTasks', () => {
+describe('initialTaskDescriptions', () => {
   describe('check expressions', () => {
     it('has a unique expression for every task description', () => {
-      const expressions = regExpTasks.map(({ expression }) =>
+      const expressions = initialTaskDescriptions.map(({ expression }) =>
         String(expression),
       );
       const duplicateExpressions = [
@@ -26,7 +26,7 @@ describe('regExpTasks', () => {
   });
 
   describe('check examples', () => {
-    describe.each(regExpTasks)(
+    describe.each(initialTaskDescriptions)(
       '$expression',
       ({ expression, positiveExamples = [], negativeExamples = [] }) => {
         it('matches all positive examples', () => {
@@ -75,18 +75,20 @@ describe('regExpTasks', () => {
 
   describe('check confusedWith attribute', () => {
     it('is used by at least 75% of the task descriptions', () => {
-      const numberOfTaskDescriptionsWithConfusedWith = regExpTasks.filter(
-        ({ confusedWith = [] }) => confusedWith.length > 0,
-      ).length;
+      const numberOfTaskDescriptionsWithConfusedWith =
+        initialTaskDescriptions.filter(
+          ({ confusedWith = [] }) => confusedWith.length > 0,
+        ).length;
       expect(
-        numberOfTaskDescriptionsWithConfusedWith / regExpTasks.length,
-        `at least 75% of the task descriptions should use confusedWith, but only ${numberOfTaskDescriptionsWithConfusedWith} of ${regExpTasks.length} do`,
+        numberOfTaskDescriptionsWithConfusedWith /
+          initialTaskDescriptions.length,
+        `at least 75% of the task descriptions should use confusedWith, but only ${numberOfTaskDescriptionsWithConfusedWith} of ${initialTaskDescriptions.length} do`,
       ).toBeGreaterThanOrEqual(0.75);
     });
 
-    describe.each(regExpTasks)('$expression', (task) => {
+    describe.each(initialTaskDescriptions)('$expression', (task) => {
       it('only contains expressions of other task descriptions', () => {
-        const otherExpressions = regExpTasks
+        const otherExpressions = initialTaskDescriptions
           .filter((otherTask) => otherTask !== task)
           .map(({ expression }) => String(expression));
         const unknownExpressions = (task.confusedWith ?? []).filter(
@@ -101,7 +103,7 @@ describe('regExpTasks', () => {
 
       it('is listed in confusedWith of every task description it is confused with', () => {
         const confusedExpressions = (task.confusedWith ?? []).map(String);
-        const tasksNotConfusedBack = regExpTasks
+        const tasksNotConfusedBack = initialTaskDescriptions
           .filter(
             (otherTask) =>
               otherTask !== task &&
@@ -122,7 +124,7 @@ describe('regExpTasks', () => {
       it('has an example that distinguishes it from every task description it is confused with', () => {
         const { positiveExamples = [], negativeExamples = [] } = task;
         const confusedExpressions = (task.confusedWith ?? []).map(String);
-        const indistinguishableTasks = regExpTasks
+        const indistinguishableTasks = initialTaskDescriptions
           .filter(
             (otherTask) =>
               otherTask !== task &&
@@ -152,46 +154,50 @@ describe('regExpTasks', () => {
     const getExamplesKey = (examples: string[] = []) =>
       JSON.stringify([...new Set(examples)].sort());
 
-    describe.each(regExpTasks.filter((regExpTasks) => regExpTasks.equalTo))(
+    describe.each(
+      initialTaskDescriptions.filter(
+        (initialTaskDescriptions) => initialTaskDescriptions.equalTo,
+      ),
+    )('$expression', (task) => {
+      it('has the same positive and negative examples as every task description it is equal to', () => {
+        const equalExpressions = (task.equalTo ?? []).map(String);
+        const tasksWithOtherExamples = initialTaskDescriptions
+          .filter(
+            (otherTask) =>
+              otherTask !== task &&
+              equalExpressions.includes(String(otherTask.expression)),
+          )
+          .filter(
+            (otherTask) =>
+              getExamplesKey(otherTask.positiveExamples) !==
+                getExamplesKey(task.positiveExamples) ||
+              getExamplesKey(otherTask.negativeExamples) !==
+                getExamplesKey(task.negativeExamples),
+          );
+        expect(
+          tasksWithOtherExamples.map(({ expression }) => expression),
+          `${task.expression} is equal to these expressions, but their positive or negative examples differ`,
+        ).toEqual([]);
+      });
+    });
+  });
+
+  describe('check subjects', () => {
+    describe.each(initialTaskDescriptions)(
       '$expression',
-      (task) => {
-        it('has the same positive and negative examples as every task description it is equal to', () => {
-          const equalExpressions = (task.equalTo ?? []).map(String);
-          const tasksWithOtherExamples = regExpTasks
-            .filter(
-              (otherTask) =>
-                otherTask !== task &&
-                equalExpressions.includes(String(otherTask.expression)),
-            )
-            .filter(
-              (otherTask) =>
-                getExamplesKey(otherTask.positiveExamples) !==
-                  getExamplesKey(task.positiveExamples) ||
-                getExamplesKey(otherTask.negativeExamples) !==
-                  getExamplesKey(task.negativeExamples),
-            );
+      ({ expression, subjects }) => {
+        it('has the subjects contained in its expression', () => {
           expect(
-            tasksWithOtherExamples.map(({ expression }) => expression),
-            `${task.expression} is equal to these expressions, but their positive or negative examples differ`,
-          ).toEqual([]);
+            [...subjects].sort(),
+            `${expression} should have exactly the subjects found in the expression`,
+          ).toEqual(getSubjectsFromExpression(expression).sort());
         });
       },
     );
   });
 
-  describe('check subjects', () => {
-    describe.each(regExpTasks)('$expression', ({ expression, subjects }) => {
-      it('has the subjects contained in its expression', () => {
-        expect(
-          [...subjects].sort(),
-          `${expression} should have exactly the subjects found in the expression`,
-        ).toEqual(getSubjectsFromExpression(expression).sort());
-      });
-    });
-  });
-
   describe('check categories', () => {
-    describe.each(regExpTasks)(
+    describe.each(initialTaskDescriptions)(
       '$expression',
       ({ expression, subjects, extraSubjects = [], categories }) => {
         it('has the categories of all its subjects', () => {
@@ -212,7 +218,7 @@ describe('regExpTasks', () => {
   });
 
   describe('check relevance', () => {
-    describe.each(regExpTasks)(
+    describe.each(initialTaskDescriptions)(
       '$expression',
       ({ expression, subjects, extraSubjects = [], relevance }) => {
         it('has the maximum relevance of its subjects', () => {
@@ -232,23 +238,30 @@ describe('regExpTasks', () => {
   });
 
   describe('check complexity', () => {
-    describe.each(regExpTasks)('$expression', ({ expression, complexity }) => {
-      it('has the complexity of its expression', () => {
-        expect(
-          complexity,
-          `${expression} should have the complexity of its expression`,
-        ).toBe(getComplexityOfExpression(expression));
-      });
-    });
+    describe.each(initialTaskDescriptions)(
+      '$expression',
+      ({ expression, complexity }) => {
+        it('has the complexity of its expression', () => {
+          expect(
+            complexity,
+            `${expression} should have the complexity of its expression`,
+          ).toBe(getComplexityOfExpression(expression));
+        });
+      },
+    );
   });
 
   describe('check parents', () => {
-    describe.each(regExpTasks)('$expression', (task) => {
+    describe.each(initialTaskDescriptions)('$expression', (task) => {
       it('has the parents derived from its subjects', () => {
         expect(
           task.parents.map(String).sort(),
           `${task.expression} should have exactly the parents found among the task descriptions`,
-        ).toEqual(getParentExpressions(task, regExpTasks).map(String).sort());
+        ).toEqual(
+          getParentExpressions(task, initialTaskDescriptions)
+            .map(String)
+            .sort(),
+        );
       });
     });
   });
