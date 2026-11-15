@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { regExpSubjectDefinitions } from './regExp.model';
 import { regExpTasks } from './regExp.tasks';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
@@ -149,5 +150,26 @@ describe('regExpTasks', () => {
         ).toEqual(getSubjectsFromExpression(expression).sort());
       });
     });
+  });
+
+  describe('check categories', () => {
+    describe.each(regExpTasks)(
+      '$expression',
+      ({ expression, subjects, extraSubjects = [], categories }) => {
+        it('has the categories of all its subjects', () => {
+          const missingCategories = [
+            ...new Set(
+              [...subjects, ...extraSubjects].map(
+                (subject) => regExpSubjectDefinitions[subject].category,
+              ),
+            ),
+          ].filter((category) => !categories.includes(category));
+          expect(
+            missingCategories,
+            `${expression} should have the categories of all its subjects and extra subjects`,
+          ).toEqual([]);
+        });
+      },
+    );
   });
 });

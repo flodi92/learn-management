@@ -43,5 +43,11 @@ Prompt example: `Check regExp.tasks.ts for consistency.`
    - consequences of the function's rules: a literal character like `x` is never a subject, `^` and `$` are only subjects if just one of them is used (an expression anchored on both ends has neither, e.g. `/^xyz$/` has `subjects: []`), `anywhere` is a subject if neither is used, and flags like `g` or `i` are subjects too
    - run it with the same command as check 1
    - on failure the test shows the `subjects` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^(x|y)$/` has `['x|y', '(x)']`; if a derived subject is wrong for the expression, fix [regExp.subjects.ts](./regExp.utils/regExp.subjects.ts) and its test [regExp.subjects.test.ts](./regExp.utils/regExp.subjects.test.ts) instead of the task
+7. `categories` cover the subjects – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
+   - principle: every subject has a category in `regExpSubjectDefinitions` in [regExp.model.ts](./regExp.model.ts); the `categories` of a task list the categories of everything it teaches, so no category of one of its subjects may be missing
+   - `categories` is a required attribute of every task; for each entry of `subjects` and of the optional `extraSubjects` (subjects a task teaches that [getSubjectsFromExpression](./regExp.utils/regExp.subjects.ts) does not derive from the expression, e.g. the literal `x` or the anchors of `/^xyz$/`) the category of its definition must be contained in `categories`; the order is ignored and a category is listed once, e.g. `/^[xyz]+$/` has `['characterClass', 'quantifier']`
+   - the test only reports missing categories, so adopt exactly the categories of the subjects and extra subjects and do not add others
+   - run it with the same command as check 1
+   - on failure the test names the missing categories of a task; add them to `categories`, and when `subjects` or `extraSubjects` of a task change, update its `categories` as well
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.tasks.ts](./regExp.tasks.ts) and gets an entry here with its test file, what it asserts and its run command.

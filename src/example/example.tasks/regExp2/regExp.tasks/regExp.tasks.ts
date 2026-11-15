@@ -5,6 +5,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     expression: /xyz/,
     subjects: ['anywhere'],
     extraSubjects: ['x'],
+    categories: ['assertion', 'characterClass'],
     positiveExamples: ['xyz', 'xyzab', 'abxyz'],
     negativeExamples: ['x', 'xy', 'XYZ'],
     confusedWith: [/^xyz$/],
@@ -13,6 +14,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     expression: /^xyz$/,
     subjects: [],
     extraSubjects: ['x', '^', '$'],
+    categories: ['characterClass', 'assertion'],
     positiveExamples: ['xyz'],
     negativeExamples: ['x', 'xy', 'xyzab', 'abxyz', 'XYZ'],
     confusedWith: [/xyz/, /^x|y|z$/],
@@ -20,6 +22,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^xyz/,
     subjects: ['^'],
+    categories: ['assertion'],
     positiveExamples: ['xyz', 'xyzab'],
     negativeExamples: ['abxyz', 'xy'],
     confusedWith: [/xyz$/, /^[^xyz]$/],
@@ -27,12 +30,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /xyz$/,
     subjects: ['$'],
+    categories: ['assertion'],
     positiveExamples: ['xyz', 'abxyz'],
     negativeExamples: ['xyzab', 'xy'],
     confusedWith: [/^xyz/],
   },
   {
     subjects: ['[xyz]'],
+    categories: ['characterClass'],
     expression: /^[xyz]$/,
     positiveExamples: ['x', 'z'],
     negativeExamples: ['a', 'b', 'xy', ''],
@@ -40,6 +45,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['[^xyz]'],
+    categories: ['characterClass'],
     expression: /^[^xyz]$/,
     positiveExamples: ['a', 'b'],
     negativeExamples: ['x', 'z', 'ab', 'xyz', ''],
@@ -47,6 +53,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['x|y'],
+    categories: ['groupsAndBackreferences'],
     expression: /^x|y$/,
     positiveExamples: ['x', 'y', 'xy'],
     negativeExamples: ['z', 'yx'],
@@ -54,6 +61,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['x|y', '(x)'],
+    categories: ['groupsAndBackreferences'],
     expression: /^(x|y)$/,
     confusedWith: [/^x|y$/],
     positiveExamples: ['x', 'y'],
@@ -61,6 +69,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['x*'],
+    categories: ['quantifier'],
     expression: /^x*$/,
     confusedWith: [/^x+$/],
     positiveExamples: ['', 'x', 'xx', 'xxxxxx'],
@@ -68,6 +77,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['x+'],
+    categories: ['quantifier'],
     expression: /^x+$/,
     confusedWith: [/^x*$/],
     positiveExamples: ['x', 'xx', 'xxxxxx'],
@@ -75,6 +85,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   },
   {
     subjects: ['x?'],
+    categories: ['quantifier'],
     expression: /^x?$/,
     positiveExamples: ['x', ''],
     negativeExamples: ['xx', 'xxxxxx', 'y', 'x?', 'x+', 'x*'],
@@ -82,6 +93,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^.$/,
     subjects: ['.'],
+    categories: ['characterClass'],
     confusedWith: [/^\w$/],
     positiveExamples: ['x', '1', '\t', ' ', '$'],
     negativeExamples: ['\n', '\r'],
@@ -89,6 +101,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\s$/,
     subjects: ['\\s'],
+    categories: ['characterClass'],
     confusedWith: [/^\S$/],
     positiveExamples: ['\t', ' '],
     negativeExamples: ['x', '1', '$'],
@@ -96,6 +109,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\S$/,
     subjects: ['\\S'],
+    categories: ['characterClass'],
     confusedWith: [/^\s$/],
     positiveExamples: ['x', '1', '$'],
     negativeExamples: ['\t', ' '],
@@ -103,6 +117,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\w$/,
     subjects: ['\\w'],
+    categories: ['characterClass'],
     confusedWith: [/^\W$/, /^\d$/, /^.$/],
     positiveExamples: ['1', '7', 'a', 'x', '_'],
     negativeExamples: ['$', '\t', ' '],
@@ -110,6 +125,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\W$/,
     subjects: ['\\W'],
+    categories: ['characterClass'],
     confusedWith: [/^\w$/],
     positiveExamples: ['$', '\t', ' '],
     negativeExamples: ['1', '7', 'a', 'x', '_'],
@@ -117,6 +133,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\d$/,
     subjects: ['\\d'],
+    categories: ['characterClass'],
     confusedWith: [/^\D$/, /^\w$/],
     positiveExamples: ['1', '7'],
     negativeExamples: ['x', '$', '\t', ' '],
@@ -124,6 +141,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^\D$/,
     subjects: ['\\D'],
+    categories: ['characterClass'],
     confusedWith: [/^\d$/],
     positiveExamples: ['x', '$', '\t', ' '],
     negativeExamples: ['1', '7'],
@@ -132,12 +150,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^[xyz][^xyz]$/,
     subjects: ['[xyz]', '[^xyz]'],
+    categories: ['characterClass'],
     positiveExamples: ['xa', 'yb'],
     negativeExamples: ['ax', 'xy', 'ab', 'by', 'yz', 'bc', 'x', '', 'xab'],
   },
   {
     expression: /^[xyz]+$/,
     subjects: ['[xyz]', 'x+'],
+    categories: ['characterClass', 'quantifier'],
     confusedWith: [/^(xyz)+$/],
     positiveExamples: ['x', 'xy', 'yx'],
     negativeExamples: ['a', 'xa'],
@@ -145,6 +165,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^[xyz]+a$/,
     subjects: ['[xyz]', 'x+'],
+    categories: ['characterClass', 'quantifier'],
     positiveExamples: ['xa', 'xya', 'yxa'],
     negativeExamples: ['a', 'ab', 'x', 'xy'],
     confusedWith: [/^([xyz]a)+$/],
@@ -152,6 +173,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^([xyz]a)+$/,
     subjects: ['[xyz]', '(x)', 'x+'],
+    categories: ['characterClass', 'groupsAndBackreferences', 'quantifier'],
     positiveExamples: ['xa', 'xaya'],
     negativeExamples: ['x', 'a', 'xya', 'ax', 'axay', ''],
     confusedWith: [/^[xyz]+a$/],
@@ -160,12 +182,14 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
     expression: /^(xyz)+$/,
     confusedWith: [/^[xyz]+$/],
     subjects: ['(x)', 'x+'],
+    categories: ['groupsAndBackreferences', 'quantifier'],
     positiveExamples: ['xyz', 'xyzxyz'],
     negativeExamples: ['x', 'xy', 'xyzx'],
   },
   {
     expression: /^xy|z$/,
     subjects: ['x|y'],
+    categories: ['groupsAndBackreferences'],
     confusedWith: [/^(xy|z)$/, /^((xy)|z)$/],
     positiveExamples: ['xy', 'z', 'xyz', 'xz'],
     negativeExamples: ['x', 'zx', 'yx', ''],
@@ -173,6 +197,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^((xy)|z)$/,
     subjects: ['(x)', 'x|y'],
+    categories: ['groupsAndBackreferences'],
     confusedWith: [/^xy|z$/],
     equalTo: [/^(xy|z)$/],
     positiveExamples: ['xy', 'z'],
@@ -181,6 +206,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^(xy|z)$/,
     subjects: ['(x)', 'x|y'],
+    categories: ['groupsAndBackreferences'],
     confusedWith: [/^xy|z$/],
     equalTo: [/^((xy)|z)$/],
     positiveExamples: ['xy', 'z'],
@@ -189,6 +215,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^x|y|z$/,
     subjects: ['x|y'],
+    categories: ['groupsAndBackreferences'],
     confusedWith: [/^xyz$/],
     positiveExamples: ['x', 'y', 'z', 'xyz', 'zyx'],
     negativeExamples: [''],
@@ -196,6 +223,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^((xy)|z)+$/,
     subjects: ['x|y', '(x)', 'x+'],
+    categories: ['groupsAndBackreferences', 'quantifier'],
     confusedWith: [/^((xy)+|z+)$/],
     positiveExamples: ['xy', 'z', 'xyz', 'xyxy', 'zxy', 'xyzxy'],
     negativeExamples: ['xz', 'xzy', 'yxz'],
@@ -203,6 +231,7 @@ export const initialTasks: InitialRegExpTaskDescription[] = [
   {
     expression: /^((xy)+|z+)$/,
     subjects: ['x|y', '(x)', 'x+'],
+    categories: ['groupsAndBackreferences', 'quantifier'],
     confusedWith: [/^((xy)|z)+$/],
     positiveExamples: ['xy', 'z', 'xyxy', 'zz'],
     negativeExamples: ['xyz', 'xyzxy', 'xyzz', ''],
