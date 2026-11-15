@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { regExpSubjectDefinitions } from './regExp.model';
 import { regExpTasks } from './regExp.tasks';
+import { getParentExpressions } from './regExp.utils/regExp.parentIds';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
 describe('regExpTasks', () => {
@@ -171,5 +172,16 @@ describe('regExpTasks', () => {
         });
       },
     );
+  });
+
+  describe('check parentRegExps', () => {
+    describe.each(regExpTasks)('$expression', (task) => {
+      it('has the parents derived from its subjects', () => {
+        expect(
+          task.parentRegExps.map(String).sort(),
+          `${task.expression} should have exactly the parents found among the tasks`,
+        ).toEqual(getParentExpressions(task, regExpTasks).map(String).sort());
+      });
+    });
   });
 });

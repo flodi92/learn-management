@@ -9,7 +9,7 @@ export interface InitialRegExpTaskDescription {
   categories: RegExpCategory[];
   relevance?: RegExpRelevance;
   complexity?: RegExpComplexity;
-  parentRegExps?: RegExp[];
+  parentRegExps: RegExp[];
 }
 
 export interface TaskDescription {

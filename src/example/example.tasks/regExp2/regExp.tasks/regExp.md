@@ -49,5 +49,11 @@ Prompt example: `Check regExp.tasks.ts for consistency.`
    - the test only reports missing categories, so adopt exactly the categories of the subjects and extra subjects and do not add others
    - run it with the same command as check 1
    - on failure the test names the missing categories of a task; add them to `categories`, and when `subjects` or `extraSubjects` of a task change, update its `categories` as well
+8. `parentRegExps` are derived from the subjects – [regExp.tasks.test.ts](./regExp.tasks.test.ts)
+   - principle: a task builds on the tasks that teach only a part of its subjects, so the learning order follows from the `subjects` of the tasks; the `parentRegExps` of a task are the expressions that [getParentExpressions](./regExp.utils/regExp.parentIds.ts) finds among all tasks, they are not authored freely
+   - `parentRegExps` is a required attribute of every task; it must contain the same expressions as `getParentExpressions(task, regExpTasks)` (order is ignored and expressions are compared by source and flags); a task without parents has `parentRegExps: []`
+   - consequences of the function's rules: a parent is a task whose `subjects` are a proper subset of the `subjects` of the task, tasks with identical `subjects` are not parents of each other, and only direct parents are listed, i.e. a parent is left out if another parent already contains its `subjects`; only `subjects` count, `extraSubjects` are ignored; the task with `subjects: []`, e.g. `/^xyz$/`, is the parent of every task that has no more specific parent
+   - run it with the same command as check 1
+   - on failure the test shows the `parentRegExps` of the task and the derived ones; adopt the derived ones in the task, e.g. `/^[xyz]+$/` has `[/^[xyz]$/, /^x+$/, /^[0-9]$/]`; when the `subjects` of a task change or a task is added or removed, update the `parentRegExps` of all tasks affected; if a derived parent is wrong, fix [regExp.parentIds.ts](./regExp.utils/regExp.parentIds.ts) and its test [regExp.parentIds.test.ts](./regExp.utils/regExp.parentIds.test.ts) instead of the task
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.tasks.ts](./regExp.tasks.ts) and gets an entry here with its test file, what it asserts and its run command.
