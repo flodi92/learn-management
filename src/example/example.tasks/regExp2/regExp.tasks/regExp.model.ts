@@ -7,7 +7,7 @@ export interface InitialRegExpTaskDescription {
   subjects: RegExpSubject[];
   extraSubjects?: RegExpSubject[];
   categories: RegExpCategory[];
-  relevance?: RegExpRelevance;
+  relevance: RegExpRelevance;
   complexity?: RegExpComplexity;
   parentRegExps: RegExp[];
 }

@@ -193,6 +193,26 @@ describe('regExpTasks', () => {
     );
   });
 
+  describe('check relevance', () => {
+    describe.each(regExpTasks)(
+      '$expression',
+      ({ expression, subjects, extraSubjects = [], relevance }) => {
+        it('has the maximum relevance of its subjects', () => {
+          expect(
+            relevance,
+            `${expression} should have the maximum relevance of its subjects and extra subjects`,
+          ).toBe(
+            Math.max(
+              ...[...subjects, ...extraSubjects].map(
+                (subject) => regExpSubjectDefinitions[subject].relevance,
+              ),
+            ),
+          );
+        });
+      },
+    );
+  });
+
   describe('check parentRegExps', () => {
     describe.each(regExpTasks)('$expression', (task) => {
       it('has the parents derived from its subjects', () => {

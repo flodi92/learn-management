@@ -60,5 +60,10 @@ Prompt example: `Check regExp.taskDescriptions.ts for consistency.`
    - no expression (same source and flags) is the `expression` of more than one task description; this is checked first in the test file, before the checks of the single task descriptions
    - run it with the same command as check 1
    - on failure the test lists all duplicated expressions at once; remove the duplicate task description, or merge its examples and attributes into the other task description if they differ, or change the expression if the task descriptions are meant to teach different things
+10. `relevance` is the maximum of the subjects – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
+    - principle: every subject has a `relevance` in `regExpSubjectDefinitions` in [regExp.model.ts](./regExp.model.ts) (`1`, `2` or `3`); a task description teaches several subjects, and its `relevance` is the maximum of the relevances of all of them, so it is never lower than the relevance of one of its subjects
+    - `relevance` is a required attribute of every task description; it must equal the maximum of the `relevance` of the definitions of all entries of `subjects` and of the optional `extraSubjects`, e.g. `/^[xyz][^xyz]$/` has `2` because `[^xyz]` has `2` while `[xyz]` has `1`; the maximum is the numerically highest value
+    - run it with the same command as check 1
+    - on failure the test names the task description with its `relevance` and the expected one; adopt the maximum, and when `subjects` or `extraSubjects` of a task description change or the `relevance` of a subject definition is changed, update the `relevance` of all task descriptions affected
 
 More checks will be added to this list in the future. Every new check is a vitest test next to [regExp.taskDescriptions.ts](./regExp.taskDescriptions.ts) and gets an entry here with its test file, what it asserts and its run command.
