@@ -10,7 +10,7 @@ const task = (expression: RegExp, subjects: RegExpSubject[]) => ({
   categories: [],
   relevance: 1 as const,
   complexity: 1 as const,
-  parentRegExps: [],
+  parents: [],
 });
 
 describe('getParentExpressions', () => {

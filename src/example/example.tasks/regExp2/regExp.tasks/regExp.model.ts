@@ -2,7 +2,7 @@ export interface InitialRegExpTaskDescription {
   expression: RegExp;
   positiveExamples: string[];
   negativeExamples: string[];
-  parentRegExps: RegExp[];
+  parents: RegExp[];
   confusedWith?: RegExp[];
   equalTo?: RegExp[];
   subjects: RegExpSubject[];
@@ -14,10 +14,21 @@ export interface InitialRegExpTaskDescription {
 
 export interface TaskDescription {
   /* @todo move to general file */
+  id: string;
+  parents: string[];
+  confusedWith: string[];
+  equalTo: string[];
+  subjects: string[];
+  categories: string[];
+  relevance: number;
+  complexity: number;
 }
 
-export interface RegExpTaskDescription
-  extends TaskDescription, InitialRegExpTaskDescription {}
+export interface RegExpTaskDescription extends TaskDescription {
+  expression: InitialRegExpTaskDescription['expression'];
+  positiveExamples: InitialRegExpTaskDescription['positiveExamples'];
+  negativeExamples: InitialRegExpTaskDescription['negativeExamples'];
+}
 
 export const regExpCategories = [
   'characterClass',

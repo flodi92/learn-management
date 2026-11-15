@@ -242,11 +242,11 @@ describe('regExpTasks', () => {
     });
   });
 
-  describe('check parentRegExps', () => {
+  describe('check parents', () => {
     describe.each(regExpTasks)('$expression', (task) => {
       it('has the parents derived from its subjects', () => {
         expect(
-          task.parentRegExps.map(String).sort(),
+          task.parents.map(String).sort(),
           `${task.expression} should have exactly the parents found among the task descriptions`,
         ).toEqual(getParentExpressions(task, regExpTasks).map(String).sort());
       });
