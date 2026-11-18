@@ -24,10 +24,61 @@ export interface TaskDescription {
   complexity: number;
 }
 
+export const regExpSubstitutions = {
+  type: 'substitution',
+  mappings: [
+    {
+      a: 'a',
+      b: 'b',
+      x: 'x',
+      y: 'y',
+      z: 'z',
+    },
+    {
+      a: 'x',
+      b: 'y',
+      x: 'a',
+      y: 'b',
+      z: 'c',
+    },
+    {
+      a: 'd',
+      b: 'e',
+      x: 'j',
+      y: 'k',
+      z: 'l',
+    },
+  ],
+} as const;
+
+type RegExpSubstitutions = typeof regExpSubstitutions;
+
+type RegExpVariants = RegExpSubstitutions; // | something else
+
 export interface RegExpTaskDescription extends TaskDescription {
   expression: InitialRegExpTaskDescription['expression'];
   positiveExamples: InitialRegExpTaskDescription['positiveExamples'];
   negativeExamples: InitialRegExpTaskDescription['negativeExamples'];
+  variants: RegExpVariants[];
+}
+
+export interface Task {
+  /* @todo move to general file */
+  taskDescriptionId: string;
+}
+
+interface RegExpSubstitution {
+  type: 'substitution';
+  mapping: Record<string, string>;
+}
+
+type RegExpVariant = RegExpSubstitution; // something else
+
+export interface RegExpTask extends Task {
+  expression: RegExp;
+  positiveExamples: string[];
+  negativeExamples: string[];
+  variant: RegExpVariant;
 }
 
 export const regExpCategories = [

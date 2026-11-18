@@ -1,5 +1,6 @@
 import {
   InitialRegExpTaskDescription,
+  regExpSubstitutions,
   RegExpTaskDescription,
 } from '../regExp.model';
 
@@ -17,4 +18,5 @@ export const normalizeTaskDescription = (
   categories: input.categories,
   relevance: input.relevance,
   complexity: input.complexity,
+  variants: [regExpSubstitutions],
 });
