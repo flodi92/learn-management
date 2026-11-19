@@ -1,3 +1,5 @@
+import { Task, TaskDescription } from '../../../../model';
+
 export interface InitialRegExpTaskDescription {
   expression: RegExp;
   positiveExamples: string[];
@@ -10,18 +12,6 @@ export interface InitialRegExpTaskDescription {
   categories: RegExpCategory[];
   relevance: RegExpRelevance;
   complexity: RegExpComplexity;
-}
-
-export interface TaskDescription {
-  /* @todo move to general file */
-  id: string;
-  parents: string[];
-  confusedWith: string[];
-  equalTo: string[];
-  subjects: string[];
-  categories: string[];
-  relevance: number;
-  complexity: number;
 }
 
 export const regExpSubstitutions = {
@@ -55,16 +45,11 @@ type RegExpSubstitutions = typeof regExpSubstitutions;
 
 type RegExpVariants = RegExpSubstitutions; // | something else
 
-export interface RegExpTaskDescription extends TaskDescription {
+export interface RegExpTaskDescription extends Required<TaskDescription> {
   expression: InitialRegExpTaskDescription['expression'];
   positiveExamples: InitialRegExpTaskDescription['positiveExamples'];
   negativeExamples: InitialRegExpTaskDescription['negativeExamples'];
   variants: RegExpVariants[];
-}
-
-export interface Task {
-  /* @todo move to general file */
-  taskDescriptionId: string;
 }
 
 interface RegExpSubstitution {

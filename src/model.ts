@@ -1,10 +1,17 @@
+export interface Task {
+  taskDescriptionId: string;
+}
+
 export interface TaskDescription {
   id: string;
   parents?: string[];
+  confusedWith?: string[];
+  equalTo?: string[];
+  subjects?: string[];
   categories?: string[];
   relevance?: number;
+  complexity?: number;
 }
-
 export interface TaskDescriptionStatisticsItem {
   mastery: number;
   lastRepetition?: number;
