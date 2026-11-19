@@ -6,7 +6,7 @@ import {
 } from '../overview.model';
 import { displaySelectableComputedStatistics } from './overview.displaySelectableComputedStatistics';
 
-const subjectStatistics: OverviewAggregatedStatisticsItem = {
+const taskDescriptionStatistics: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 1,
   selected: 0,
   selectionState: 'implicitNoSelection',
@@ -18,35 +18,40 @@ const subjectStatistics: OverviewAggregatedStatisticsItem = {
 
 const statistics: OverviewRecursiveStatistics = {
   groupType: 'category',
-  statistics: subjectStatistics,
+  statistics: taskDescriptionStatistics,
   children: {
-    Fractions: { groupType: 'subject', statistics: subjectStatistics },
+    Fractions: {
+      groupType: 'taskDescription',
+      statistics: taskDescriptionStatistics,
+    },
   },
   getChildrenIds: () => ['Fractions'],
 };
 
-const subjectPath: OverviewSelectionPath = [['subject', 'Fractions']];
+const taskDescriptionPath: OverviewSelectionPath = [
+  ['taskDescription', 'Fractions'],
+];
 
 const selectAfterToggles = (
   toggles: number,
-  preselectedSubjectIds: string[] = [],
+  preselectedTaskDescriptionIds: string[] = [],
 ) =>
   displaySelectableComputedStatistics(
     async (_statistics, toggleSelection) => {
       Array.from({ length: toggles }).forEach(() =>
-        toggleSelection(subjectPath),
+        toggleSelection(taskDescriptionPath),
       );
     },
     () => statistics,
-    preselectedSubjectIds,
+    preselectedTaskDescriptionIds,
   );
 
-describe('OverviewDisplaySelectableComputedStatistics subject toggling', () => {
-  it('selects an unselected subject on the first toggle', async () => {
+describe('OverviewDisplaySelectableComputedStatistics taskDescription toggling', () => {
+  it('selects an unselected taskDescription on the first toggle', async () => {
     expect(await selectAfterToggles(1)).toEqual(['Fractions']);
   });
 
-  it('deselects a subject on the second toggle', async () => {
+  it('deselects a taskDescription on the second toggle', async () => {
     expect(await selectAfterToggles(2)).toEqual([]);
   });
 
@@ -54,7 +59,7 @@ describe('OverviewDisplaySelectableComputedStatistics subject toggling', () => {
     expect(await selectAfterToggles(3)).toEqual(['Fractions']);
   });
 
-  it('deselects a preselected subject on the first toggle', async () => {
+  it('deselects a preselected taskDescription on the first toggle', async () => {
     expect(await selectAfterToggles(1, ['Fractions'])).toEqual([]);
   });
 });

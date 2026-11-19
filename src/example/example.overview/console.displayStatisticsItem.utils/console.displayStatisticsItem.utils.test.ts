@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import {
   OverviewAggregatedStatisticsItem,
   OverviewRecursiveStatistics,
-  OverviewSubjectStatisticsItem,
+  OverviewTaskDescriptionStatisticsItem,
   SelectionState,
 } from '../../../overview/overview.model';
 import {
@@ -15,7 +15,7 @@ import {
 import {
   camelCaseToWords,
   formatStatistics,
-  isOverviewSubjectStatisticsItem,
+  isOverviewTaskDescriptionStatisticsItem,
 } from './console.formatStatistics';
 import { getStatisticsColor } from './console.getStatisticsColor';
 import { sortChildren } from './console.sortChildren';
@@ -34,7 +34,7 @@ const aggregated: OverviewAggregatedStatisticsItem = {
   forRepeat: 4,
 };
 
-const subject: OverviewSubjectStatisticsItem = {
+const taskDescription: OverviewTaskDescriptionStatisticsItem = {
   id: 'Fractions',
   label: 'Fractions',
   mastery: 0.95,
@@ -55,10 +55,10 @@ describe('camelCaseToWords', () => {
   });
 });
 
-describe('isOverviewSubjectStatisticsItem', () => {
-  it('distinguishes subject from aggregated statistics', () => {
-    expect(isOverviewSubjectStatisticsItem(subject)).toBe(true);
-    expect(isOverviewSubjectStatisticsItem(aggregated)).toBe(false);
+describe('isOverviewTaskDescriptionStatisticsItem', () => {
+  it('distinguishes taskDescription from aggregated statistics', () => {
+    expect(isOverviewTaskDescriptionStatisticsItem(taskDescription)).toBe(true);
+    expect(isOverviewTaskDescriptionStatisticsItem(aggregated)).toBe(false);
   });
 });
 
@@ -123,19 +123,19 @@ describe('formatStatistics', () => {
     );
   });
 
-  it('shows only the colored mastery of a subject when not focused', () => {
-    expect(formatStatistics(subject, false)).toBe(forRepeat('95%'));
+  it('shows only the colored mastery of a taskDescription when not focused', () => {
+    expect(formatStatistics(taskDescription, false)).toBe(forRepeat('95%'));
   });
 
-  it('shows learning state, mastery and repetitions of a subject when focused', () => {
-    expect(formatStatistics(subject, true)).toBe(
+  it('shows learning state, mastery and repetitions of a taskDescription when focused', () => {
+    expect(formatStatistics(taskDescription, true)).toBe(
       `${forRepeat('for repeat (95%)')} 5x 2 days before, last mastery: 0.5, last correctness: undefined`,
     );
   });
 
-  it('does not show an infinite number of days of a subject', () => {
+  it('does not show an infinite number of days of a taskDescription', () => {
     const neverRepeated = {
-      ...subject,
+      ...taskDescription,
       lastRepetitionBeforeDays: Infinity,
       numberOfRepetitions: 0,
     };
@@ -145,8 +145,8 @@ describe('formatStatistics', () => {
 });
 
 describe('getStatisticsColor', () => {
-  it('uses the color of the learning state for a subject', () => {
-    expect(getStatisticsColor(subject)('x')).toBe(
+  it('uses the color of the learning state for a taskDescription', () => {
+    expect(getStatisticsColor(taskDescription)('x')).toBe(
       learningStateColors.forRepeat('x'),
     );
   });
@@ -175,8 +175,10 @@ describe('sortChildren', () => {
       forRepeat: counts[3],
     },
   });
-  const subjectChild = (mastery: number): OverviewRecursiveStatistics => ({
-    statistics: { ...subject, mastery },
+  const taskDescriptionChild = (
+    mastery: number,
+  ): OverviewRecursiveStatistics => ({
+    statistics: { ...taskDescription, mastery },
   });
   const sortedKeys = (children: Record<string, OverviewRecursiveStatistics>) =>
     sortChildren(Object.entries(children)).map(([key]) => key);
@@ -215,12 +217,12 @@ describe('sortChildren', () => {
     ).toEqual(['learned', 'empty']);
   });
 
-  it('sorts subjects by the highest mastery first', () => {
+  it('sorts taskDescriptions by the highest mastery first', () => {
     expect(
       sortedKeys({
-        a: subjectChild(0.2),
-        b: subjectChild(0.9),
-        c: subjectChild(0.5),
+        a: taskDescriptionChild(0.2),
+        b: taskDescriptionChild(0.9),
+        c: taskDescriptionChild(0.5),
       }),
     ).toEqual(['b', 'c', 'a']);
   });

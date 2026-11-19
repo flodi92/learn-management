@@ -1,8 +1,8 @@
-import { SubjectStatisticsItem, LearningState } from '../../model';
+import { LearningState, TaskDescriptionStatisticsItem } from '../../model';
 import {
   learningInProgressMasteryMin,
   learningInProgressMasteryMax,
-  repeatSubjectsMasteryMax,
+  repeatTaskDescriptionsMasteryMax,
 } from '../learnScheduler.constants';
 
 export const determineLearningStateFromStatisticsItem = ({
@@ -10,7 +10,7 @@ export const determineLearningStateFromStatisticsItem = ({
   lastMastery,
   lastRepetition,
   lastCorrectness,
-}: SubjectStatisticsItem): LearningState => {
+}: TaskDescriptionStatisticsItem): LearningState => {
   if (mastery < learningInProgressMasteryMin) {
     return 'notLearned';
   }
@@ -23,7 +23,7 @@ export const determineLearningStateFromStatisticsItem = ({
   }
   if (
     (lastMastery ?? 0) > learningInProgressMasteryMax &&
-    mastery < repeatSubjectsMasteryMax
+    mastery < repeatTaskDescriptionsMasteryMax
   ) {
     return 'forRepeat';
   }

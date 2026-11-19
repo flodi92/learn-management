@@ -13,3 +13,10 @@ Subject in another name > TaskDescription
 Task => TaskDescription
 
 At the end verify that the namings Subject or Task do not appear neither in a variable name, a type name nor in a file name.
+
+---
+
+That looks already good.
+I want you to make same more exceptions
+
+- taskPresenter and everything related should keep its name.

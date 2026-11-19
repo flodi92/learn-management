@@ -1,69 +1,69 @@
-import { LearningState, LearnSubject, TimedResult } from '../../model';
-import { computeSubjectStatisticsAt } from './computeSubjectStatisticsAt';
+import { LearningState, TaskDescription, TimedResult } from '../../model';
+import { computeTaskDescriptionStatisticsAt } from './computeTaskDescriptionStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from './determineLearningStateFromStatisticsItem';
-import { prioritizeSubjects } from './prioritizeSubjects';
+import { prioritizeTaskDescriptions } from './prioritizeTaskDescriptions';
 
-interface AssembleNextSessionProps<Subject extends LearnSubject> {
+interface AssembleNextSessionProps<TD extends TaskDescription> {
   count: number;
   day: number;
-  idSubjectMapping: Record<string, Subject>;
+  idTaskDescriptionMapping: Record<string, TD>;
   results: TimedResult[];
 }
 
-export const assembleNextSession = <Subject extends LearnSubject>({
+export const assembleNextSession = <TD extends TaskDescription>({
   count,
   day,
-  idSubjectMapping,
+  idTaskDescriptionMapping,
   results,
-}: AssembleNextSessionProps<Subject>): Subject[] => {
+}: AssembleNextSessionProps<TD>): TD[] => {
   if (count <= 0) {
     return [];
   }
 
-  const subjectStatistics = computeSubjectStatisticsAt(
+  const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
     day,
-    idSubjectMapping,
+    idTaskDescriptionMapping,
     results,
   );
 
   const {
-    learning: learningInProgressSubjects = [],
-    forRepeat: repeatSubjects = [],
-    notLearned: notLearnedSubjects = [],
-  } = Object.values(idSubjectMapping)
+    learning: learningInProgressTaskDescriptions = [],
+    forRepeat: repeatTaskDescriptions = [],
+    notLearned: notLearnedTaskDescriptions = [],
+  } = Object.values(idTaskDescriptionMapping)
     .map(
-      (subject) =>
+      (taskDescription) =>
         [
-          subject,
+          taskDescription,
           determineLearningStateFromStatisticsItem(
-            subjectStatistics[subject.id],
+            taskDescriptionStatistics[taskDescription.id],
           ),
         ] as const,
     )
     .reduce(
-      (acc, [subject, learningState]) => {
+      (acc, [taskDescription, learningState]) => {
         if (!acc[learningState]) {
           acc[learningState] = [];
         }
-        acc[learningState].push(subject);
+        acc[learningState].push(taskDescription);
         return acc;
       },
-      {} as Record<LearningState, Subject[] | undefined>,
+      {} as Record<LearningState, TD[] | undefined>,
     );
 
-  const sessionSubjects = [
-    ...learningInProgressSubjects,
-    ...repeatSubjects,
+  const sessionTaskDescriptions = [
+    ...learningInProgressTaskDescriptions,
+    ...repeatTaskDescriptions,
   ].slice(0, count);
 
-  if (sessionSubjects.length < count) {
-    sessionSubjects.push(
-      ...prioritizeSubjects(notLearnedSubjects, subjectStatistics).slice(
-        0,
-        count - sessionSubjects.length,
-      ),
+  if (sessionTaskDescriptions.length < count) {
+    sessionTaskDescriptions.push(
+      ...prioritizeTaskDescriptions(
+        notLearnedTaskDescriptions,
+        taskDescriptionStatistics,
+      ).slice(0, count - sessionTaskDescriptions.length),
     );
   }
 
-  return sessionSubjects;
+  return sessionTaskDescriptions;
 };

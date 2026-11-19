@@ -1,8 +1,8 @@
 import { learningStates } from '../../../model';
 import {
   OverviewAggregatedStatisticsItem,
-  OverviewSubjectStatisticsItem,
   OverviewStatistics,
+  OverviewTaskDescriptionStatisticsItem,
   SelectionState,
 } from '../../../overview/overview.model';
 import {
@@ -13,7 +13,7 @@ import {
   unfocusedSelectionColor,
 } from '../console.constants';
 
-const summarizedSubjectKeys = new Set<string>([
+const summarizedTaskDescriptionKeys = new Set<string>([
   'id',
   'label',
   'mastery',
@@ -26,9 +26,10 @@ const summarizedSubjectKeys = new Set<string>([
 export const camelCaseToWords = (text: string): string =>
   text.replace(/([a-z\d])([A-Z])/g, '$1 $2').toLowerCase();
 
-export const isOverviewSubjectStatisticsItem = (
+export const isOverviewTaskDescriptionStatisticsItem = (
   statistics: OverviewStatistics,
-): statistics is OverviewSubjectStatisticsItem => 'learningState' in statistics;
+): statistics is OverviewTaskDescriptionStatisticsItem =>
+  'learningState' in statistics;
 
 const formatLabeledValue = (
   key: string,
@@ -72,8 +73,8 @@ const formatAggregatedStatistics = (
   return `${formatSelectionState(statistics.selectionState, isFocused)} ${formatted}`;
 };
 
-const formatSubjectStatistics = (
-  statistics: OverviewSubjectStatisticsItem,
+const formatTaskDescriptionStatistics = (
+  statistics: OverviewTaskDescriptionStatisticsItem,
   isFocused: boolean,
 ): string => {
   const color = learningStateColors[statistics.learningState];
@@ -88,7 +89,7 @@ const formatSubjectStatistics = (
     repetitions,
   ].join(' ');
   const otherValues = Object.entries(statistics)
-    .filter(([key]) => !summarizedSubjectKeys.has(key))
+    .filter(([key]) => !summarizedTaskDescriptionKeys.has(key))
     .map(([key, value]) => formatLabeledValue(key, value));
   return [summary, ...otherValues].join(', ');
 };
@@ -97,6 +98,6 @@ export const formatStatistics = (
   statistics: OverviewStatistics,
   isFocused: boolean,
 ): string =>
-  isOverviewSubjectStatisticsItem(statistics)
-    ? formatSubjectStatistics(statistics, isFocused)
+  isOverviewTaskDescriptionStatisticsItem(statistics)
+    ? formatTaskDescriptionStatistics(statistics, isFocused)
     : formatAggregatedStatistics(statistics, isFocused);

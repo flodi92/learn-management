@@ -1,44 +1,44 @@
-import { LearnSubject, TimedResult } from '../model';
+import { TaskDescription, TimedResult } from '../model';
 import { getToday } from '../utils';
 import { RelevanceCategoryGroupType } from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
-import { computeSubjectsStatistics } from './overview.utils/overview.computeSubjectsStatistics';
+import { computeTaskDescriptionsStatistics } from './overview.utils/overview.computeTaskDescriptionsStatistics';
 import { displaySelectableComputedStatistics } from './overview.utils/overview.displaySelectableComputedStatistics';
 import { DisplayComputedStatistics } from './overview.model';
 import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
 import { getSelectionKey } from './overview.utils/overview.getSelectionKey';
 
-export abstract class Overview<Subject extends LearnSubject> {
+export abstract class Overview<TD extends TaskDescription> {
   constructor(public getLabelFromId: (id: string) => string) {}
 
-  abstract askForNumberOfTasks(): Promise<number>;
+  abstract askForNumberOfTaskDescriptions(): Promise<number>;
   abstract showSessionFinishedView(): Promise<void>;
 
   public async displayStatistics(
-    idSubjectMapping: Record<string, Subject>,
+    idTaskDescriptionMapping: Record<string, TD>,
     results: TimedResult[],
-    preselectedSubjects: Subject[],
-  ): Promise<Subject[]> {
+    preselectedTaskDescriptions: TD[],
+  ): Promise<TD[]> {
     const selectedItems = await displaySelectableComputedStatistics(
       this.displayComputedStatistics.bind(this),
       (getSelectedIds, getGroupSelection) =>
         computeStatistics(
-          idSubjectMapping,
+          idTaskDescriptionMapping,
           results,
           getToday(),
           this.getLabelFromId,
           ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
           getGroupsForRelevanceAndCategory,
-          computeSubjectsStatistics,
+          computeTaskDescriptionsStatistics,
           computeAggregatedStatistics,
           getSelectedIds,
           (parentGroups) => getGroupSelection()[getSelectionKey(parentGroups)],
         ),
-      preselectedSubjects.map(({ id }) => id),
+      preselectedTaskDescriptions.map(({ id }) => id),
     );
 
-    return selectedItems.map((id) => idSubjectMapping[id]);
+    return selectedItems.map((id) => idTaskDescriptionMapping[id]);
   }
 
   protected abstract displayComputedStatistics(

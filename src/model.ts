@@ -1,11 +1,11 @@
-export interface LearnSubject {
+export interface TaskDescription {
   id: string;
   parentIds?: string[];
   categories?: string[];
   relevance?: number;
 }
 
-export interface SubjectStatisticsItem {
+export interface TaskDescriptionStatisticsItem {
   mastery: number;
   lastRepetition?: number;
   lastMastery?: number;
@@ -13,7 +13,10 @@ export interface SubjectStatisticsItem {
   numberOfRepetitions: number;
 }
 
-export type SubjectStatistics = Record<string, SubjectStatisticsItem>;
+export type TaskDescriptionStatistics = Record<
+  string,
+  TaskDescriptionStatisticsItem
+>;
 
 export const learningStates = [
   'notLearned',

@@ -107,7 +107,7 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     expect(view().slice(4, 8)).toEqual([
       '        1:     0 0 0 2 0 ⌀ 2.5 days before',
-      '          subject statistics',
+      '          taskDescription statistics',
       '          > Fractions: learned (95%) 5x 2 days before',
       '            Solving equations: 90%',
     ]);
@@ -219,7 +219,7 @@ describe('ConsoleDisplayStatistics selection with space', () => {
     vi.restoreAllMocks();
   });
 
-  it('toggles the focused subject with its subject path', () => {
+  it('toggles the focused taskDescription with its taskDescription path', () => {
     const toggleSelection = vi.fn();
     new ConsoleDisplayStatistics(
       formatStatistics,
@@ -234,6 +234,8 @@ describe('ConsoleDisplayStatistics selection with space', () => {
     press('space', ' ');
 
     expect(toggleSelection).toHaveBeenCalledTimes(1);
-    expect(toggleSelection).toHaveBeenCalledWith([['subject', 'Fractions']]);
+    expect(toggleSelection).toHaveBeenCalledWith([
+      ['taskDescription', 'Fractions'],
+    ]);
   });
 });

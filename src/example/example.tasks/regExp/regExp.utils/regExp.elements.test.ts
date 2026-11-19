@@ -73,7 +73,7 @@ describe('getRegExpElements', () => {
 });
 
 describe('setRegExpElements', () => {
-  it('preserves task fields and computes elements per task', () => {
+  it('preserves taskDescription fields and computes elements per taskDescription', () => {
     const result = setRegExpElements([
       { id: '0', expression: /^a$/ },
       { id: '1', expression: /^\d+$/, positiveExamples: ['1', '22'] },

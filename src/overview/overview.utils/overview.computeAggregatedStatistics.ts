@@ -1,6 +1,6 @@
 import {
-  OverviewSubjectStatisticsItem,
   OverviewAggregatedStatisticsItem,
+  OverviewTaskDescriptionStatisticsItem,
   SelectionState,
 } from '../overview.model';
 
@@ -26,7 +26,7 @@ const determineSelectionState = (
 };
 
 export const computeAggregatedStatistics = (
-  statisticsItems: OverviewSubjectStatisticsItem[],
+  statisticsItems: OverviewTaskDescriptionStatisticsItem[],
   selectedIds: string[],
   groupSelection: boolean | undefined,
 ): OverviewAggregatedStatisticsItem => {

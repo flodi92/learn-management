@@ -1,6 +1,6 @@
-import { InitialRegExpTask } from '../regExp.model';
+import { InitialRegExpTaskDescription } from '../regExp.model';
 
-const simpleExpressionsCharacterClasses: InitialRegExpTask[] = [
+const simpleExpressionsCharacterClasses: InitialRegExpTaskDescription[] = [
   {
     expression: /^[xyz]$/,
     positiveExamples: ['x', 'z'],
@@ -179,7 +179,7 @@ const simpleExpressionsCharacterClasses: InitialRegExpTask[] = [
   },
 ];
 
-const simpleExpressionsAssertions: InitialRegExpTask[] = [
+const simpleExpressionsAssertions: InitialRegExpTaskDescription[] = [
   {
     expression: /^a/,
     positiveExamples: ['abc', 'a'],
@@ -226,7 +226,7 @@ const simpleExpressionsAssertions: InitialRegExpTask[] = [
   },
 ];
 
-const simpleExpressionsGroups: InitialRegExpTask[] = [
+const simpleExpressionsGroups: InitialRegExpTaskDescription[] = [
   {
     expression: /^(a)$/,
     positiveExamples: ['a'],
@@ -267,7 +267,7 @@ const simpleExpressionsGroups: InitialRegExpTask[] = [
   },
 ];
 
-const simpleExpressionsQuantifiers: InitialRegExpTask[] = [
+const simpleExpressionsQuantifiers: InitialRegExpTaskDescription[] = [
   {
     expression: /^a+$/,
     positiveExamples: ['a', 'aaa'],
@@ -322,7 +322,7 @@ const simpleExpressionsQuantifiers: InitialRegExpTask[] = [
   },
 ];
 
-const simpleExpressionsModifiers: InitialRegExpTask[] = [
+const simpleExpressionsModifiers: InitialRegExpTaskDescription[] = [
   {
     expression: /^abc$/i,
     positiveExamples: ['ABC', 'abc'],
@@ -413,7 +413,7 @@ const simpleExpressionsModifiers: InitialRegExpTask[] = [
   },
 ];
 
-const simpleExpressionsTestContract: InitialRegExpTask[] = [
+const simpleExpressionsTestContract: InitialRegExpTaskDescription[] = [
   {
     expression: /^[\s\S]*$/,
     positiveExamples: ['x', 'A', { value: '\n', alternative: 'newline' }, '0'],
@@ -436,7 +436,7 @@ const simpleExpressionsTestContract: InitialRegExpTask[] = [
   },
 ];
 
-export const simpleExpressions: InitialRegExpTask[] = [
+export const simpleExpressions: InitialRegExpTaskDescription[] = [
   ...simpleExpressionsCharacterClasses,
   ...simpleExpressionsAssertions,
   ...simpleExpressionsGroups,

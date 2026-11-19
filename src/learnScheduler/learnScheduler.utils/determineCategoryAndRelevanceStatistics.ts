@@ -1,47 +1,49 @@
 import {
-  SubjectStatistics,
-  LearnSubject,
   CategoryAndRelevanceStatistics,
+  TaskDescription,
+  TaskDescriptionStatistics,
 } from '../../model';
 import { determineLearningStateFromStatisticsItem } from './determineLearningStateFromStatisticsItem';
 
 export const determineCategoryAndRelevanceStatistics = (
-  subjectStatistics: SubjectStatistics,
-  idSubjectMapping: Record<string, LearnSubject>,
+  taskDescriptionStatistics: TaskDescriptionStatistics,
+  idTaskDescriptionMapping: Record<string, TaskDescription>,
 ): CategoryAndRelevanceStatistics => {
   const buffer = {} as CategoryAndRelevanceStatistics;
 
-  Object.entries(subjectStatistics).forEach(([id, subjectStatisticsItem]) => {
-    if (!idSubjectMapping[id]) return;
+  Object.entries(taskDescriptionStatistics).forEach(
+    ([id, taskDescriptionStatisticsItem]) => {
+      if (!idTaskDescriptionMapping[id]) return;
 
-    const { relevance, categories } = idSubjectMapping[id];
-    if (!relevance) return;
+      const { relevance, categories } = idTaskDescriptionMapping[id];
+      if (!relevance) return;
 
-    (categories ?? []).forEach((category) => {
-      if (!buffer[category]) {
-        buffer[category] = {};
-      }
+      (categories ?? []).forEach((category) => {
+        if (!buffer[category]) {
+          buffer[category] = {};
+        }
 
-      if (!buffer[category][relevance]) {
-        buffer[category][relevance] = {
-          category,
-          relevance,
-          notLearned: 0,
-          learning: 0,
-          forRepeat: 0,
-          learned: 0,
-          all: 0,
-        };
-      }
+        if (!buffer[category][relevance]) {
+          buffer[category][relevance] = {
+            category,
+            relevance,
+            notLearned: 0,
+            learning: 0,
+            forRepeat: 0,
+            learned: 0,
+            all: 0,
+          };
+        }
 
-      const learningState = determineLearningStateFromStatisticsItem(
-        subjectStatisticsItem,
-      );
+        const learningState = determineLearningStateFromStatisticsItem(
+          taskDescriptionStatisticsItem,
+        );
 
-      buffer[category][relevance][learningState]++;
-      buffer[category][relevance].all++;
-    });
-  });
+        buffer[category][relevance][learningState]++;
+        buffer[category][relevance].all++;
+      });
+    },
+  );
 
   return buffer;
 };

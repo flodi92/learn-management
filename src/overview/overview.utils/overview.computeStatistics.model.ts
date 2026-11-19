@@ -1,44 +1,41 @@
-import { LearnSubject, TimedResult } from '../../model';
+import { TaskDescription, TimedResult } from '../../model';
 
-export type GroupTypeOrSubject<GroupType extends string> =
-  GroupType | 'subject';
+export type GroupTypeOrTaskDescription<GroupType extends string> =
+  GroupType | 'taskDescription';
 
-export type GetGroups<
-  Subject extends LearnSubject,
-  GroupType extends string,
-> = (
-  GroupTypeOrSubject: GroupTypeOrSubject<GroupType>,
-  subject: Subject,
+export type GetGroups<TD extends TaskDescription, GroupType extends string> = (
+  groupTypeOrTaskDescription: GroupTypeOrTaskDescription<GroupType>,
+  taskDescription: TD,
 ) => string[] | number[];
 
 export type ComputeAggregatedStatistics<
-  SubjectStatistics extends object,
+  TaskDescriptionStatistics extends object,
   AggregatedStatistics extends object,
 > = (
-  tuples: SubjectStatistics[],
+  tuples: TaskDescriptionStatistics[],
   selectedIds: string[],
   groupSelection: boolean | undefined,
 ) => AggregatedStatistics;
 
-export type ComputeSubjectStatistics<
-  Subject extends LearnSubject,
-  SubjectStatistics extends object,
+export type ComputeTaskDescriptionStatistics<
+  TD extends TaskDescription,
+  TaskDescriptionStatistics extends object,
 > = (
-  idSubjectMapping: Record<string, Subject>,
+  idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
-) => SubjectStatisticsTuples<Subject, SubjectStatistics>;
+) => TaskDescriptionStatisticsTuples<TD, TaskDescriptionStatistics>;
 
-export type SubjectStatisticsTuple<
-  Subject extends LearnSubject,
+export type TaskDescriptionStatisticsTuple<
+  TD extends TaskDescription,
   Statistics extends object,
-> = [string, Subject, Statistics];
+> = [string, TD, Statistics];
 
-export type SubjectStatisticsTuples<
-  Subject extends LearnSubject,
+export type TaskDescriptionStatisticsTuples<
+  TD extends TaskDescription,
   Statistics extends object,
-> = SubjectStatisticsTuple<Subject, Statistics>[];
+> = TaskDescriptionStatisticsTuple<TD, Statistics>[];
 
 export interface OverviewRecursiveUndeterminedStatistics<
   Statistics extends object = object,

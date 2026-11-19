@@ -1,19 +1,19 @@
 import { LearnScheduler } from './learnScheduler/learnScheduler';
-import { Result, SaveDataBase, LearnSubject } from './model';
+import { Result, SaveDataBase, TaskDescription } from './model';
 import { Overview } from './overview/overview';
 import { TaskPresenter } from './userInterface/taskPresenter';
 
-export class Starter<Subject extends LearnSubject> {
+export class Starter<TD extends TaskDescription> {
   private scheduler;
   private presenter;
 
   constructor(
-    presenter: TaskPresenter<Subject>,
-    tasks: Subject[],
+    presenter: TaskPresenter<TD>,
+    taskDescriptions: TD[],
     private saveDataBase: SaveDataBase,
-    private overview: Overview<Subject>,
+    private overview: Overview<TD>,
   ) {
-    this.scheduler = new LearnScheduler(tasks);
+    this.scheduler = new LearnScheduler(taskDescriptions);
     this.presenter = presenter;
     this.presenter.onAnswered = this.onAnswered.bind(this);
     this.presenter.onFinished = this.onFinished.bind(this);
@@ -23,10 +23,13 @@ export class Starter<Subject extends LearnSubject> {
   private finishSession?: () => void;
 
   private async runSession() {
-    const numberOfTasks = await this.overview.askForNumberOfTasks();
-    const suggestedSession = this.scheduler.nextSession(numberOfTasks);
+    const numberOfTaskDescriptions =
+      await this.overview.askForNumberOfTaskDescriptions();
+    const suggestedSession = this.scheduler.nextSession(
+      numberOfTaskDescriptions,
+    );
     const session = await this.overview.displayStatistics(
-      this.scheduler.idSubjectMapping,
+      this.scheduler.idTaskDescriptionMapping,
       this.scheduler.results,
       suggestedSession,
     );
@@ -62,7 +65,7 @@ export class Starter<Subject extends LearnSubject> {
     this.scheduler.restoreFromSaveData(this.saveDataBase.loadSaveData());
   }
 
-  protected get idSubjectMapping() {
-    return this.scheduler.idSubjectMapping;
+  protected get idTaskDescriptionMapping() {
+    return this.scheduler.idTaskDescriptionMapping;
   }
 }

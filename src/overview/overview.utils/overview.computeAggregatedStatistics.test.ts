@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { OverviewSubjectStatisticsItem } from '../overview.model';
+import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
 import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
 
-const createItem = (id: string): OverviewSubjectStatisticsItem => ({
+const createItem = (id: string): OverviewTaskDescriptionStatisticsItem => ({
   id,
   label: id,
   mastery: 0.5,

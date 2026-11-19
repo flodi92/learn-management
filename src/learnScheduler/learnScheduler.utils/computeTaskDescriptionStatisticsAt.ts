@@ -1,17 +1,21 @@
-import { LearnSubject, TimedResult, SubjectStatistics } from '../../model';
+import {
+  TaskDescription,
+  TaskDescriptionStatistics,
+  TimedResult,
+} from '../../model';
 import { getMasteries } from './getMasteries';
 
-export const computeSubjectStatisticsAt = (
+export const computeTaskDescriptionStatisticsAt = (
   day: number,
-  idSubjectMapping: Record<string, LearnSubject>,
+  idTaskDescriptionMapping: Record<string, TaskDescription>,
   results: TimedResult[],
-): SubjectStatistics => {
+): TaskDescriptionStatistics => {
   return Object.fromEntries(
-    Object.keys(idSubjectMapping).map((id) => {
+    Object.keys(idTaskDescriptionMapping).map((id) => {
       const relevantResults = results
         .filter(
           (result) =>
-            idSubjectMapping[result.id].parentIds?.includes(id) &&
+            idTaskDescriptionMapping[result.id].parentIds?.includes(id) &&
             result.day <= day,
         )
         .sort((a, b) => a.day - b.day);

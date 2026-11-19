@@ -1,40 +1,42 @@
 import {
   CategoryAndRelevanceStatistics,
-  LearnSubject,
-  SubjectStatistics,
+  TaskDescription,
+  TaskDescriptionStatistics,
 } from '../../model';
 import { isNotUndefined } from '../../utils';
 import { determineCategoryAndRelevanceStatistics } from './determineCategoryAndRelevanceStatistics';
 
-export const prioritizeSubjects = <Subject extends LearnSubject>(
-  subjects: Subject[],
-  subjectStatistics: SubjectStatistics,
-): Subject[] => {
-  const idSubjectMapping = Object.fromEntries(
-    subjects.map((subject) => [subject.id, subject] as const),
+export const prioritizeTaskDescriptions = <TD extends TaskDescription>(
+  taskDescriptions: TD[],
+  taskDescriptionStatistics: TaskDescriptionStatistics,
+): TD[] => {
+  const idTaskDescriptionMapping = Object.fromEntries(
+    taskDescriptions.map(
+      (taskDescription) => [taskDescription.id, taskDescription] as const,
+    ),
   );
 
   const statistics = determineCategoryAndRelevanceStatistics(
-    subjectStatistics,
-    idSubjectMapping,
+    taskDescriptionStatistics,
+    idTaskDescriptionMapping,
   );
 
-  let subjectsWithCategoryRelevanceStatistics = subjects.map(
-    (subject) =>
+  let taskDescriptionsWithCategoryRelevanceStatistics = taskDescriptions.map(
+    (taskDescription) =>
       [
-        subject.id,
-        subject.categories
+        taskDescription.id,
+        taskDescription.categories
           ?.map((category) =>
-            subject.relevance
-              ? statistics[category][subject.relevance]
+            taskDescription.relevance
+              ? statistics[category][taskDescription.relevance]
               : undefined,
           )
           .filter(isNotUndefined) ?? [],
       ] as const,
   );
 
-  subjectsWithCategoryRelevanceStatistics =
-    subjectsWithCategoryRelevanceStatistics.sort(([_, a], [__, b]) => {
+  taskDescriptionsWithCategoryRelevanceStatistics =
+    taskDescriptionsWithCategoryRelevanceStatistics.sort(([_, a], [__, b]) => {
       const sortedItems = [
         ...a.map((value) => ({ ...value, isA: true })),
         ...b.map((value) => ({ ...value, isA: false })),
@@ -67,7 +69,7 @@ export const prioritizeSubjects = <Subject extends LearnSubject>(
       return isLastA ? 1 : -1;
     });
 
-  return subjectsWithCategoryRelevanceStatistics.map(
-    ([id]) => idSubjectMapping[id],
+  return taskDescriptionsWithCategoryRelevanceStatistics.map(
+    ([id]) => idTaskDescriptionMapping[id],
   );
 };

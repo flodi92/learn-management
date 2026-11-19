@@ -14,8 +14,8 @@ This module supplies the overview-specific arrow functions used by
   the sum of `notLearned`, `learning`, `learned`, and `forRepeat`; a sum of
   zero produces a share of zero.
 
-The formatter determines the item type with `isOverviewSubjectStatisticsItem`
-and delegates to `formatSubjectStatistics` or
+The formatter determines the item type with `isOverviewTaskDescriptionStatisticsItem`
+and delegates to `formatTaskDescriptionStatistics` or
 `formatAggregatedStatistics`. Only a focused line shows additional details, except for the root line, which
 always uses the detailed form. A child's id or label is followed by a
 colon colored by `getStatisticsColor`.
@@ -45,7 +45,7 @@ colon colored by `getStatisticsColor`.
   commas. Labels and all other text without a color of its own are displayed
   normally, never dimmed.
 
-### OverviewSubjectStatisticsItem
+### OverviewTaskDescriptionStatisticsItem
 
 - The short form contains only
   `${Math.round(mastery * 100)}%`, colored by the learning state, without

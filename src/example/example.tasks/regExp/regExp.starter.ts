@@ -1,17 +1,17 @@
-import { regExpTasks } from './regExp.tasks/regExp.tasks';
+import { regExpTaskDescriptions } from './regExp.taskDescriptions/regExp.taskDescriptions';
 import { Starter } from '../../../starter';
-import { RegExpTask } from './regExp.model';
+import { RegExpTaskDescription } from './regExp.model';
 import { ConsoleOverview } from '../../example.overview/console.overview';
 import { RegExpTaskPresenter } from './regExp.taskPresenter/regExp.taskPresenter';
 import { SQLiteDataBase } from '../../example.dataBase/sqlite.dataBase';
 
-export class RegExpStarter extends Starter<RegExpTask> {
+export class RegExpStarter extends Starter<RegExpTaskDescription> {
   constructor() {
     let getLabelFromId!: (id: string) => string;
 
     super(
       new RegExpTaskPresenter(),
-      regExpTasks,
+      regExpTaskDescriptions,
       new SQLiteDataBase(),
       new ConsoleOverview((id) => getLabelFromId(id)),
     );
@@ -20,6 +20,6 @@ export class RegExpStarter extends Starter<RegExpTask> {
   }
 
   private getLabelFromId(id: string): string {
-    return `${super.idSubjectMapping[id].expression}`;
+    return `${super.idTaskDescriptionMapping[id].expression}`;
   }
 }

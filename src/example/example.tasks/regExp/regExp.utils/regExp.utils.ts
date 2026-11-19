@@ -1,9 +1,9 @@
 import {
-  InitialRegExpTask,
+  InitialRegExpTaskDescription,
   RegExpExample,
   regExpObjects,
   RegExpRelevance,
-  RegExpTask,
+  RegExpTaskDescription,
 } from '../regExp.model';
 import { setRegExpElements } from './regExp.elements';
 import { setParentIds } from './regExp.parentIds';
@@ -16,42 +16,60 @@ export const getExampleAlternative = (
 ): string | undefined =>
   typeof example === 'string' ? undefined : example.alternative;
 
-const setIds = <T extends InitialRegExpTask>(
-  initialTasks: T[],
-): (T & { id: RegExpTask['id'] })[] =>
-  initialTasks.map((task, idx) => ({ ...task, id: `${idx}` }));
+const setIds = <T extends InitialRegExpTaskDescription>(
+  initialTaskDescriptions: T[],
+): (T & { id: RegExpTaskDescription['id'] })[] =>
+  initialTaskDescriptions.map((taskDescription, idx) => ({
+    ...taskDescription,
+    id: `${idx}`,
+  }));
 
 const setCategoriesAndRelevance = <
-  T extends InitialRegExpTask & { elements: RegExpTask['elements'] },
+  T extends InitialRegExpTaskDescription & {
+    elements: RegExpTaskDescription['elements'];
+  },
 >(
-  initialTasks: T[],
+  initialTaskDescriptions: T[],
 ): (T & {
-  categories: RegExpTask['categories'];
-  relevance: RegExpTask['relevance'];
+  categories: RegExpTaskDescription['categories'];
+  relevance: RegExpTaskDescription['relevance'];
 })[] =>
-  initialTasks.map((task, idx) => {
-    const taskRegExpObjects = task.elements.map((value) => ({
-      value,
-      ...regExpObjects[value],
-    }));
+  initialTaskDescriptions.map((taskDescription, idx) => {
+    const taskDescriptionRegExpObjects = taskDescription.elements.map(
+      (value) => ({
+        value,
+        ...regExpObjects[value],
+      }),
+    );
     return {
-      ...task,
+      ...taskDescription,
       categories: Array.from(
-        new Set(taskRegExpObjects.map((regExpObject) => regExpObject.category)),
+        new Set(
+          taskDescriptionRegExpObjects.map(
+            (regExpObject) => regExpObject.category,
+          ),
+        ),
       ),
       relevance: Math.max(
-        ...taskRegExpObjects.map((regExpObject) => regExpObject.relevance),
+        ...taskDescriptionRegExpObjects.map(
+          (regExpObject) => regExpObject.relevance,
+        ),
       ) as RegExpRelevance,
     };
   });
 
 export const addMissingRegExpAttributes = (
-  initialTasks: InitialRegExpTask[],
-): RegExpTask[] => {
-  const tasksWithIds = setIds(initialTasks);
-  const tasksWithElements = setRegExpElements(tasksWithIds);
-  const tasksWithParentIds = setParentIds(tasksWithElements);
-  const tasksWithCategoriesAndRelevance =
-    setCategoriesAndRelevance(tasksWithParentIds);
-  return setParentIds(tasksWithCategoriesAndRelevance);
+  initialTaskDescriptions: InitialRegExpTaskDescription[],
+): RegExpTaskDescription[] => {
+  const taskDescriptionsWithIds = setIds(initialTaskDescriptions);
+  const taskDescriptionsWithElements = setRegExpElements(
+    taskDescriptionsWithIds,
+  );
+  const taskDescriptionsWithParentIds = setParentIds(
+    taskDescriptionsWithElements,
+  );
+  const taskDescriptionsWithCategoriesAndRelevance = setCategoriesAndRelevance(
+    taskDescriptionsWithParentIds,
+  );
+  return setParentIds(taskDescriptionsWithCategoriesAndRelevance);
 };

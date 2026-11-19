@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { RegExpTask } from '../regExp.model';
+import { RegExpTaskDescription } from '../regExp.model';
 import { Result } from '../../../../model';
 import { TaskPresenter } from '../../../../userInterface/taskPresenter';
 import { maximumNumberOfShownExamples } from '../regExp.constants';
@@ -26,16 +26,16 @@ const shuffle = <T>(items: T[]): T[] => {
   return copy;
 };
 
-const buildExamples = (task: RegExpTask): Example[] => {
+const buildExamples = (taskDescription: RegExpTaskDescription): Example[] => {
   const positives = shuffle(
-    (task.positiveExamples ?? []).map((example) => ({
+    (taskDescription.positiveExamples ?? []).map((example) => ({
       text: getExampleValue(example),
       alternative: getExampleAlternative(example),
       isPositive: true,
     })),
   );
   const negatives = shuffle(
-    (task.negativeExamples ?? []).map((example) => ({
+    (taskDescription.negativeExamples ?? []).map((example) => ({
       text: getExampleValue(example),
       alternative: getExampleAlternative(example),
       isPositive: false,
@@ -59,9 +59,9 @@ const buildExamples = (task: RegExpTask): Example[] => {
 const isAnsweredCorrectly = (example: Example): boolean =>
   (example.answer === 'positive') === example.isPositive;
 
-export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
-  private tasks: RegExpTask[] = [];
-  private currentTaskIndex = 0;
+export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
+  private taskDescriptions: RegExpTaskDescription[] = [];
+  private currentTaskDescriptionIndex = 0;
   private examples: Example[] = [];
   private cursor = 0;
   private checked = false;
@@ -78,26 +78,26 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
     this._onFinished = handler;
   }
 
-  start(tasks: RegExpTask[]) {
-    this.tasks = tasks;
-    this.currentTaskIndex = 0;
+  start(taskDescriptions: RegExpTaskDescription[]) {
+    this.taskDescriptions = taskDescriptions;
+    this.currentTaskDescriptionIndex = 0;
     this.summary = { correct: 0, incorrect: 0 };
 
-    if (this.tasks.length === 0) {
-      console.log('No tasks available.');
+    if (this.taskDescriptions.length === 0) {
+      console.log('No taskDescriptions available.');
       return;
     }
-    this.loadTask();
+    this.loadTaskDescription();
     this.render();
     this.listen();
   }
 
-  private get currentTask(): RegExpTask {
-    return this.tasks[this.currentTaskIndex];
+  private get currentTaskDescription(): RegExpTaskDescription {
+    return this.taskDescriptions[this.currentTaskDescriptionIndex];
   }
 
-  private loadTask() {
-    this.examples = buildExamples(this.currentTask);
+  private loadTaskDescription() {
+    this.examples = buildExamples(this.currentTaskDescription);
     this.cursor = 0;
     this.checked = false;
   }
@@ -105,8 +105,9 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
   private render() {
     console.clear();
     console.log(
-      chalk.bold(`Task ${this.currentTaskIndex + 1}/${this.tasks.length}: `) +
-        chalk.cyan(this.currentTask.expression.toString()),
+      chalk.bold(
+        `TaskDescription ${this.currentTaskDescriptionIndex + 1}/${this.taskDescriptions.length}: `,
+      ) + chalk.cyan(this.currentTaskDescription.expression.toString()),
     );
     console.log(
       chalk.dim(
@@ -208,7 +209,7 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
         this.render();
         this.updateSummary();
       } else {
-        this.nextTask();
+        this.nextTaskDescription();
         return;
       }
     }
@@ -222,18 +223,18 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTask> {
       this.summary.incorrect += 1;
     }
     this._onAnswered?.({
-      id: this.currentTask.id,
+      id: this.currentTaskDescription.id,
       correctness: isCorrect ? 1 : 0,
     });
   }
 
-  private nextTask() {
-    this.currentTaskIndex += 1;
-    if (this.currentTaskIndex >= this.tasks.length) {
+  private nextTaskDescription() {
+    this.currentTaskDescriptionIndex += 1;
+    if (this.currentTaskDescriptionIndex >= this.taskDescriptions.length) {
       this.finish();
       return;
     }
-    this.loadTask();
+    this.loadTaskDescription();
     this.render();
   }
 

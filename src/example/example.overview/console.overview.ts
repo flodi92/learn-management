@@ -3,22 +3,22 @@ import { createInterface } from 'node:readline/promises';
 import {
   OverviewRecursiveStatistics,
   OverviewSelectionPath,
-  OverviewSubjectSelection,
+  OverviewTaskDescriptionSelection,
 } from '../../overview/overview.model';
 import { Overview } from '../../overview/overview';
 import { consoleDisplayStatistics } from './console.displayStatistics/console.displayStatistics';
 import { formatStatistics } from './console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from './console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from './console.displayStatisticsItem.utils/console.sortChildren';
-import { LearnSubject } from '../../model';
+import { TaskDescription } from '../../model';
 
 export class ConsoleOverview<
-  Subject extends LearnSubject = LearnSubject,
-> extends Overview<Subject> {
+  TD extends TaskDescription = TaskDescription,
+> extends Overview<TD> {
   constructor(getLabelFromId: (id: string) => string) {
     super(getLabelFromId);
   }
-  async askForNumberOfTasks(): Promise<number> {
+  async askForNumberOfTaskDescriptions(): Promise<number> {
     const readline = createInterface({ input: stdin, output: stdout });
     try {
       while (true) {
@@ -52,7 +52,7 @@ export class ConsoleOverview<
   protected async displayComputedStatistics(
     statistics: OverviewRecursiveStatistics,
     toggleSelection: (path: OverviewSelectionPath) => void,
-    subjectSelection: () => OverviewSubjectSelection,
+    taskDescriptionSelection: () => OverviewTaskDescriptionSelection,
   ): Promise<void> {
     await consoleDisplayStatistics(
       statistics,
@@ -60,7 +60,7 @@ export class ConsoleOverview<
       getStatisticsColor,
       sortChildren,
       toggleSelection,
-      subjectSelection,
+      taskDescriptionSelection,
     );
   }
 }

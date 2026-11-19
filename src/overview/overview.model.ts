@@ -1,11 +1,11 @@
-import { LearningState, SubjectStatisticsItem } from '../model';
+import { LearningState, TaskDescriptionStatisticsItem } from '../model';
 import {
-  GroupTypeOrSubject,
+  GroupTypeOrTaskDescription,
   OverviewRecursiveUndeterminedStatistics,
 } from './overview.utils/overview.computeStatistics.model';
 
-export interface OverviewSubjectStatisticsItem extends Omit<
-  SubjectStatisticsItem,
+export interface OverviewTaskDescriptionStatisticsItem extends Omit<
+  TaskDescriptionStatisticsItem,
   'lastRepetition'
 > {
   id: string;
@@ -29,37 +29,37 @@ export type OverviewAggregatedStatisticsItem = {
 } & Record<LearningState, number>;
 
 export type OverviewStatistics =
-  OverviewSubjectStatisticsItem | OverviewAggregatedStatisticsItem;
+  OverviewTaskDescriptionStatisticsItem | OverviewAggregatedStatisticsItem;
 
 export type OverviewRecursiveStatistics =
   OverviewRecursiveUndeterminedStatistics<
     OverviewStatistics,
-    GroupTypeOrSubject<RelevanceCategoryGroupType>
+    GroupTypeOrTaskDescription<RelevanceCategoryGroupType>
   >;
 
 export type RelevanceCategoryGroupType = 'relevance' | 'category';
 
-export type OverviewGroupTypeOrSubject =
-  GroupTypeOrSubject<RelevanceCategoryGroupType>;
+export type OverviewGroupTypeOrTaskDescription =
+  GroupTypeOrTaskDescription<RelevanceCategoryGroupType>;
 
 export type OverviewSelectionPath = [
-  OverviewGroupTypeOrSubject,
+  OverviewGroupTypeOrTaskDescription,
   string | number,
 ][];
 
 export type OverviewSelectionKey =
-  `[["${OverviewGroupTypeOrSubject}",${string}`;
+  `[["${OverviewGroupTypeOrTaskDescription}",${string}`;
 
 export type OverviewGroupSelection = Partial<
   Record<OverviewSelectionKey, boolean>
 >;
 
-export type OverviewSubjectSelection = Partial<Record<string, true>>;
+export type OverviewTaskDescriptionSelection = Partial<Record<string, true>>;
 
 export type DisplayComputedStatistics = (
   statistics: OverviewRecursiveStatistics,
   toggleSelection: (path: OverviewSelectionPath) => void,
-  subjectSelection: () => OverviewSubjectSelection,
+  taskDescriptionSelection: () => OverviewTaskDescriptionSelection,
 ) => Promise<void>;
 
 export type CreateComputedStatistics = (

@@ -29,29 +29,32 @@ const nextSessionIds = (
   scheduler: LearnScheduler,
   count: number,
   day: number,
-) => scheduler.nextSession(count, day).map((task) => task.id);
+) =>
+  scheduler
+    .nextSession(count, day)
+    .map((taskDescription) => taskDescription.id);
 
 const LearnSchedulerTestWrapper = ({
   learningTimes,
-  subjects,
-  tasksPerSession,
+  taskDescriptions,
+  taskDescriptionsPerSession,
   doSession,
   checkSession,
   doFinal,
 }: {
   learningTimes: number[];
-  subjects: string[];
-  tasksPerSession: number;
+  taskDescriptions: string[];
+  taskDescriptionsPerSession: number;
   doSession: (
     params: DoSessionParams,
   ) => Parameters<LearnScheduler['recordResults']>[0];
   checkSession: (params: CheckSessionParams) => void;
   doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
-  const scheduler = createScheduler(subjects);
+  const scheduler = createScheduler(taskDescriptions);
   const results: { id: string; day: number; correctness: number }[] = [];
   learningTimes.forEach((day, index) => {
-    const session = nextSessionIds(scheduler, tasksPerSession, day);
+    const session = nextSessionIds(scheduler, taskDescriptionsPerSession, day);
     const sessionResults = doSession({
       day,
       index,
@@ -83,67 +86,76 @@ const LearnSchedulerTestWrapper = ({
 };
 
 describe('LearnScheduler', () => {
-  const subjects = Array.from({ length: 100 }).map((_, i) => `${i}`);
+  const taskDescriptions = Array.from({ length: 100 }).map((_, i) => `${i}`);
 
   const learningTimes1 = Array.from({ length: 10 }).map((_, i) => i);
 
   const doSession = ({ session }: DoSessionParams) =>
-    Object.fromEntries(session.map((task) => [task, 0.5]));
+    Object.fromEntries(
+      session.map((taskDescription) => [taskDescription, 0.5]),
+    );
 
   const doSession2 = ({ session, index }: DoSessionParams) =>
     Object.fromEntries(
-      session.map((task) => [task, index < 2 ? 0 : index < 4 ? 0.5 : 1]),
+      session.map((taskDescription) => [
+        taskDescription,
+        index < 2 ? 0 : index < 4 ? 0.5 : 1,
+      ]),
     );
 
   describe('creates valid sessions', () => {
-    it('returns the requested number of distinct known subjects', () => {
-      const scheduler = createScheduler(subjects);
+    it('returns the requested number of distinct known taskDescriptions', () => {
+      const scheduler = createScheduler(taskDescriptions);
 
       const session = nextSessionIds(scheduler, 10, 0);
 
       expect(session).toHaveLength(10);
       expect(new Set(session).size).toBe(session.length);
-      expect(session.every((subject) => subjects.includes(subject))).toBe(true);
+      expect(
+        session.every((taskDescription) =>
+          taskDescriptions.includes(taskDescription),
+        ),
+      ).toBe(true);
     });
 
-    it('returns an empty session when no subjects are requested', () => {
-      const scheduler = createScheduler(subjects);
+    it('returns an empty session when no taskDescriptions are requested', () => {
+      const scheduler = createScheduler(taskDescriptions);
 
       expect(nextSessionIds(scheduler, 0, 0)).toEqual([]);
     });
   });
 
-  describe('repeats learned subjects', () => {
-    it('keeps a mastered subject available for later repetition', () => {
-      const scheduler = createScheduler(['subject']);
+  describe('repeats learned taskDescriptions', () => {
+    it('keeps a mastered taskDescription available for later repetition', () => {
+      const scheduler = createScheduler(['taskDescription']);
 
       const firstSession = nextSessionIds(scheduler, 1, 0);
-      scheduler.recordResults({ subject: 1 }, 0);
+      scheduler.recordResults({ taskDescription: 1 }, 0);
 
-      expect(firstSession).toEqual(['subject']);
-      expect(nextSessionIds(scheduler, 1, 1)).toEqual(['subject']);
-      expect(nextSessionIds(scheduler, 1, 10)).toEqual(['subject']);
+      expect(firstSession).toEqual(['taskDescription']);
+      expect(nextSessionIds(scheduler, 1, 1)).toEqual(['taskDescription']);
+      expect(nextSessionIds(scheduler, 1, 10)).toEqual(['taskDescription']);
     });
 
-    it('uses a failed repetition to make the subject available again', () => {
-      const scheduler = createScheduler(['subject']);
+    it('uses a failed repetition to make the taskDescription available again', () => {
+      const scheduler = createScheduler(['taskDescription']);
 
-      expect(nextSessionIds(scheduler, 1, 0)).toEqual(['subject']);
-      scheduler.recordResults({ subject: 0 }, 0);
+      expect(nextSessionIds(scheduler, 1, 0)).toEqual(['taskDescription']);
+      scheduler.recordResults({ taskDescription: 0 }, 0);
 
-      expect(nextSessionIds(scheduler, 1, 1)).toContain('subject');
+      expect(nextSessionIds(scheduler, 1, 1)).toContain('taskDescription');
     });
   });
 
-  describe.skip('limits number of learning in progress subjects', () => {
+  describe.skip('limits number of learning in progress taskDescriptions', () => {
     it.each([
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
     ])('case $#', ({ learningTimes, doSession }) =>
       LearnSchedulerTestWrapper({
         learningTimes,
-        subjects,
-        tasksPerSession: 10,
+        taskDescriptions,
+        taskDescriptionsPerSession: 10,
         doSession,
         checkSession: ({ masteries }) => {
           expect(Object.values(masteries).length).toEqual(100);
@@ -159,7 +171,7 @@ describe('LearnScheduler', () => {
     );
   });
 
-  describe('assures constant repetition of learning in progress subjects', () => {
+  describe('assures constant repetition of learning in progress taskDescriptions', () => {
     it.each([
       { learningTimes: learningTimes1, doSession },
       { learningTimes: learningTimes1, doSession: doSession2 },
@@ -167,15 +179,21 @@ describe('LearnScheduler', () => {
       let checkForNextSession: string[] = [];
       LearnSchedulerTestWrapper({
         learningTimes,
-        subjects,
-        tasksPerSession: 10,
+        taskDescriptions,
+        taskDescriptionsPerSession: 10,
         doSession,
         checkSession: ({ masteries, session }) => {
-          expect(checkForNextSession.every((task) => session.includes(task)));
+          expect(
+            checkForNextSession.every((taskDescription) =>
+              session.includes(taskDescription),
+            ),
+          );
           checkForNextSession = session.filter(
-            (task) =>
-              masteries[task] > intensiveLearningInProgressMasteryMin &&
-              masteries[task] < intensiveLearningInProgressMasteryMax,
+            (taskDescription) =>
+              masteries[taskDescription] >
+                intensiveLearningInProgressMasteryMin &&
+              masteries[taskDescription] <
+                intensiveLearningInProgressMasteryMax,
           );
         },
       });
@@ -190,24 +208,30 @@ describe('LearnScheduler', () => {
       let lastRepetition: Record<string, { day: number; mastery: number }> = {};
       LearnSchedulerTestWrapper({
         learningTimes,
-        subjects,
-        tasksPerSession: 10,
+        taskDescriptions,
+        taskDescriptionsPerSession: 10,
         doSession,
         checkSession: ({ day, masteries, session }) => {
           expect(
             session.every(
-              (task) =>
+              (taskDescription) =>
                 !(
-                  masteries[task] > learningInProgressMasteryMax &&
-                  lastRepetition[task].mastery > learningInProgressMasteryMax
-                ) || day - lastRepetition[task].day > minTimeForRepetition,
+                  masteries[taskDescription] > learningInProgressMasteryMax &&
+                  lastRepetition[taskDescription].mastery >
+                    learningInProgressMasteryMax
+                ) ||
+                day - lastRepetition[taskDescription].day >
+                  minTimeForRepetition,
             ),
           );
 
           lastRepetition = {
             ...lastRepetition,
             ...Object.fromEntries(
-              session.map((task) => [task, { day, mastery: masteries[task] }]),
+              session.map((taskDescription) => [
+                taskDescription,
+                { day, mastery: masteries[taskDescription] },
+              ]),
             ),
           };
         },

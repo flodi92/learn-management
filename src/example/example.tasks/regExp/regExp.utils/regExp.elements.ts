@@ -1,4 +1,8 @@
-import { InitialRegExpTask, RegExpElement, RegExpTask } from '../regExp.model';
+import {
+  InitialRegExpTaskDescription,
+  RegExpElement,
+  RegExpTaskDescription,
+} from '../regExp.model';
 
 const MODIFIER_FLAGS: RegExpElement[] = [
   'd',
@@ -258,10 +262,10 @@ export const getRegExpElements = (expression: RegExp): RegExpElement[] => {
   return Array.from(elements);
 };
 
-export const setRegExpElements = <T extends InitialRegExpTask>(
-  tasksWithIds: T[],
-): (T & { elements: RegExpTask['elements'] })[] =>
-  tasksWithIds.map((task) => ({
-    ...task,
-    elements: getRegExpElements(task.expression),
+export const setRegExpElements = <T extends InitialRegExpTaskDescription>(
+  taskDescriptionsWithIds: T[],
+): (T & { elements: RegExpTaskDescription['elements'] })[] =>
+  taskDescriptionsWithIds.map((taskDescription) => ({
+    ...taskDescription,
+    elements: getRegExpElements(taskDescription.expression),
   }));

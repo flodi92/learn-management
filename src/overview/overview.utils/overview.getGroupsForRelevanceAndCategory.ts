@@ -1,11 +1,11 @@
-import { LearnSubject } from '../../model';
+import { TaskDescription } from '../../model';
 import { GetGroups } from './overview.computeStatistics.model';
 import { RelevanceCategoryGroupType } from '../overview.model';
 
 export const getGroupsForRelevanceAndCategory: GetGroups<
-  LearnSubject,
+  TaskDescription,
   RelevanceCategoryGroupType
-> = (groupType, subject) =>
+> = (groupType, taskDescription) =>
   groupType === 'category'
-    ? (subject.categories ?? [])
-    : [subject.relevance ?? 1];
+    ? (taskDescription.categories ?? [])
+    : [taskDescription.relevance ?? 1];

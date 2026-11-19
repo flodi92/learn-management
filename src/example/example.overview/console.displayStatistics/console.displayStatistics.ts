@@ -1,8 +1,8 @@
 import readline from 'node:readline';
 import {
-  OverviewGroupTypeOrSubject,
+  OverviewGroupTypeOrTaskDescription,
   OverviewSelectionPath,
-  OverviewSubjectSelection,
+  OverviewTaskDescriptionSelection,
 } from '../../../overview/overview.model';
 import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
 import {
@@ -29,7 +29,7 @@ import {
   pathId,
 } from './console.displayStatistics.utils';
 
-type SubjectSelection = () => OverviewSubjectSelection;
+type TaskDescriptionSelection = () => OverviewTaskDescriptionSelection;
 
 export class ConsoleDisplayStatistics<Statistics extends object> {
   private root?: OverviewRecursiveUndeterminedStatistics<Statistics>;
@@ -39,7 +39,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   private focus?: string[];
   private resolveDisplay?: () => void;
   private readonly showSelectionIndicators: boolean;
-  private readonly subjectSelection: SubjectSelection;
+  private readonly taskDescriptionSelection: TaskDescriptionSelection;
 
   constructor(
     private readonly formatStatistics: StatisticsFormatter<Statistics>,
@@ -48,10 +48,10 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     private readonly toggleSelection: (
       path: OverviewSelectionPath,
     ) => void = () => {},
-    subjectSelection?: SubjectSelection,
+    taskDescriptionSelection?: TaskDescriptionSelection,
   ) {
-    this.showSelectionIndicators = subjectSelection !== undefined;
-    this.subjectSelection = subjectSelection ?? (() => ({}));
+    this.showSelectionIndicators = taskDescriptionSelection !== undefined;
+    this.taskDescriptionSelection = taskDescriptionSelection ?? (() => ({}));
   }
 
   public display(
@@ -147,7 +147,9 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     );
     if (this.showSelectionIndicators) {
       console.log(
-        helpColor('space: toggle the focused group or subject selection'),
+        helpColor(
+          'space: toggle the focused group or taskDescription selection',
+        ),
       );
     }
     console.log(helpColor('enter: quit or accept current selection'));
@@ -157,7 +159,8 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     for (const line of this.lines) {
       const isFocused = !!line.path && pathId(line.path) === focusId;
       const pointer = isFocused ? focusPointerColor('> ') : '  ';
-      const selectionIndicator = this.getSubjectSelectionIndicator(line);
+      const selectionIndicator =
+        this.getTaskDescriptionSelectionIndicator(line);
       const text = line.statistics
         ? `${this.getStatisticsColor(line.statistics)(`${line.text}:`)} ${this.formatStatistics(line.statistics, isFocused)}`
         : line.text;
@@ -172,14 +175,14 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     }
   }
 
-  private getSubjectSelectionIndicator(line: Line<Statistics>): string {
+  private getTaskDescriptionSelectionIndicator(line: Line<Statistics>): string {
     if (!this.showSelectionIndicators || !line.path || !line.statistics) {
       return '';
     }
     const node = getNode(this.root!, line.path);
     if (!node || node.parentGroups) return '';
     const isSelected =
-      this.subjectSelection()[line.path[line.path.length - 1]] === true;
+      this.taskDescriptionSelection()[line.path[line.path.length - 1]] === true;
     return selectionStateIndicators[
       isSelected ? 'explicitSelectionUnselections' : 'implicitNoSelection'
     ].text;
@@ -240,11 +243,13 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     const node = getNode(this.root!, this.focus);
     if (!node) return;
     const parentGroups: readonly (readonly [string, string | number])[] =
-      node.parentGroups ?? [['subject', this.focus[this.focus.length - 1]]];
+      node.parentGroups ?? [
+        ['taskDescription', this.focus[this.focus.length - 1]],
+      ];
     this.toggleSelection(
       parentGroups.map(
         ([type, key]) =>
-          [type, key] as [OverviewGroupTypeOrSubject, string | number],
+          [type, key] as [OverviewGroupTypeOrTaskDescription, string | number],
       ),
     );
     this.update();
@@ -304,14 +309,14 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
   getStatisticsColor: StatisticsColorer<Statistics>,
   sortChildren: StatisticsSorter<Statistics>,
   toggleSelection: (path: OverviewSelectionPath) => void = () => {},
-  subjectSelection?: SubjectSelection,
+  taskDescriptionSelection?: TaskDescriptionSelection,
 ): Promise<void> => {
   const overview = new ConsoleDisplayStatistics(
     formatStatistics,
     getStatisticsColor,
     sortChildren,
     toggleSelection,
-    subjectSelection,
+    taskDescriptionSelection,
   );
   await overview.display(statistics);
 };

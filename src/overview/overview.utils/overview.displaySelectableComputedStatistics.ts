@@ -5,46 +5,46 @@ import {
   OverviewRecursiveStatistics,
   OverviewSelectionKey,
   OverviewSelectionPath,
-  OverviewSubjectSelection,
+  OverviewTaskDescriptionSelection,
 } from '../overview.model';
 import { getSelectionKey } from './overview.getSelectionKey';
-import { isSubjectSelectionPath } from './overview.isSubjectSelectionPath';
+import { isTaskDescriptionSelectionPath } from './overview.isTaskDescriptionSelectionPath';
 
 export class OverviewDisplaySelectableComputedStatistics {
   private statistics: OverviewRecursiveStatistics;
   private groupSelection: OverviewGroupSelection;
-  private subjectSelection: OverviewSubjectSelection = {};
+  private taskDescriptionSelection: OverviewTaskDescriptionSelection = {};
 
   constructor(
     createStatistics: CreateComputedStatistics,
     private displayComputedStatistics: DisplayComputedStatistics,
-    preselectedSubjectIds: string[],
+    preselectedTaskDescriptionIds: string[],
   ) {
     this.statistics = createStatistics(
       () => this.selectedItems,
       () => this.groupSelection,
     );
     this.groupSelection = Object.fromEntries(
-      preselectedSubjectIds.map((id) => [
-        getSelectionKey([['subject', id]]),
+      preselectedTaskDescriptionIds.map((id) => [
+        getSelectionKey([['taskDescription', id]]),
         true,
       ]),
     );
-    this.updateSubjectSelection();
+    this.updateTaskDescriptionSelection();
   }
 
   public async display(): Promise<string[]> {
     await this.displayComputedStatistics(
       this.statistics,
       this.toggleSelection.bind(this),
-      () => this.subjectSelection,
+      () => this.taskDescriptionSelection,
     );
 
     return this.selectedItems;
   }
 
   private get selectedItems() {
-    return Object.entries(this.subjectSelection)
+    return Object.entries(this.taskDescriptionSelection)
       .filter(([, selected]) => selected)
       .map(([id]) => id);
   }
@@ -53,17 +53,17 @@ export class OverviewDisplaySelectableComputedStatistics {
     const pathStr = getSelectionKey(path);
     const selected = this.groupSelection[pathStr];
 
-    if (isSubjectSelectionPath(path)) {
+    if (isTaskDescriptionSelectionPath(path)) {
       this.groupSelection[pathStr] = selected === true ? undefined : true;
     } else {
       this.groupSelection[pathStr] =
         selected === undefined ? true : selected === true ? false : undefined;
     }
 
-    this.updateSubjectSelection();
+    this.updateTaskDescriptionSelection();
   }
 
-  private updateSubjectSelection() {
+  private updateTaskDescriptionSelection() {
     const entries = (
       Object.entries(this.groupSelection) as [
         OverviewSelectionKey,
@@ -74,15 +74,15 @@ export class OverviewDisplaySelectableComputedStatistics {
         [JSON.parse(pathStr) as OverviewSelectionPath, selected] as const,
     );
 
-    const [subjectSelection, pureGroupSelection] = entries.reduce(
+    const [taskDescriptionSelection, pureGroupSelection] = entries.reduce(
       (acc, entry): [typeof entries, typeof entries] => {
-        const [subjectSelection, pureGroupSelection] = acc;
+        const [taskDescriptionSelection, pureGroupSelection] = acc;
         const [path] = entry;
         const [lastGroupType] = path[path.length - 1];
 
-        return lastGroupType === 'subject'
-          ? [[...subjectSelection, entry], pureGroupSelection]
-          : [subjectSelection, [...pureGroupSelection, entry]];
+        return lastGroupType === 'taskDescription'
+          ? [[...taskDescriptionSelection, entry], pureGroupSelection]
+          : [taskDescriptionSelection, [...pureGroupSelection, entry]];
       },
       [[], []] as [typeof entries, typeof entries],
     );
@@ -91,7 +91,7 @@ export class OverviewDisplaySelectableComputedStatistics {
       ([pathA], [pathB]) => pathA.length - pathB.length,
     );
 
-    this.subjectSelection = sortedPureGroupSelection.reduce(
+    this.taskDescriptionSelection = sortedPureGroupSelection.reduce(
       (acc, [path, selected]) => {
         const childrenIds = this.statistics.getChildrenIds!(path);
 
@@ -103,16 +103,19 @@ export class OverviewDisplaySelectableComputedStatistics {
 
         return acc;
       },
-      {} as OverviewSubjectSelection,
+      {} as OverviewTaskDescriptionSelection,
     );
 
-    this.subjectSelection = subjectSelection.reduce((acc, [path, selected]) => {
-      const [, lastId] = path[path.length - 1];
-      acc[lastId] = selected ? true : undefined;
-      return acc;
-    }, this.subjectSelection);
+    this.taskDescriptionSelection = taskDescriptionSelection.reduce(
+      (acc, [path, selected]) => {
+        const [, lastId] = path[path.length - 1];
+        acc[lastId] = selected ? true : undefined;
+        return acc;
+      },
+      this.taskDescriptionSelection,
+    );
 
-    this.subjectSelection = sortedPureGroupSelection
+    this.taskDescriptionSelection = sortedPureGroupSelection
       .reverse()
       .reduce((acc, [path, selected]) => {
         const childrenIds = this.statistics.getChildrenIds!(path);
@@ -124,17 +127,17 @@ export class OverviewDisplaySelectableComputedStatistics {
         });
 
         return acc;
-      }, this.subjectSelection);
+      }, this.taskDescriptionSelection);
   }
 }
 
 export const displaySelectableComputedStatistics = (
   displayComputedStatistics: DisplayComputedStatistics,
   createStatistics: CreateComputedStatistics,
-  preselectedSubjectIds: string[],
+  preselectedTaskDescriptionIds: string[],
 ) =>
   new OverviewDisplaySelectableComputedStatistics(
     createStatistics,
     displayComputedStatistics,
-    preselectedSubjectIds,
+    preselectedTaskDescriptionIds,
   ).display();

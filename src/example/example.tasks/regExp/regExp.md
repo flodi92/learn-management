@@ -6,15 +6,15 @@
 - try to make the same examples in other tasks to make clear the commonalities and differences
 - try to be complete and add an example for every type of string that is covered by the expression
 - an example is either a `string` or `{ value: string, alternative: string }`; use the object form when an example contains whitespace other than an ordinary space (`\n`, `\t`, `\r`, `\v`, `\f`) or an invisible control character such as backspace, null, or `\x01`. Examples containing only ordinary spaces remain strings. In the object form, `value` is the tested string and `alternative` uses readable markers such as `abc<tab>def` or `a<newline>b`; for a standalone invisible character use a label such as `tab`, `newline`, `backspace`, or `null character`, since regExpTaskPresenter displays the alternative inside `<...>`.
-- define the task structure in regExp.model.ts; author only the fields of InitialRegExpTask
+- define the task structure in regExp.model.ts; author only the fields of InitialRegExpTaskDescription
 - do not use logic in index.ts, regExp.simpleExpressions.ts, or regExp.simpleCombinations.ts apart from invoking an imported function; only use nested objects, arrays, RegExp, string, and number values
 
 ## file structure
 
-- regExp.model.ts defines `InitialRegExpTask` (the authored task data) and `RegExpTask` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
-- regExp.simpleExpressions.ts contains the simple-expression `InitialRegExpTask` arrays, concatenated into `simpleExpressions`
-- regExp.simpleCombinations.ts contains the simple- and complex-combination `InitialRegExpTask` arrays, concatenated into `simpleCombinations`
-- index.ts combines both source arrays as `initialTasks` and exports `tasks` after adding the derived attributes
+- regExp.model.ts defines `InitialRegExpTaskDescription` (the authored task data) and `RegExpTaskDescription` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
+- regExp.simpleExpressions.ts contains the simple-expression `InitialRegExpTaskDescription` arrays, concatenated into `simpleExpressions`
+- regExp.simpleCombinations.ts contains the simple- and complex-combination `InitialRegExpTaskDescription` arrays, concatenated into `simpleCombinations`
+- index.ts combines both source arrays as `initialTaskDescriptions` and exports `regExpTaskDescriptions` after adding the derived attributes
 - utils/regExp.utils.ts coordinates enrichment; utils/regExp.elements.ts derives expression elements, and utils/regExp.parentIds.ts derives the direct parent relationships
 - keep parsing and enrichment logic in `utils/`; the task definition files should remain declarative
 
@@ -30,8 +30,8 @@
 
 ### task data and derived attributes
 
-- An `InitialRegExpTask` supplies an `expression` and optional `positiveExamples`, `negativeExamples` (each a `RegExpExample`: string or `{ value, alternative }`), and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
-- `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTasks` array, derives its `elements` from the regular expression, then derives its `parentIds`.
+- An `InitialRegExpTaskDescription` supplies an `expression` and optional `positiveExamples`, `negativeExamples` (each a `RegExpExample`: string or `{ value, alternative }`), and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
+- `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTaskDescriptions` array, derives its `elements` from the regular expression, then derives its `parentIds`.
 - `elements` is a unique list of recognized regex aspects: syntax such as character classes, assertions, groups, quantifiers, and alternation, together with modifier flags. Repeated occurrences of the same aspect are listed once.
 - Anchoring is treated as the default: when both `^` and `$` are present they are omitted from `elements`; when just one is present that assertion is included; when neither is present, `anywhere` is included. Write exceptions intentionally when a task teaches anchor behavior or unanchored matching.
 - A task is a parent only when its element set is a proper subset of the other task's element set. `parentIds` contains only the nearest (direct) parents; incomparable direct parents may both be included, while equal element sets do not create a parent relationship.

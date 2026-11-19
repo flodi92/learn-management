@@ -1,29 +1,32 @@
-import { computeSubjectStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeSubjectStatisticsAt';
+import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
 import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/learnScheduler.utils/determineLearningStateFromStatisticsItem';
-import { LearnSubject, TimedResult } from '../../model';
-import { OverviewSubjectStatisticsItem } from '../overview.model';
+import { TaskDescription, TimedResult } from '../../model';
+import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
 import {
-  SubjectStatisticsTuple,
-  SubjectStatisticsTuples,
+  TaskDescriptionStatisticsTuple,
+  TaskDescriptionStatisticsTuples,
 } from './overview.computeStatistics.model';
 
-export const computeSubjectsStatistics = <Subject extends LearnSubject>(
-  idSubjectMapping: Record<string, Subject>,
+export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
+  idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
-): SubjectStatisticsTuples<Subject, OverviewSubjectStatisticsItem> => {
-  const subjectStatistics = computeSubjectStatisticsAt(
+): TaskDescriptionStatisticsTuples<
+  TD,
+  OverviewTaskDescriptionStatisticsItem
+> => {
+  const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
     day,
-    idSubjectMapping,
+    idTaskDescriptionMapping,
     results,
   );
 
-  return Object.entries(subjectStatistics).map(
+  return Object.entries(taskDescriptionStatistics).map(
     ([id, statisticsItem]) =>
       [
         id,
-        idSubjectMapping[id],
+        idTaskDescriptionMapping[id],
         {
           id,
           label: getLabelFromId(id),
@@ -37,9 +40,9 @@ export const computeSubjectsStatistics = <Subject extends LearnSubject>(
           lastMastery: statisticsItem.lastMastery,
           lastCorrectness: statisticsItem.lastCorrectness,
         },
-      ] satisfies SubjectStatisticsTuple<
-        Subject,
-        OverviewSubjectStatisticsItem
+      ] satisfies TaskDescriptionStatisticsTuple<
+        TD,
+        OverviewTaskDescriptionStatisticsItem
       >,
   );
 };

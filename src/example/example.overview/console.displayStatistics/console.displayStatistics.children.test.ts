@@ -9,11 +9,11 @@ import { sortChildren } from '../console.displayStatisticsItem.utils/console.sor
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
-// Children are named "subject 01", "subject 02", ... and sorted by their decreasing mastery
+// Children are named "taskDescription 01", "taskDescription 02", ... and sorted by their decreasing mastery
 const createStatistics = (
   numberOfChildren: number,
 ): OverviewRecursiveUndeterminedStatistics<OverviewStatistics> => ({
-  groupType: 'subject',
+  groupType: 'taskDescription',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
     selected: 0,
@@ -25,7 +25,7 @@ const createStatistics = (
   },
   children: Object.fromEntries(
     Array.from({ length: numberOfChildren }, (_, index) => {
-      const label = `subject ${String(index + 1).padStart(2, '0')}`;
+      const label = `taskDescription ${String(index + 1).padStart(2, '0')}`;
       return [
         label,
         {
@@ -82,8 +82,8 @@ describe('ConsoleDisplayStatistics with many children', () => {
     start(35);
     const lines = childLines();
     expect(lines).toHaveLength(16);
-    expect(lines[0]).toMatch(/^ {2}> subject 01: /);
-    expect(lines[14]).toMatch(/^ {4}subject 15: /);
+    expect(lines[0]).toMatch(/^ {2}> taskDescription 01: /);
+    expect(lines[14]).toMatch(/^ {4}taskDescription 15: /);
     expect(lines[15]).toBe('    …');
   });
 
@@ -96,21 +96,21 @@ describe('ConsoleDisplayStatistics with many children', () => {
   it('adds the next 15 children when going down from the last shown child', () => {
     start(35);
     press('down', 14);
-    expect(focusedLine()).toMatch(/subject 15: /);
+    expect(focusedLine()).toMatch(/taskDescription 15: /);
     expect(childLines()).toHaveLength(16);
 
     press('down');
-    expect(focusedLine()).toMatch(/subject 16: /);
+    expect(focusedLine()).toMatch(/taskDescription 16: /);
     const lines = childLines();
     expect(lines).toHaveLength(31);
-    expect(lines[29]).toMatch(/subject 30: /);
+    expect(lines[29]).toMatch(/taskDescription 30: /);
     expect(lines[30]).toBe('    …');
   });
 
   it('shows all children after loading the last chunk', () => {
     start(35);
     press('down', 14 + 1 + 14 + 1);
-    expect(focusedLine()).toMatch(/subject 31: /);
+    expect(focusedLine()).toMatch(/taskDescription 31: /);
     const lines = childLines();
     expect(lines).toHaveLength(35);
     expect(lines.every((line) => !line.includes('…'))).toBe(true);
@@ -136,13 +136,13 @@ describe('ConsoleDisplayStatistics with many children', () => {
       sortChildren,
     ).display(statistics);
     press('right');
-    expect(focusedLine()).toMatch(/subject 01: /);
+    expect(focusedLine()).toMatch(/taskDescription 01: /);
     // parent, heading, 15 children, ellipsis
     expect(childLines()).toHaveLength(18);
     press('down', 14);
-    expect(focusedLine()).toMatch(/subject 15: /);
+    expect(focusedLine()).toMatch(/taskDescription 15: /);
     press('down');
-    expect(focusedLine()).toMatch(/subject 16: /);
+    expect(focusedLine()).toMatch(/taskDescription 16: /);
     expect(childLines()).toHaveLength(22);
   });
 });

@@ -23,7 +23,7 @@ Follow the style of the surrounding files.
 
 - PascalCase for classes, interfaces, types and type parameters (descriptive words, `T` only for pass-through helpers); camelCase for everything else, including constants and string-literal values. No enums, no UPPER_SNAKE_CASE, no default exports.
 - Functions are arrow functions with verb-first names (`compute…`, `get…`, `determine…`, `is…` for predicates).
-- Prefix a module's types with the module name (`RegExpTask`); parameter-object types are `<FunctionName>Props`.
+- Prefix a module's types with the module name (`RegExpTaskDescription`); parameter-object types are `<FunctionName>Props`.
 - Collections are plural, counts are `numberOf…`, booleans read as statements (`isFocused`), units are part of the name (`…Days`), backing fields of accessors start with `_`.
 - Spell it `regExp` and `dataBase`.
 - Tests: `describe` names the unit under test, `it` describes behavior in third person.

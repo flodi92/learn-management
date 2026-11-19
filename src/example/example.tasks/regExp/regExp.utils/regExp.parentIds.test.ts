@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { setParentIds } from './regExp.parentIds';
-import { RegExpTask } from '../regExp.model';
+import { RegExpTaskDescription } from '../regExp.model';
 
-type TaskWithElements = Pick<RegExpTask, 'id' | 'expression' | 'elements'>;
+type TaskDescriptionWithElements = Pick<
+  RegExpTaskDescription,
+  'id' | 'expression' | 'elements'
+>;
 
-const task = (
+const taskDescription = (
   id: string,
-  elements: TaskWithElements['elements'],
-): TaskWithElements => ({
+  elements: TaskDescriptionWithElements['elements'],
+): TaskDescriptionWithElements => ({
   id,
   expression: /x/,
   elements,
@@ -15,21 +18,30 @@ const task = (
 
 describe('setParentIds', () => {
   it('assigns no parents when there is no subset relationship', () => {
-    const result = setParentIds([task('0', ['\\d']), task('1', ['\\w'])]);
+    const result = setParentIds([
+      taskDescription('0', ['\\d']),
+      taskDescription('1', ['\\w']),
+    ]);
 
     expect(result.find((t) => t.id === '0')?.parentIds).toEqual([]);
     expect(result.find((t) => t.id === '1')?.parentIds).toEqual([]);
   });
 
-  it('assigns a task with a proper subset of elements as parent', () => {
-    const result = setParentIds([task('0', ['\\d']), task('1', ['\\d', 'x+'])]);
+  it('assigns a taskDescription with a proper subset of elements as parent', () => {
+    const result = setParentIds([
+      taskDescription('0', ['\\d']),
+      taskDescription('1', ['\\d', 'x+']),
+    ]);
 
     expect(result.find((t) => t.id === '0')?.parentIds).toEqual([]);
     expect(result.find((t) => t.id === '1')?.parentIds).toEqual(['0']);
   });
 
-  it('does not treat tasks with identical elements as parents of each other', () => {
-    const result = setParentIds([task('0', ['\\d']), task('1', ['\\d'])]);
+  it('does not treat taskDescriptions with identical elements as parents of each other', () => {
+    const result = setParentIds([
+      taskDescription('0', ['\\d']),
+      taskDescription('1', ['\\d']),
+    ]);
 
     expect(result.find((t) => t.id === '0')?.parentIds).toEqual([]);
     expect(result.find((t) => t.id === '1')?.parentIds).toEqual([]);
@@ -37,9 +49,9 @@ describe('setParentIds', () => {
 
   it('only keeps the direct parent, skipping indirect ancestors', () => {
     const result = setParentIds([
-      task('0', []),
-      task('1', ['\\d']),
-      task('2', ['\\d', 'x+']),
+      taskDescription('0', []),
+      taskDescription('1', ['\\d']),
+      taskDescription('2', ['\\d', 'x+']),
     ]);
 
     expect(result.find((t) => t.id === '2')?.parentIds).toEqual(['1']);
@@ -47,9 +59,9 @@ describe('setParentIds', () => {
 
   it('assigns multiple direct parents when none of them is an ancestor of another', () => {
     const result = setParentIds([
-      task('0', ['\\d']),
-      task('1', ['\\w']),
-      task('2', ['\\d', '\\w']),
+      taskDescription('0', ['\\d']),
+      taskDescription('1', ['\\w']),
+      taskDescription('2', ['\\d', '\\w']),
     ]);
 
     expect(result.find((t) => t.id === '2')?.parentIds).toEqual(
@@ -60,10 +72,10 @@ describe('setParentIds', () => {
 
   it('forms a directed graph without cycles for a chain of subsets', () => {
     const result = setParentIds([
-      task('0', []),
-      task('1', ['\\d']),
-      task('2', ['\\d', 'x+']),
-      task('3', ['\\d', 'x+', 'g']),
+      taskDescription('0', []),
+      taskDescription('1', ['\\d']),
+      taskDescription('2', ['\\d', 'x+']),
+      taskDescription('3', ['\\d', 'x+', 'g']),
     ]);
 
     expect(result.find((t) => t.id === '0')?.parentIds).toEqual([]);

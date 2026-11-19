@@ -1,8 +1,8 @@
-import { LearnSubject, Result } from '../model';
+import { Result, TaskDescription } from '../model';
 
-export abstract class TaskPresenter<Task extends LearnSubject> {
+export abstract class TaskPresenter<TD extends TaskDescription> {
   abstract set onAnswered(handler: (result: Result) => void);
   abstract set onFinished(handler: () => void);
 
-  abstract start(tasks: Task[]): void;
+  abstract start(taskDescriptions: TD[]): void;
 }

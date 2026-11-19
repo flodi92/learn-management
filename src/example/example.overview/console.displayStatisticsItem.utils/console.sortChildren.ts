@@ -4,7 +4,7 @@ import {
   OverviewStatistics,
 } from '../../../overview/overview.model';
 import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
-import { isOverviewSubjectStatisticsItem } from './console.formatStatistics';
+import { isOverviewTaskDescriptionStatisticsItem } from './console.formatStatistics';
 
 const learningStateShares = (
   statistics: OverviewAggregatedStatisticsItem,
@@ -36,14 +36,14 @@ const compareStatistics = (
   b: OverviewStatistics,
 ): number => {
   if (
-    isOverviewSubjectStatisticsItem(a) &&
-    isOverviewSubjectStatisticsItem(b)
+    isOverviewTaskDescriptionStatisticsItem(a) &&
+    isOverviewTaskDescriptionStatisticsItem(b)
   ) {
     return b.mastery - a.mastery;
   }
   if (
-    !isOverviewSubjectStatisticsItem(a) &&
-    !isOverviewSubjectStatisticsItem(b)
+    !isOverviewTaskDescriptionStatisticsItem(a) &&
+    !isOverviewTaskDescriptionStatisticsItem(b)
   ) {
     return compareAggregatedStatistics(a, b);
   }

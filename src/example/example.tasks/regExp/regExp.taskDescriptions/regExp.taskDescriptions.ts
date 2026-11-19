@@ -1,11 +1,13 @@
-import { InitialRegExpTask } from '../regExp.model';
+import { InitialRegExpTaskDescription } from '../regExp.model';
 import { simpleCombinations } from './regExp.simpleCombinations';
 import { simpleExpressions } from './regExp.simpleExpressions';
 import { addMissingRegExpAttributes } from '../regExp.utils/regExp.utils';
 
-export const initialTasks: InitialRegExpTask[] = [
+export const initialTaskDescriptions: InitialRegExpTaskDescription[] = [
   ...simpleExpressions,
   ...simpleCombinations,
 ];
 
-export const regExpTasks = addMissingRegExpAttributes(initialTasks);
+export const regExpTaskDescriptions = addMissingRegExpAttributes(
+  initialTaskDescriptions,
+);

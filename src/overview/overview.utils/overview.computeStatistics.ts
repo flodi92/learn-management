@@ -1,31 +1,31 @@
-import { LearnSubject, TimedResult } from '../../model';
+import { TaskDescription, TimedResult } from '../../model';
 import { OverviewRecursiveUndeterminedStatistics } from './overview.computeStatistics.model';
-import { SubjectStatisticsTuples } from './overview.computeStatistics.model';
+import { TaskDescriptionStatisticsTuples } from './overview.computeStatistics.model';
 import {
   ComputeAggregatedStatistics,
-  ComputeSubjectStatistics,
+  ComputeTaskDescriptionStatistics,
   GetGroups,
-  GroupTypeOrSubject,
+  GroupTypeOrTaskDescription,
 } from './overview.computeStatistics.model';
 
 class StatisticsComputation<
-  Subject extends LearnSubject,
+  TD extends TaskDescription,
   GroupType extends string,
-  SubjectStatistics extends object,
+  TaskDescriptionStatistics extends object,
   AggregatedStatistics extends object,
 > implements OverviewRecursiveUndeterminedStatistics<
-  SubjectStatistics | AggregatedStatistics,
-  GroupTypeOrSubject<GroupType>
+  TaskDescriptionStatistics | AggregatedStatistics,
+  GroupTypeOrTaskDescription<GroupType>
 > {
   constructor(
-    private subjectStatisticsTuples: SubjectStatisticsTuples<
-      Subject,
-      SubjectStatistics
+    private taskDescriptionStatisticsTuples: TaskDescriptionStatisticsTuples<
+      TD,
+      TaskDescriptionStatistics
     >,
     private groupTypes: GroupType[],
-    private getGroups: GetGroups<Subject, GroupType>,
+    private getGroups: GetGroups<TD, GroupType>,
     private computeAggregatedStatistics: ComputeAggregatedStatistics<
-      SubjectStatistics,
+      TaskDescriptionStatistics,
       AggregatedStatistics
     >,
     private getSelectedIds: () => string[],
@@ -38,8 +38,8 @@ class StatisticsComputation<
     ])[] = [],
   ) {}
 
-  public get groupType(): GroupTypeOrSubject<GroupType> {
-    return this.groupTypes.length ? this.groupTypes[0] : 'subject';
+  public get groupType(): GroupTypeOrTaskDescription<GroupType> {
+    return this.groupTypes.length ? this.groupTypes[0] : 'taskDescription';
   }
 
   private get childrensGroupTypes() {
@@ -48,8 +48,8 @@ class StatisticsComputation<
 
   public get statistics(): AggregatedStatistics {
     return this.computeAggregatedStatistics(
-      this.subjectStatisticsTuples.map(
-        ([id, subject, progressItem]) => progressItem,
+      this.taskDescriptionStatisticsTuples.map(
+        ([id, taskDescription, progressItem]) => progressItem,
       ),
       this.getSelectedIds(),
       this.getGroupSelection(this.parentGroups),
@@ -59,16 +59,16 @@ class StatisticsComputation<
   private _children?: Record<
     string | number,
     OverviewRecursiveUndeterminedStatistics<
-      SubjectStatistics | AggregatedStatistics,
-      GroupTypeOrSubject<GroupType>
+      TaskDescriptionStatistics | AggregatedStatistics,
+      GroupTypeOrTaskDescription<GroupType>
     >
   >;
 
   get children(): Record<
     string | number,
     OverviewRecursiveUndeterminedStatistics<
-      SubjectStatistics | AggregatedStatistics,
-      GroupTypeOrSubject<GroupType>
+      TaskDescriptionStatistics | AggregatedStatistics,
+      GroupTypeOrTaskDescription<GroupType>
     >
   > {
     if (this._children === undefined) {
@@ -79,16 +79,17 @@ class StatisticsComputation<
   }
 
   private computeChildren() {
-    const { groupType, childrensGroupTypes, subjectStatisticsTuples } = this;
+    const { groupType, childrensGroupTypes, taskDescriptionStatisticsTuples } =
+      this;
 
-    if (groupType === 'subject') {
+    if (groupType === 'taskDescription') {
       return Object.fromEntries(
-        subjectStatisticsTuples.map(
-          ([id, subject, progressItem]) =>
+        taskDescriptionStatisticsTuples.map(
+          ([id, taskDescription, progressItem]) =>
             [
               id,
               {
-                groupType: 'subject',
+                groupType: 'taskDescription',
                 statistics: progressItem,
               },
             ] as const,
@@ -96,10 +97,10 @@ class StatisticsComputation<
       );
     }
 
-    const groupedTuples = subjectStatisticsTuples.reduce(
+    const groupedTuples = taskDescriptionStatisticsTuples.reduce(
       (acc, tuple) => {
-        const [id, subject, progressItem] = tuple;
-        const groups = this.getGroups(groupType, subject);
+        const [id, taskDescription, progressItem] = tuple;
+        const groups = this.getGroups(groupType, taskDescription);
 
         groups.forEach((group) => {
           if (!acc[group]) acc[group] = [];
@@ -110,7 +111,7 @@ class StatisticsComputation<
       },
       {} as Record<
         string | number,
-        SubjectStatisticsTuples<Subject, SubjectStatistics>
+        TaskDescriptionStatisticsTuples<TD, TaskDescriptionStatistics>
       >,
     );
 
@@ -131,10 +132,10 @@ class StatisticsComputation<
   }
 
   public getChildrenIds(
-    path: [GroupTypeOrSubject<GroupType>, string | number][],
+    path: [GroupTypeOrTaskDescription<GroupType>, string | number][],
   ): string[] {
     if (path.length === 0) {
-      return this.subjectStatisticsTuples.map(([id]) => id);
+      return this.taskDescriptionStatisticsTuples.map(([id]) => id);
     }
 
     const [[expectedGroupType, group], ...restPath] = path;
@@ -142,8 +143,8 @@ class StatisticsComputation<
     const children: Record<
       string | number,
       OverviewRecursiveUndeterminedStatistics<
-        SubjectStatistics | AggregatedStatistics,
-        GroupTypeOrSubject<GroupType>
+        TaskDescriptionStatistics | AggregatedStatistics,
+        GroupTypeOrTaskDescription<GroupType>
       >
     > = this.children;
 
@@ -162,23 +163,23 @@ class StatisticsComputation<
 }
 
 export const computeStatistics = <
-  Subject extends LearnSubject,
+  TD extends TaskDescription,
   GroupType extends string,
-  SubjectStatistics extends object,
+  TaskDescriptionStatistics extends object,
   AggregatedStatistics extends object,
 >(
-  idSubjectMapping: Record<string, Subject>,
+  idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
   day: number,
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
-  getGroups: GetGroups<Subject, GroupType>,
-  computeSubjectsStatistics: ComputeSubjectStatistics<
-    Subject,
-    SubjectStatistics
+  getGroups: GetGroups<TD, GroupType>,
+  computeTaskDescriptionsStatistics: ComputeTaskDescriptionStatistics<
+    TD,
+    TaskDescriptionStatistics
   >,
   aggregateStatistics: ComputeAggregatedStatistics<
-    SubjectStatistics,
+    TaskDescriptionStatistics,
     AggregatedStatistics
   >,
   getSelectedIds: () => string[],
@@ -186,11 +187,11 @@ export const computeStatistics = <
     parentGroups: readonly (readonly [GroupType, string | number])[],
   ) => boolean | undefined,
 ): OverviewRecursiveUndeterminedStatistics<
-  SubjectStatistics | AggregatedStatistics,
-  GroupTypeOrSubject<GroupType>
+  TaskDescriptionStatistics | AggregatedStatistics,
+  GroupTypeOrTaskDescription<GroupType>
 > => {
-  const statistics = computeSubjectsStatistics(
-    idSubjectMapping,
+  const statistics = computeTaskDescriptionsStatistics(
+    idTaskDescriptionMapping,
     results,
     day,
     getLabelFromId,
