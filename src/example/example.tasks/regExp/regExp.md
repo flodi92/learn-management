@@ -11,11 +11,11 @@
 
 ## file structure
 
-- regExp.model.ts defines `InitialRegExpTaskDescription` (the authored task data) and `RegExpTaskDescription` (the enriched runtime task, with `id`, `elements`, and `parentIds`)
+- regExp.model.ts defines `InitialRegExpTaskDescription` (the authored task data) and `RegExpTaskDescription` (the enriched runtime task, with `id`, `elements`, and `parents`)
 - regExp.simpleExpressions.ts contains the simple-expression `InitialRegExpTaskDescription` arrays, concatenated into `simpleExpressions`
 - regExp.simpleCombinations.ts contains the simple- and complex-combination `InitialRegExpTaskDescription` arrays, concatenated into `simpleCombinations`
 - index.ts combines both source arrays as `initialTaskDescriptions` and exports `regExpTaskDescriptions` after adding the derived attributes
-- utils/regExp.utils.ts coordinates enrichment; utils/regExp.elements.ts derives expression elements, and utils/regExp.parentIds.ts derives the direct parent relationships
+- utils/regExp.utils.ts coordinates enrichment; utils/regExp.elements.ts derives expression elements, and utils/regExp.parents.ts derives the direct parent relationships
 - keep parsing and enrichment logic in `utils/`; the task definition files should remain declarative
 
 ### regex elements and relevances
@@ -30,11 +30,11 @@
 
 ### task data and derived attributes
 
-- An `InitialRegExpTaskDescription` supplies an `expression` and optional `positiveExamples`, `negativeExamples` (each a `RegExpExample`: string or `{ value, alternative }`), and `nots`. Do not manually add `id`, `elements`, or `parentIds` to task definitions.
-- `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTaskDescriptions` array, derives its `elements` from the regular expression, then derives its `parentIds`.
+- An `InitialRegExpTaskDescription` supplies an `expression` and optional `positiveExamples`, `negativeExamples` (each a `RegExpExample`: string or `{ value, alternative }`), and `nots`. Do not manually add `id`, `elements`, or `parents` to task definitions.
+- `addMissingRegExpAttributes` assigns each task a string `id` based on its position in the combined `initialTaskDescriptions` array, derives its `elements` from the regular expression, then derives its `parents`.
 - `elements` is a unique list of recognized regex aspects: syntax such as character classes, assertions, groups, quantifiers, and alternation, together with modifier flags. Repeated occurrences of the same aspect are listed once.
 - Anchoring is treated as the default: when both `^` and `$` are present they are omitted from `elements`; when just one is present that assertion is included; when neither is present, `anywhere` is included. Write exceptions intentionally when a task teaches anchor behavior or unanchored matching.
-- A task is a parent only when its element set is a proper subset of the other task's element set. `parentIds` contains only the nearest (direct) parents; incomparable direct parents may both be included, while equal element sets do not create a parent relationship.
+- A task is a parent only when its element set is a proper subset of the other task's element set. `parents` contains only the nearest (direct) parents; incomparable direct parents may both be included, while equal element sets do not create a parent relationship.
 - The element list is a teaching classification, not a second regex engine: the `expression` remains the source of matching behavior.
 
 ### tests

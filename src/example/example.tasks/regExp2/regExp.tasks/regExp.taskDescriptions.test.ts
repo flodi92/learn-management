@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { regExpSubjectDefinitions } from './regExp.model';
 import { initialTaskDescriptions } from './regExp.taskDescriptions';
 import { getComplexityOfExpression } from './regExp.utils/regExp.complexity';
-import { getParentExpressions } from './regExp.utils/regExp.parentIds';
+import { getParentExpressions } from './regExp.utils/regExp.parents';
 import { getSubjectsFromExpression } from './regExp.utils/regExp.subjects';
 
 describe('initialTaskDescriptions', () => {

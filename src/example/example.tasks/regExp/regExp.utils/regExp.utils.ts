@@ -6,7 +6,7 @@ import {
   RegExpTaskDescription,
 } from '../regExp.model';
 import { setRegExpElements } from './regExp.elements';
-import { setParentIds } from './regExp.parentIds';
+import { setParents } from './regExp.parents';
 
 export const getExampleValue = (example: RegExpExample): string =>
   typeof example === 'string' ? example : example.value;
@@ -65,11 +65,9 @@ export const addMissingRegExpAttributes = (
   const taskDescriptionsWithElements = setRegExpElements(
     taskDescriptionsWithIds,
   );
-  const taskDescriptionsWithParentIds = setParentIds(
-    taskDescriptionsWithElements,
-  );
+  const taskDescriptionsWithParents = setParents(taskDescriptionsWithElements);
   const taskDescriptionsWithCategoriesAndRelevance = setCategoriesAndRelevance(
-    taskDescriptionsWithParentIds,
+    taskDescriptionsWithParents,
   );
-  return setParentIds(taskDescriptionsWithCategoriesAndRelevance);
+  return setParents(taskDescriptionsWithCategoriesAndRelevance);
 };

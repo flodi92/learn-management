@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getParentExpressions } from './regExp.parentIds';
+import { getParentExpressions } from './regExp.parents';
 import { RegExpSubject } from '../regExp.model';
 
 const task = (expression: RegExp, subjects: RegExpSubject[]) => ({

@@ -22,7 +22,7 @@ const isProperSubset = (
   !isSubset(supersetElements, subsetElements);
 
 // direct parents only: exclude ancestors that are already reachable through another parent
-const getDirectParentIds = (
+const getDirectParents = (
   taskDescription: RegExpTaskDescriptionWithIdAndElements,
   candidates: RegExpTaskDescriptionWithIdAndElements[],
 ): string[] => {
@@ -44,13 +44,10 @@ const getDirectParentIds = (
   return directParents.map((parent) => parent.id);
 };
 
-export const setParentIds = <T extends RegExpTaskDescriptionWithIdAndElements>(
+export const setParents = <T extends RegExpTaskDescriptionWithIdAndElements>(
   taskDescriptionsWithElements: T[],
-): (T & { parentIds: RegExpTaskDescription['parentIds'] })[] =>
+): (T & { parents: RegExpTaskDescription['parents'] })[] =>
   taskDescriptionsWithElements.map((taskDescription) => ({
     ...taskDescription,
-    parentIds: getDirectParentIds(
-      taskDescription,
-      taskDescriptionsWithElements,
-    ),
+    parents: getDirectParents(taskDescription, taskDescriptionsWithElements),
   }));

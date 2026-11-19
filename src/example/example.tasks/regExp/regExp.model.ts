@@ -12,7 +12,7 @@ export type InitialRegExpTaskDescription = {
 
 export interface RegExpTaskDescription extends InitialRegExpTaskDescription {
   id: string;
-  parentIds: string[];
+  parents: string[];
   elements: RegExpElement[];
   categories: RegExpCategory[];
   relevance: RegExpRelevance;

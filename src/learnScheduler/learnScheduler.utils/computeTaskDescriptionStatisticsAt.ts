@@ -15,7 +15,7 @@ export const computeTaskDescriptionStatisticsAt = (
       const relevantResults = results
         .filter(
           (result) =>
-            idTaskDescriptionMapping[result.id].parentIds?.includes(id) &&
+            idTaskDescriptionMapping[result.id].parents?.includes(id) &&
             result.day <= day,
         )
         .sort((a, b) => a.day - b.day);

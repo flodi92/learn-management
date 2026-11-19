@@ -1,6 +1,6 @@
 export interface TaskDescription {
   id: string;
-  parentIds?: string[];
+  parents?: string[];
   categories?: string[];
   relevance?: number;
 }
