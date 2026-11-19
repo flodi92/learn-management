@@ -5,10 +5,11 @@ import { TaskPresenter } from '../../../../userInterface/taskPresenter';
 import { isNotUndefined } from '../../../../utils';
 import { RegExpTaskDescription } from '../regExp.tasks/regExp.model';
 import { maximumNumberOfShownExamples } from '../regExp.constants';
+import { getExampleAlternative } from './regExp.taskPresenter.utils';
 
 type Example = {
   text: string;
-  alternative?: string;
+  alternative: string;
   isPositive: boolean;
   answer?: 'positive' | 'negative';
 };
@@ -21,8 +22,6 @@ const shuffle = <T>(items: T[]): T[] => {
   }
   return copy;
 };
-
-const getExampleAlternative = (value: string) => value; // @todo
 
 const buildExamples = (taskDescription: RegExpTaskDescription): Example[] => {
   const positives = shuffle(
@@ -118,11 +117,7 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
       const pointer =
         !this.checked && idx === this.cursor ? chalk.yellow('> ') : '  ';
       const label = example.answer ? ` (${example.answer})` : '';
-      const shown =
-        example.alternative !== undefined
-          ? chalk.magenta(`<${example.alternative}>`)
-          : example.text;
-      const line = `${pointer}${shown}${label}`;
+      const line = `${pointer}${example.alternative}${label}`;
 
       console.log(
         this.checked
