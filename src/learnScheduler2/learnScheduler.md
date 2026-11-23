@@ -33,7 +33,26 @@ export type SaveData = TimedResult[];
 
 The scheduling algorithm by assembleNextSession should be designed in a way to meet the following optimization targets.
 
-The targets follow the spaced repetition model of the article (wiki/article.md, MEMORIZE): the learner is expected to forget exponentially with the time since the last repetition, correct repetitions slow down forgetting, incorrect ones speed it up, and the more likely an item is forgotten the more urgent its repetition is. Targets 2 to 4 are different views on this one principle. Targets 1 and 5 to 8 are about which TaskDescription instances take part in the learning process at all and in which order.
+The targets follow the spaced repetition model described in the section below: the learner is expected to forget exponentially with the time since the last repetition, correct repetitions slow down forgetting, incorrect ones speed it up, and the more likely an item is forgotten the more urgent its repetition is. Targets 2 to 4 are different views on this one principle. Targets 1 and 5 to 8 are about which TaskDescription instances take part in the learning process at all and in which order.
+
+### Spaced repetition model
+
+The model and the terminology are taken from Tabibian et al., "Enhancing human learning via spaced repetition optimization", PNAS 116(10), 2019 (algorithm MEMORIZE). This section contains everything of it that is needed to understand the scheduler, the article itself is not required. The article calls the repeated things items, here they are TaskDescription instances.
+
+- **Review events**: each repetition is a test. The learner either recalls the item (r = 1) or forgets it (r = 0). Here the correctness between 0 and 1 replaces that binary outcome.
+- **Forgetting curve**: the probability to recall an item at time t is `m(t) = exp(-n * (t - tr))` with the time of the last repetition `tr` and the forgetting rate `n`. It starts at 1 at the repetition and decays exponentially. The inverse of the forgetting rate is called memory strength or half-life. The scheduler uses the half-life `S` (`n = ln(2) / S`), so `m(t) = 2^(-(t - tr) / S)`.
+- **Effect of a repetition on the forgetting rate**: it is multiplicative. A successful recall multiplies the forgetting rate by `(1 - alpha)` with `alpha <= 1`, an unsuccessful one by `(1 + beta)` with `beta >= 0`. So successful repetitions make forgetting slower (the half-life grows), failed ones faster. The initial forgetting rate expresses the difficulty of an item: difficult items are forgotten faster. The parameters were estimated from data (half-life regression) in the article and are constants in the model.
+- **Simplification of the article**: studies show that repeating an item while it is still in short-term memory (mass practice) does not improve long-term retention (inverted U shape). The article does not model it because it is hard to optimize and does not improve predictions on its data. The scheduler models it simply: a repetition on the same day as the previous one does not increase the stability.
+- **Optimization problem**: reviewing an item more often keeps the recall probability high but costs repetitions. The article therefore minimizes a loss that rewards a high recall probability and penalizes the number of repetitions, weighted by a parameter `q` per item (a smaller `q` means more repetitions, a higher recall probability, and may favour the learning of one item over another).
+- **Optimal reviewing intensity**: under that loss the optimal rate of repetitions of an item at time t is `u(t) = q^(-1/2) * (1 - m(t))`. It depends only on the current recall probability: the lower it is, i.e. the more likely the item is forgotten, the more urgent a repetition. MEMORIZE samples the actual repetition times randomly from that intensity.
+- **Independence of items**: the model treats items as independent and runs one instance per item. Dependencies between items (a repetition influencing the memory of other items) are not part of it. The scheduler adds such dependencies itself (inherited repetitions via parents, related items in target 5).
+
+How the scheduler uses the model, deviating from the article where it says so:
+
+- The recall probability and the half-life are computed for each TaskDescription from its repetitions in the way defined in Computation of stability and recall probability.
+- Instead of sampling random repetition times, a TaskDescription is due when its recall probability falls below a target recall probability. For a given `q` the intensity `u` grows linearly with `1 - m`, so reaching a certain `m` is equivalent to a certain urgency and the order by the lowest recall probability is the order by urgency. The two targets (learning and learnt) play the role of `q`: a higher target means more frequent repetitions.
+- The selection is deterministic and made in sessions of a limited size, so the ranking by recall probability decides which of the due instances take part.
+- After a repetition the recall probability is not always reset to 1 as in the article. It is set depending on the correctness, which is the article's remark that the recall probability right after a review may be below 1 for difficult items.
 
 ### Terms used by the targets
 
@@ -44,7 +63,7 @@ Everything is evaluated per TaskDescription instance (not per group of TaskDescr
 - **introduced**: a TaskDescription that has at least one repetition (see repetitions, this includes repetitions inherited from descendants).
 - **learnt**: a TaskDescription whose stability has reached the learnt threshold at least once. It stays learnt for all conditions below, even if it later has to be repeated or its stability falls again. Otherwise a forgotten TaskDescription would block the introduction of others again.
 - **learning in progress**: introduced but not learnt. If a learning in progress TaskDescription has not been repeated for so long that its recall probability fell below a drop-out threshold it is considered not learned again (does not count as learning in progress), so that abandoned instances cannot block the limit forever.
-- **due**: the recall probability is lower than the target recall probability of its phase. The target is high for learning in progress instances (short temporal distance) and lower for learnt instances (long temporal distance). This corresponds to the parameter q of the article, which trades off recall probability against the number of repetitions per item.
+- **due**: the recall probability is lower than the target recall probability of its phase. The target is high for learning in progress instances (short temporal distance) and lower for learnt instances (long temporal distance). This corresponds to the parameter `q` of the spaced repetition model, which trades off recall probability against the number of repetitions per item.
 - **eligible for introduction**: in learning state notLearned (never introduced or dropped out, see learning state) and passing the conditions of targets 1 and 6 to 8.
 - **effective relevance / effective complexity**: the smallest relevance (complexity) of the TaskDescription itself and of all TaskDescription instances that have it as proper subset of their subjects (target 7). A TaskDescription that is a prerequisite of a more relevant (simpler) TaskDescription must not be blocked by the targets 6 and 8, otherwise they would contradict target 7.
 - **optional fields**: a TaskDescription without relevance does not take part in target 6, without complexity not in target 8, without subjects (or with an empty list) not in target 7, without categories not in target 5 (via category) and 8. It is neither blocked nor does it block.
@@ -119,7 +138,7 @@ Exception: A TaskDescription that is related to a scheduled TaskDescription does
 2. If not all candidates fit into a session, the slots are given to: due learning in progress instances (2), then due learnt instances (4), then newly introduced instances (1, 6 to 8). Within each group the lowest recall probability, respectively the lowest effective relevance and effective complexity comes first.
 3. Target 5 reorders only otherwise equal candidates and fills remaining slots.
 4. If still slots remain and nothing is due or eligible, the TaskDescription instances with the lowest recall probability are repeated to fill the session (target 3 gives way). If there are no candidates at all, fewer TaskDescription instances than requested are returned.
-5. The selection is deterministic. Equal priorities are resolved by id. Unlike MEMORIZE it does not sample repetition times randomly.
+5. The selection is deterministic. Equal priorities are resolved by id. Unlike MEMORIZE (see spaced repetition model) it does not sample repetition times randomly.
 
 ## Derived statistics to base the scheduling on
 
@@ -213,21 +232,21 @@ This paragraph is considered to define an implementation strategy for computing 
 
 All parameters are constants (in `learnScheduler.constants.ts`). The values are start values that were checked against the example below. They may be tuned as long as the properties at the end of the scheduling strategy hold.
 
-| parameter                       | value | meaning                                                                         |
-| ------------------------------- | ----- | ------------------------------------------------------------------------------- |
-| initialStabilityDays            | 2     | stability before the first repetition                                           |
-| stabilityGain                   | 2     | maximum additional growth factor of the stability by a correct repetition       |
-| spacingFloor                    | 0.4   | share of the gain a correct repetition gets even without any elapsed time       |
-| failureFactor                   | 0.4   | factor of the stability for a fully incorrect repetition                        |
-| minStabilityDays                | 1     | lower bound of the stability                                                    |
-| maxStabilityDays                | 365   | upper bound of the stability                                                    |
-| failedRecallProbability         | 0.5   | recall probability right after a fully incorrect repetition                     |
-| learntStabilityDays             | 20    | stability from which a TaskDescription is learnt                                |
-| dropOutRecallProbability        | 0.1   | recall probability below which a not learnt TaskDescription is notLearned again |
-| learningTargetRecallProbability | 0.85  | due threshold while not learnt (parameter q of the article, short distances)    |
-| learntTargetRecallProbability   | 0.6   | due threshold once learnt (long distances)                                      |
-| learningInProgressFraction      | 0.5   | share of the session size that may be learning in progress (target 1)           |
-| relatedLookAheadDays            | 2     | how many days ahead a related TaskDescription is regarded as nearly due         |
+| parameter                       | value | meaning                                                                                      |
+| ------------------------------- | ----- | -------------------------------------------------------------------------------------------- |
+| initialStabilityDays            | 2     | stability before the first repetition                                                        |
+| stabilityGain                   | 2     | maximum additional growth factor of the stability by a correct repetition                    |
+| spacingFloor                    | 0.4   | share of the gain a correct repetition gets even without any elapsed time                    |
+| failureFactor                   | 0.4   | factor of the stability for a fully incorrect repetition                                     |
+| minStabilityDays                | 1     | lower bound of the stability                                                                 |
+| maxStabilityDays                | 365   | upper bound of the stability                                                                 |
+| failedRecallProbability         | 0.5   | recall probability right after a fully incorrect repetition                                  |
+| learntStabilityDays             | 20    | stability from which a TaskDescription is learnt                                             |
+| dropOutRecallProbability        | 0.1   | recall probability below which a not learnt TaskDescription is notLearned again              |
+| learningTargetRecallProbability | 0.85  | due threshold while not learnt (parameter q of the spaced repetition model, short distances) |
+| learntTargetRecallProbability   | 0.6   | due threshold once learnt (long distances)                                                   |
+| learningInProgressFraction      | 0.5   | share of the session size that may be learning in progress (target 1)                        |
+| relatedLookAheadDays            | 2     | how many days ahead a related TaskDescription is regarded as nearly due                      |
 
 ### Computation of stability and recall probability
 
@@ -237,13 +256,13 @@ For each repetition with day `d` and correctness `c`:
 
 1. Recall probability right before the repetition `before`: `1` for the first repetition, otherwise `R * 2^(-(d - L) / S)`.
 2. Spacing `spacing = 1 - before`, so a repetition after a long time (low recall probability) counts as more spaced.
-3. Growth factor for a fully correct repetition: `1 + stabilityGain * (spacingFloor + (1 - spacingFloor) * spacing)`. If the repetition is on the same day as the previous one it is `1` (mass practice does not improve the stability, article: inverted U shape).
-4. Factor of the repetition: `growth^c * failureFactor^(1 - c)`. This interpolates between a correct and an incorrect repetition in the same way as the multiplicative effect on the forgetting rate in the article, and `c = 0.5` is neutral for the standard values.
+3. Growth factor for a fully correct repetition: `1 + stabilityGain * (spacingFloor + (1 - spacingFloor) * spacing)`. If the repetition is on the same day as the previous one it is `1` (mass practice does not improve the stability, see spaced repetition model).
+4. Factor of the repetition: `growth^c * failureFactor^(1 - c)`. This interpolates between a correct and an incorrect repetition in the same way as the multiplicative effect on the forgetting rate in the spaced repetition model (a stability factor above 1 corresponds to `1 - alpha`, below 1 to `1 + beta`), and `c = 0.5` is neutral for the standard values.
 5. New stability: `S * factor`, limited to `[minStabilityDays, maxStabilityDays]`.
 6. `R = failedRecallProbability + (1 - failedRecallProbability) * c` and `L = d`.
 7. If the new stability is at least `learntStabilityDays` the TaskDescription is learnt.
 
-The recall probability (mastery) on a day `D >= L` is `R * 2^(-(D - L) / S)`. This is the exponential forgetting curve of the article with the half-life `S` (forgetting rate `ln(2) / S`). Results after `D` are not part of the repetitions, so `D >= L` always holds.
+The recall probability (mastery) on a day `D >= L` is `R * 2^(-(D - L) / S)`. This is the exponential forgetting curve of the spaced repetition model with the half-life `S` (forgetting rate `ln(2) / S`). Results after `D` are not part of the repetitions, so `D >= L` always holds.
 
 Example for perfect answers, each given on the first day it is due (rounded):
 
