@@ -31,39 +31,95 @@ export type SaveData = TimedResult[];
 
 ## Optimization targets of scheduling
 
-The scheduling algorithm by assembleNextSession should be designed in a way to meet the following optimization targets
+The scheduling algorithm by assembleNextSession should be designed in a way to meet the following optimization targets.
+
+The targets follow the spaced repetition model of the article (wiki/article.md, MEMORIZE): the learner is expected to forget exponentially with the time since the last repetition, correct repetitions slow down forgetting, incorrect ones speed it up, and the more likely an item is forgotten the more urgent its repetition is. Targets 2 to 4 are different views on this one principle. Targets 1 and 5 to 8 are about which TaskDescription instances take part in the learning process at all and in which order.
+
+### Terms used by the targets
+
+Everything is evaluated per TaskDescription instance (not per group of TaskDescription instances with equal characteristics).
+
+- **recall probability**: the estimated probability that the learner answers correctly on a given day. It decreases with the days passed since the last repetition. How fast it decreases (the forgetting rate) is lowered by correct and raised by incorrect repetitions. A correctness between 0 and 1 acts as an interpolation between a fully correct and a fully incorrect repetition. The mastery (see below) must meet its four principles; whether mastery is the recall probability itself or derived from it is defined in the derived statistics.
+- **stability**: the retention half-life in days that follows from the forgetting rate. In contrast to the recall probability it does not decay over time, it only changes through repetitions. It grows with correct repetitions, especially if they are spaced far apart, and shrinks with incorrect ones.
+- **introduced**: a TaskDescription that has at least one result.
+- **learnt**: a TaskDescription whose stability has reached the learnt threshold at least once. It stays learnt for all conditions below, even if it later has to be repeated or its stability falls again. Otherwise a forgotten TaskDescription would block the introduction of others again.
+- **learning in progress**: introduced but not learnt. If a learning in progress TaskDescription has not been repeated for so long that its recall probability fell below a drop-out threshold it is considered not learned again (does not count as learning in progress), so that abandoned instances cannot block the limit forever.
+- **due**: the recall probability is lower than the target recall probability of its phase. The target is high for learning in progress instances (short temporal distance) and lower for learnt instances (long temporal distance). This corresponds to the parameter q of the article, which trades off recall probability against the number of repetitions per item.
+- **eligible for introduction**: not introduced and passing the conditions of targets 1 and 6 to 8.
+- **effective relevance / effective complexity**: the smallest relevance (complexity) of the TaskDescription itself and of all TaskDescription instances that have it as proper subset of their subjects (target 7). A TaskDescription that is a prerequisite of a more relevant (simpler) TaskDescription must not be blocked by the targets 6 and 8, otherwise they would contradict target 7.
+- **optional fields**: a TaskDescription without relevance does not take part in target 6, without complexity not in target 8, without subjects (or with an empty list) not in target 7, without categories not in target 5 (via category) and 8. It is neither blocked nor does it block.
+- **parameters**: the learning in progress fraction (target 1), the learnt threshold for stability, the drop-out threshold, the target recall probability for learning in progress and for learnt instances and the minimum distance between two repetitions (one day) are constants to be defined in the implementation strategy.
+
+### Targets
 
 1. Limit the number of learning in progress TaskDescription instances
 
 Learning TaskDescription instances will take some repetitions until the level of mastery has raised to the point where the learner is confident of performing correctly.
 
-To ensure that the learner can focus on a number of learning in progress TaskDescription instances the algorithm should only introduce new TaskDescription instances when others have already reached a certain degree of mastery.
+To ensure that the learner can focus on a number of learning in progress TaskDescription instances the algorithm should only introduce new TaskDescription instances when others have already been learnt.
+
+- The limit is global (over all categories) and proportional to the session size: at most `max(1, ceil(learningInProgressFraction * count))` TaskDescription instances may be learning in progress. Therefore all of them can be repeated within one session.
+- A new TaskDescription is only introduced while the number of learning in progress instances, including those introduced earlier in the same session, is below the limit.
+- Learnt instances do not count, they leave the learning in progress phase.
 
 2. Assure constant repetition of learning in progress TaskDescription instances
 
-Subjects once introduced into the learning process should be repeated regularly with low temporal distance until the user has reached a certain level of mastery.
+TaskDescription instances once introduced into the learning process should be repeated regularly with low temporal distance until they are learnt.
 
-3. Avoids unnecessary repetitions
+- A learning in progress TaskDescription is repeated as soon as it is due. Its target recall probability is high, so the repetition happens after a few days at most.
+- A TaskDescription is repeated at most once per day, so the temporal distance is at least one day. Repeating it in the same session twice is not wanted.
+- If more learning in progress instances are due than fit into a session, those with the lowest recall probability come first.
 
-Subjects that have been answered with a high level of correctness for several times are considered of having a high level of mastery. They should be repeated with higher temporal distance to allow other TaskDescription instances to be learned.
+3. Avoid unnecessary repetitions
 
-4. Repeat learned TaskDescription instances
+TaskDescription instances that have been answered with a high level of correctness several times, preferably with temporal distance in between, have a high stability and a high mastery. They should be repeated with higher temporal distance to allow other TaskDescription instances to be learned.
 
-Subjects that have already reached a high level of mastery should be repeated from time to time in order to assure they are constantly kept by the learner. In case a repetition is successfull the temporal distance to the next repetition will even be greater. The oposite goes if the repetition shows a low correctness. In that case the repetitions will become more frequent.
+- A TaskDescription that is not due is not scheduled as long as there are other candidates (due or eligible for introduction) to fill the session.
+- The temporal distance until a TaskDescription becomes due again grows with its stability. No fixed intervals are prescribed.
 
-5. Related TaskDescription instances should be scheduled temporarily close
+4. Repeat learnt TaskDescription instances
+
+TaskDescription instances that have already reached a high level of mastery should be repeated from time to time in order to assure they are constantly kept by the learner. In case a repetition is successful the temporal distance to the next repetition will even be greater (stability grows). The opposite goes if the repetition shows a low correctness. In that case the repetitions will become more frequent (stability shrinks).
+
+- A learnt TaskDescription becomes due when its recall probability falls below its target recall probability, which is lower than that of learning in progress instances but greater than zero, so it is never dropped from repetition.
+- Due learnt instances are ordered by their recall probability, the lowest comes first.
+
+5. Related TaskDescription instances should be scheduled temporally close
 
 - two TaskDescription instances are considered related if they have a category in common
 - two TaskDescription instances are considered even more related if they are linked with confusedWith
-- two TaskDescription instances are considered even more related if they are linked with equalsTo
+- two TaskDescription instances are considered even more related if they are linked with equalTo
 
-Exception: A TaskDescription that is related to a scheduled TaskDescription does not necessarily have to be scheduled if the TaskDescription's relevance is higher than the highest relevance of the category
+A link counts in both directions, regardless of which of the two TaskDescription instances declares it. The stronger the relation, the stronger the aim to schedule them temporally close: preferably within the same session, otherwise within a few days.
 
-6. Do not schedule TaskDescription instances of a lower relavance (greater number) before TaskDescription instances of higher relevance of the same and of other categories have been learnt.
+- This target only influences the choice among candidates. It never overrides the due conditions of targets 2 to 4, the limit of target 1 and the conditions of targets 6 to 8.
+- If slots of a session remain after all due and eligible candidates have been chosen, TaskDescription instances related to the already chosen ones are preferred.
 
-7. Do not schedule TaskDescription instances with several subjects before each TaskDescription that holds a subset of those subjects has been learnt.
+Exception: A TaskDescription that is related to a scheduled TaskDescription does not necessarily have to be scheduled if its relevance number is greater than the smallest relevance number of its category (it is less relevant than the most relevant TaskDescription instances of the category). If it has several categories the one with the smallest number counts.
 
-8. Do not schedule TaskDescription instances as long as there are other TaskDescription instances in the same category that have a lower complexity.
+6. Do not introduce TaskDescription instances of a lower relevance (greater number) before all TaskDescription instances of higher relevance (smaller number) have been learnt.
+
+- This is a hard condition and global: it compares with all TaskDescription instances of all categories, not only those of the same category.
+- A TaskDescription is eligible for introduction only if every TaskDescription with a smaller effective relevance is learnt.
+
+7. Do not introduce TaskDescription instances with several subjects before each TaskDescription that holds a proper subset of those subjects has been learnt.
+
+- Only non-empty proper subsets count. TaskDescription instances with exactly the same subjects do not block each other.
+- It is a hard condition and global, it compares with all TaskDescription instances independent of their categories.
+- It has precedence over targets 6 and 8 by means of the effective relevance and effective complexity, so that these targets never demand the opposite order.
+
+8. Do not introduce TaskDescription instances as long as there are other TaskDescription instances in the same category that have the same effective relevance and a lower effective complexity and are not learnt yet.
+
+- Relevance has precedence over complexity: TaskDescription instances of a different relevance are ordered by target 6 only. Complexity orders TaskDescription instances of the same relevance.
+- "Same category" means at least one category in common.
+
+### Precedence between targets
+
+1. The conditions 6, 7 and 8 and the limit of 1 decide which TaskDescription instances may be introduced at all (hard conditions).
+2. If not all candidates fit into a session, the slots are given to: due learning in progress instances (2), then due learnt instances (4), then newly introduced instances (1, 6 to 8). Within each group the lowest recall probability, respectively the lowest effective relevance and effective complexity comes first.
+3. Target 5 reorders only otherwise equal candidates and fills remaining slots.
+4. If still slots remain and nothing is due or eligible, the TaskDescription instances with the lowest recall probability are repeated to fill the session (target 3 gives way). If there are no candidates at all, fewer TaskDescription instances than requested are returned.
+5. The selection is deterministic. Equal priorities are resolved by id. Unlike MEMORIZE it does not sample repetition times randomly.
 
 ## Derived statistics to base the scheduling on
 
