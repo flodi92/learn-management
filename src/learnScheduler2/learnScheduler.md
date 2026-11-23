@@ -90,6 +90,7 @@ The learning state can be computed for a specific day and a specific TaskDescrip
 The learning state can have the following values.
 
 ```typescript
+// defined in model.ts
 export const learningStates = [
   'notLearned', // not examined at all or examined long before without ever having learned
   'learning', // in progress of learning, should be repeated regularely until learned
