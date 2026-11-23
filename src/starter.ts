@@ -1,4 +1,4 @@
-import { LearnScheduler } from './learnScheduler/learnScheduler';
+import { LearnScheduler } from './learnScheduler2/learnScheduler';
 import { Result, SaveDataBase, TaskDescription } from './model';
 import { Overview } from './overview/overview';
 import { TaskPresenter } from './userInterface/taskPresenter';

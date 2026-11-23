@@ -1,5 +1,4 @@
-import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
-import { determineLearningStateFromStatisticsItem } from '../../learnScheduler/learnScheduler.utils/determineLearningStateFromStatisticsItem';
+import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler2/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
 import { TaskDescription, TimedResult } from '../../model';
 import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
 import {
@@ -31,12 +30,12 @@ export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
           id,
           label: getLabelFromId(id),
           mastery: statisticsItem.mastery,
-          lastRepetitionBeforeDays: statisticsItem.lastRepetition
-            ? day - statisticsItem.lastRepetition
-            : Infinity,
+          lastRepetitionBeforeDays:
+            statisticsItem.lastRepetition === undefined
+              ? Infinity
+              : day - statisticsItem.lastRepetition,
           numberOfRepetitions: statisticsItem.numberOfRepetitions,
-          learningState:
-            determineLearningStateFromStatisticsItem(statisticsItem),
+          learningState: statisticsItem.learningState,
           lastMastery: statisticsItem.lastMastery,
           lastCorrectness: statisticsItem.lastCorrectness,
         },

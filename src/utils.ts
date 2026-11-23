@@ -1,9 +1,9 @@
-import { milisecondsPerDay } from './learnScheduler/learnScheduler.constants';
+import { millisecondsPerDay } from './utils.constants';
 
 export const isNotUndefined = <T>(value: T): value is Exclude<T, undefined> =>
   value !== undefined;
 
-export const getToday = () => Date.now() / milisecondsPerDay;
+export const getToday = () => Date.now() / millisecondsPerDay;
 
 export type AssertTrue<T extends true> = T;
 

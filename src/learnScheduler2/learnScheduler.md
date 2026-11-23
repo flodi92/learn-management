@@ -4,7 +4,7 @@
 
 LearningScheduler is a class that selects subjects to be learned during the next learning session aiming to optimize the selection based on analyzing former results.
 
-learnScheduler2/learnScheduler.ts is a reimplementation of learnScheduler/learnScheduler.ts that aims for better algorithms.
+The scheduler is implemented in `learnScheduler.ts`.
 
 ## Data model to base on the scheduling algorithm
 

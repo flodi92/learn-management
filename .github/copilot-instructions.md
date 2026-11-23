@@ -32,7 +32,7 @@ Follow the style of the surrounding files.
 
 Everything in `src/` except `src/example/` is generic: it makes no assumptions about how things are visualized, which tasks or subjects are learned, or which database is used. Those concerns are injected through abstractions such as `TaskPresenter`, `SaveDataBase` and `Overview<Subject>`.
 
-- `src/learnScheduler/` – scheduling of learn sessions.
+- `src/learnScheduler2/` – scheduling of learn sessions.
 - `src/overview/` – learning progress statistics, grouped by relevance/category.
 - `src/userInterface/` – abstract presentation of tasks.
 - `src/example/` – examples of how the generic implementations can be used, runnable via the npm scripts below. Every choice made there is just one possible way and can be replaced, e.g. a web app could display things differently and tasks for other subjects could be created:
@@ -84,7 +84,7 @@ Read the relevant file before working in the corresponding area.
 
 **Learn scheduler**
 
-- [src/learnScheduler/learnScheduler.md](../src/learnScheduler/learnScheduler.md) – how `LearningScheduler` selects subjects for the next session and the principles behind it.
+- [src/learnScheduler2/learnScheduler.md](../src/learnScheduler2/learnScheduler.md) – how `LearningScheduler` selects subjects for the next session and the principles behind it.
 
 **Overview**
 
