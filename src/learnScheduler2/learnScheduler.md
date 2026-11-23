@@ -283,7 +283,7 @@ Apply the rules of the learning state with `dropOutRecallProbability`, `learntSt
 
 ### Scheduling strategy based on statistics
 
-`assembleNextSession` selects at most `count` TaskDescription instances for `day` in the following steps. It returns an empty array for `count <= 0` and fewer than `count` instances if there are not enough candidates. The order of the returned array is the order of selection. Whenever the order of candidates is not decided by the given criteria, the id decides (ascending), so the result is deterministic.
+`assembleNextSession` selects at most `count` TaskDescription instances for `day` in the following steps. A fractional count is rounded down for the number of available slots. It returns an empty array for `count <= 0` and fewer than `count` instances if there are not enough candidates. The order of the returned array is the order of selection. Whenever the order of candidates is not decided by the given criteria, the id decides (ascending), so the result is deterministic.
 
 **Step 1: statistics.** Compute for all TaskDescription instances the learning state, the recall probability, the due flag, the effective relevance and complexity, and whether it has been **repeated today** (`lastRepetition` is defined and is on the same day as `day`; inherited repetitions count). TaskDescription instances repeated today are excluded from all selections below (once per day), but they still count for learning states, the learnt condition and the limit of learning in progress instances.
 
@@ -317,7 +317,7 @@ Order of candidates: effective relevance ascending, effective complexity ascendi
 
 ### constructor
 
-LearnScheduler's constructor is invoked with an array of TaskDescription instances. It is just a string array of TaskDescription ids. The LearningScheduler does not concern on what concrete tasks are behind that TaskDescription instances.
+LearnScheduler's constructor is invoked with an array of TaskDescription instances. The LearningScheduler does not concern itself with what concrete tasks are behind those TaskDescription instances. Effective characteristics are computed from this array at construction.
 
 ### nextSession
 

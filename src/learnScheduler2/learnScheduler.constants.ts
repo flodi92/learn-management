@@ -1,1 +1,13 @@
-export const milisecondsPerDay = 1000 * 60 * 60 * 24;
+export const initialStabilityDays = 2;
+export const stabilityGain = 2;
+export const spacingFloor = 0.4;
+export const failureFactor = 0.4;
+export const minStabilityDays = 1;
+export const maxStabilityDays = 365;
+export const failedRecallProbability = 0.5;
+export const learntStabilityDays = 20;
+export const dropOutRecallProbability = 0.1;
+export const learningTargetRecallProbability = 0.85;
+export const learntTargetRecallProbability = 0.6;
+export const learningInProgressFraction = 0.5;
+export const relatedLookAheadDays = 2;
