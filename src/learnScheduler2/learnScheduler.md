@@ -41,14 +41,14 @@ Everything is evaluated per TaskDescription instance (not per group of TaskDescr
 
 - **recall probability**: the estimated probability that the learner answers correctly on a given day. It decreases with the days passed since the last repetition. How fast it decreases (the forgetting rate) is lowered by correct and raised by incorrect repetitions. A correctness between 0 and 1 acts as an interpolation between a fully correct and a fully incorrect repetition. The mastery (see below) must meet its four principles; whether mastery is the recall probability itself or derived from it is defined in the derived statistics.
 - **stability**: the retention half-life in days that follows from the forgetting rate. In contrast to the recall probability it does not decay over time, it only changes through repetitions. It grows with correct repetitions, especially if they are spaced far apart, and shrinks with incorrect ones.
-- **introduced**: a TaskDescription that has at least one result.
+- **introduced**: a TaskDescription that has at least one repetition (see repetitions, this includes repetitions inherited from descendants).
 - **learnt**: a TaskDescription whose stability has reached the learnt threshold at least once. It stays learnt for all conditions below, even if it later has to be repeated or its stability falls again. Otherwise a forgotten TaskDescription would block the introduction of others again.
 - **learning in progress**: introduced but not learnt. If a learning in progress TaskDescription has not been repeated for so long that its recall probability fell below a drop-out threshold it is considered not learned again (does not count as learning in progress), so that abandoned instances cannot block the limit forever.
 - **due**: the recall probability is lower than the target recall probability of its phase. The target is high for learning in progress instances (short temporal distance) and lower for learnt instances (long temporal distance). This corresponds to the parameter q of the article, which trades off recall probability against the number of repetitions per item.
-- **eligible for introduction**: not introduced and passing the conditions of targets 1 and 6 to 8.
+- **eligible for introduction**: in learning state notLearned (never introduced or dropped out, see learning state) and passing the conditions of targets 1 and 6 to 8.
 - **effective relevance / effective complexity**: the smallest relevance (complexity) of the TaskDescription itself and of all TaskDescription instances that have it as proper subset of their subjects (target 7). A TaskDescription that is a prerequisite of a more relevant (simpler) TaskDescription must not be blocked by the targets 6 and 8, otherwise they would contradict target 7.
 - **optional fields**: a TaskDescription without relevance does not take part in target 6, without complexity not in target 8, without subjects (or with an empty list) not in target 7, without categories not in target 5 (via category) and 8. It is neither blocked nor does it block.
-- **parameters**: the learning in progress fraction (target 1), the learnt threshold for stability, the drop-out threshold, the target recall probability for learning in progress and for learnt instances and the minimum distance between two repetitions (one day) are constants to be defined in the implementation strategy.
+- **parameters**: the learning in progress fraction (target 1), the learnt threshold for stability, the drop-out threshold, the target recall probability for learning in progress and for learnt instances and the minimum distance between two repetitions (one day) are constants, they are defined in the parameters table of the implementation strategy.
 
 ### Targets
 
@@ -123,26 +123,45 @@ Exception: A TaskDescription that is related to a scheduled TaskDescription does
 
 ## Derived statistics to base the scheduling on
 
-### mastery
+All statistics are computed for a specific day and a specific TaskDescription from SaveData. Only results with `result.day <= day` are taken into account, later ones are ignored. Days are numbers as in TimedResult.day (one day is the difference of 1, the time of day is a fraction). "Same day" always means the same integer part of the day (`Math.floor`).
 
-The mastery is a value between 0 and 1 and can be computed for a specific day and a specific TaskDescription based on the number of repetitions, their correctness and temporal distance which is extractd from SaveData.
+### repetitions
 
-The computation takes the following principles into account.
+A TaskDescription is considered to have been repeated on a day when a TimedResult with its id exists for that day or when a TimedResult exists for a TaskDescription that has it as parent or as indirect ancestor (transitively over `parents`). The correctness of such an inherited repetition is the correctness of the original result. Links by `confusedWith` and `equalTo` do not create repetitions, those relations are only used by target 5.
 
-- The mastery is considered greater if the learner has had a greater number of repetitions with correct results.
-- The mastery is considered greater if those repetitions are more resent.
-- The mastery is considered greater if there are more correct results underneath the most resent repetitions.
-- The mastery is considered greater if more time has passed between repetitions with correct results
+The repetitions of a TaskDescription are the list of these (day, correctness) pairs ordered by day. Several repetitions on the same day are allowed and are kept in the order in which they were recorded.
 
-A TaskDescription is considered to have been repeated at a specific day when a TimedResult with that specific id appears in SaveData or when another TaskDescription is repeated that has the latter TaskDescription as parent or as indirect ancestor.
+- **number of repetitions**: the length of that list.
+- **last repetition**: the day of the last element, undefined without repetitions.
+- **last correctness**: the correctness of the last element, undefined without repetitions.
 
-### number of repetitions
+### stability
 
-The number of repetitions can be computed for a specific day and a specific TaskDescription based on SavedData.
+The retention half-life in days as defined in the terms of the targets. It is a result of replaying all repetitions of the TaskDescription in chronological order, see Computation of stability and recall probability. A TaskDescription without repetitions has no stability.
+
+### recall probability and mastery
+
+The recall probability is the estimated probability to answer correctly on the given day. It is 0 for a TaskDescription without repetitions. Otherwise it is derived from the stability, the last repetition and its correctness, see Computation of stability and recall probability.
+
+The **mastery** is defined as exactly this recall probability. It is a value between 0 and 1 and fulfils the four principles of the mastery:
+
+- It is greater with more repetitions with correct results, because each of them increases the stability.
+- It is greater if the repetitions are more recent, because the recall probability declines with the days since the last repetition.
+- It is greater if there are more correct results underneath the most recent repetitions, because repetitions are replayed in chronological order and every correct one increases and every incorrect one decreases the stability, so the most recent ones shape it most.
+- It is greater if more time has passed between repetitions with correct results, because a correct repetition increases the stability more the lower the recall probability was at the time of the repetition.
+
+**last mastery** is the recall probability immediately after the last repetition (undefined without repetitions).
+
+### learnt
+
+A TaskDescription is learnt if its stability was greater than or equal to the learnt threshold directly after at least one of its repetitions. Once learnt it stays learnt.
+
+### due
+
+A TaskDescription is due on a day if it has been introduced, is not dropped out (see learning state) and its recall probability is lower than the target recall probability of its phase: the learning target while it is not learnt, the learnt target once it is learnt.
 
 ### learning state
 
-The learning state can be computed for a specific day and a specific TaskDescription based on SavedData.
 The learning state can have the following values.
 
 ```typescript
@@ -157,6 +176,31 @@ export const learningStates = [
 export type LearningState = (typeof learningStates)[number];
 ```
 
+The learning state of a TaskDescription on a day is determined by the first matching rule:
+
+1. No repetitions: `notLearned`.
+2. Not learnt and recall probability lower than the drop-out threshold: `notLearned` (dropped out, its history is kept).
+3. Not learnt: `learning`.
+4. Learnt and recall probability lower than the learnt target (= due): `forRepeat`.
+5. Otherwise: `learned`.
+
+Consequences: only `learning` instances count as learning in progress (target 1). `notLearned` instances are the candidates for introduction. A learnt TaskDescription never returns to `learning` or `notLearned`, a bad repetition only makes it `forRepeat` more often.
+
+### effective relevance and effective complexity
+
+Defined in the terms of the targets. Computed once for all TaskDescription instances from the TaskDescription graph only (independent of results): the effective relevance of a TaskDescription is the minimum of its own relevance and the relevance of all TaskDescription instances whose subjects contain its subjects as non-empty proper subset. Missing values are ignored, if none exists the value is undefined. The effective complexity is computed in the same way from complexity.
+
+### relatedness
+
+Relatedness between two different TaskDescription instances A and B is a strength, links count in both directions:
+
+- 3: A is in `equalTo` of B or B in `equalTo` of A
+- 2: otherwise, A is in `confusedWith` of B or vice versa
+- 1: otherwise, A and B have at least one category in common
+- 0: otherwise (not related)
+
+The strength of a TaskDescription towards a set of chosen TaskDescription instances is the maximum strength to any member of the set.
+
 ### more statistics
 
 More statistics can be defined when ever necessary to find a good implementation strategy for the optimization targets.
@@ -165,38 +209,90 @@ More statistics can be defined when ever necessary to find a good implementation
 
 This paragraph is considered to define an implementation strategy for computing the former defined statistics and meeting the optimization targets for scheduling.
 
-### Computation of mastery
+### Parameters
 
-@todo not yet described
+All parameters are constants (in `learnScheduler.constants.ts`). The values are start values that were checked against the example below. They may be tuned as long as the properties at the end of the scheduling strategy hold.
+
+| parameter                       | value | meaning                                                                         |
+| ------------------------------- | ----- | ------------------------------------------------------------------------------- |
+| initialStabilityDays            | 2     | stability before the first repetition                                           |
+| stabilityGain                   | 2     | maximum additional growth factor of the stability by a correct repetition       |
+| spacingFloor                    | 0.4   | share of the gain a correct repetition gets even without any elapsed time       |
+| failureFactor                   | 0.4   | factor of the stability for a fully incorrect repetition                        |
+| minStabilityDays                | 1     | lower bound of the stability                                                    |
+| maxStabilityDays                | 365   | upper bound of the stability                                                    |
+| failedRecallProbability         | 0.5   | recall probability right after a fully incorrect repetition                     |
+| learntStabilityDays             | 20    | stability from which a TaskDescription is learnt                                |
+| dropOutRecallProbability        | 0.1   | recall probability below which a not learnt TaskDescription is notLearned again |
+| learningTargetRecallProbability | 0.85  | due threshold while not learnt (parameter q of the article, short distances)    |
+| learntTargetRecallProbability   | 0.6   | due threshold once learnt (long distances)                                      |
+| learningInProgressFraction      | 0.5   | share of the session size that may be learning in progress (target 1)           |
+| relatedLookAheadDays            | 2     | how many days ahead a related TaskDescription is regarded as nearly due         |
+
+### Computation of stability and recall probability
+
+Replay the repetitions of a TaskDescription (see repetitions) in chronological order. State: stability `S`, day `L` and recall probability right after the last repetition `R`. Before the first repetition `S = initialStabilityDays` and there is no `L` and `R`.
+
+For each repetition with day `d` and correctness `c`:
+
+1. Recall probability right before the repetition `before`: `1` for the first repetition, otherwise `R * 2^(-(d - L) / S)`.
+2. Spacing `spacing = 1 - before`, so a repetition after a long time (low recall probability) counts as more spaced.
+3. Growth factor for a fully correct repetition: `1 + stabilityGain * (spacingFloor + (1 - spacingFloor) * spacing)`. If the repetition is on the same day as the previous one it is `1` (mass practice does not improve the stability, article: inverted U shape).
+4. Factor of the repetition: `growth^c * failureFactor^(1 - c)`. This interpolates between a correct and an incorrect repetition in the same way as the multiplicative effect on the forgetting rate in the article, and `c = 0.5` is neutral for the standard values.
+5. New stability: `S * factor`, limited to `[minStabilityDays, maxStabilityDays]`.
+6. `R = failedRecallProbability + (1 - failedRecallProbability) * c` and `L = d`.
+7. If the new stability is at least `learntStabilityDays` the TaskDescription is learnt.
+
+The recall probability (mastery) on a day `D >= L` is `R * 2^(-(D - L) / S)`. This is the exponential forgetting curve of the article with the half-life `S` (forgetting rate `ln(2) / S`). Results after `D` are not part of the repetitions, so `D >= L` always holds.
+
+Example for perfect answers, each given on the first day it is due (rounded):
+
+| repetition | day | stability | state after |
+| ---------- | --- | --------- | ----------- |
+| 1          | 0   | 3.6       | learning    |
+| 2          | 1   | 7.2       | learning    |
+| 3          | 3   | 14.5      | learning    |
+| 4          | 7   | 29.2      | learned     |
+| 5          | 29  | 66.8      | learned     |
+| 6          | 79  | 152.7     | learned     |
+
+With a correctness of 0.8 each time 7 repetitions are needed to be learnt, with 0.6 each time the stability does not leave the learning phase for a long time.
 
 ### Computation of learning state
 
-@todo not yet described
+Apply the rules of the learning state with `dropOutRecallProbability`, `learntStabilityDays` and `learntTargetRecallProbability` (see Parameters). The due flag uses `learningTargetRecallProbability` for TaskDescription instances that are not learnt and `learntTargetRecallProbability` for learnt ones. A TaskDescription in state `learning` that has dropped out is `notLearned`, but keeps its stability and history, so when it is repeated again it continues from there (a long pause gives a large spacing and thus a large growth for a correct repetition).
 
-### Scheduling stategies based on statistics
+### Scheduling strategy based on statistics
 
-@todo not yet described
+`assembleNextSession` selects at most `count` TaskDescription instances for `day` in the following steps. It returns an empty array for `count <= 0` and fewer than `count` instances if there are not enough candidates. The order of the returned array is the order of selection. Whenever the order of candidates is not decided by the given criteria, the id decides (ascending), so the result is deterministic.
 
-The following is just an example of the style to define the scheduling strategy. It should not be taken seriously and it should be replaced by a better definition.
+**Step 1: statistics.** Compute for all TaskDescription instances the learning state, the recall probability, the due flag, the effective relevance and complexity, and whether it has been **repeated today** (`lastRepetition` is defined and is on the same day as `day`; inherited repetitions count). TaskDescription instances repeated today are excluded from all selections below (once per day), but they still count for learning states, the learnt condition and the limit of learning in progress instances.
 
-```md
-@ todo remove and find better description
+**Step 2: due learning in progress instances.** Candidates are all instances in state `learning` that are due. Order: recall probability ascending, then effective relevance ascending, then effective complexity ascending (undefined values last). Take them in that order while slots are left.
 
-- if compared TaskDescription instances have different categories
-  - if one TaskDescription belongs to a category with no learning in progress and the other one's category has TaskDescriptions with learning in progress prefer the one with learning in progress
-- if compared TaskDescription instances categories have both instances for learning in progress
-  - and if the categories are similar
-    - take the one with higher relevance (smaller number)
-  - and if categories are not similar
-    - take the one with higher percentage of learning in progress instances
-- if compared TaskDescription instances categories have both not learning in progress
-  - and if the categories are similar
-    - take the one with higher relevance (smaller number)
-  - and if the categories are not similar
-    - take the one with higher percentage of not learned instances
+**Step 3: due learnt instances.** Candidates are all instances in state `forRepeat`. Order: recall probability ascending. Take them while slots are left.
 
-if category of TaskDescription has already learning in progress then prefer that
-```
+**Step 4: introductions.** Only while slots are left and the room for learning in progress instances is greater than 0. The room is `max(1, ceil(learningInProgressFraction * count))` minus the number of instances in state `learning` (due or not, repeated today or not). Every introduced instance reduces the room by 1. Candidates are the instances in state `notLearned` that fulfil all of the following conditions, evaluated on the learning states at `day` (instances chosen in this session do not count as learnt):
+
+- Target 6: if it has an effective relevance, every instance with a smaller effective relevance is learnt.
+- Target 7: every instance whose subjects are a non-empty proper subset of its subjects is learnt.
+- Target 8: if it has an effective relevance, an effective complexity and categories, every instance that shares at least one category with it, has the same effective relevance and a smaller effective complexity is learnt.
+
+Order of candidates: effective relevance ascending, effective complexity ascending (undefined last), then the relatedness preference (see below), then id. The candidate is picked one at a time, the relatedness preference is recalculated after each pick because the set of chosen instances grows.
+
+**Step 5: fill.** If slots are left, fill them with introduced instances that are not chosen yet, are in state `learning` or `learned` (not due, otherwise they were chosen in step 2 and 3) and are not repeated today. Order: relatedness preference first, then nearly due before others, then recall probability ascending. An instance is nearly due if its recall probability on `day + relatedLookAheadDays` would be lower than its target recall probability. One at a time, the preference is recalculated after each pick.
+
+**Relatedness preference (target 5).** A candidate has the preference if its relatedness strength to the set of already chosen instances is greater than 0 and the exception does not apply. A higher strength is preferred. The exception applies if the candidate has a relevance and categories and its relevance is greater than the smallest relevance found in the categories it belongs to (the smallest of the per category minimums, over all instances of that category). The preference only reorders otherwise equal candidates in step 4 and orders the fill in step 5, it never admits an instance that does not fulfil the conditions of the steps above.
+
+**Properties that must hold** (basis for tests):
+
+- Learning in progress instances never exceed the limit through introductions.
+- No instance appears twice or is repeated on a day it has already been repeated.
+- An instance with a smaller effective relevance is learnt before an instance with a greater one is introduced.
+- Perfect answers at the moment they become due need 4 repetitions to be learnt (see example above); a never repeated learning in progress instance drops out and does not block the limit.
+- The temporal distance between due repetitions grows with every perfect answer (rounded days in the example above: 1, 2, 4, 22, 50).
+- A fully incorrect answer makes the instance due on the next day.
+- Given the same SaveData, day and count the result is always the same.
 
 ## interface
 
