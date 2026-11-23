@@ -1,241 +1,253 @@
-import { getMasteries } from './learnScheduler.utils/getMasteries';
-import {
-  learningInProgressMasteryMin,
-  learningInProgressMasteryMax,
-  intensiveLearningInProgressMasteryMin,
-  intensiveLearningInProgressMasteryMax,
-  minTimeForRepetition,
-} from './learnScheduler.constants';
+import { TaskDescription, TimedResult } from '../model';
 import { LearnScheduler } from './learnScheduler';
 
-interface DoSessionParams {
-  day: number;
-  index: number;
-  session: string[];
-}
-
-interface CheckSessionParams {
-  day: number;
-  index: number;
-  masteries: Record<string, number>;
-  session: string[];
-  results: Record<string, number>;
-}
-
-const createScheduler = (ids: string[]) =>
-  new LearnScheduler(ids.map((id) => ({ id })));
-
-const nextSessionIds = (
-  scheduler: LearnScheduler,
+const sessionIds = (
+  tasks: TaskDescription[],
+  results: TimedResult[],
   count: number,
   day: number,
-) =>
-  scheduler
-    .nextSession(count, day)
-    .map((taskDescription) => taskDescription.id);
-
-const LearnSchedulerTestWrapper = ({
-  learningTimes,
-  taskDescriptions,
-  taskDescriptionsPerSession,
-  doSession,
-  checkSession,
-  doFinal,
-}: {
-  learningTimes: number[];
-  taskDescriptions: string[];
-  taskDescriptionsPerSession: number;
-  doSession: (
-    params: DoSessionParams,
-  ) => Parameters<LearnScheduler['recordResults']>[0];
-  checkSession: (params: CheckSessionParams) => void;
-  doFinal?: (scheduler: LearnScheduler) => void;
-}) => {
-  const scheduler = createScheduler(taskDescriptions);
-  const results: { id: string; day: number; correctness: number }[] = [];
-  learningTimes.forEach((day, index) => {
-    const session = nextSessionIds(scheduler, taskDescriptionsPerSession, day);
-    const sessionResults = doSession({
-      day,
-      index,
-      session,
-    });
-
-    scheduler.recordResults(sessionResults, day);
-
-    results.push(
-      ...Object.entries(sessionResults).map(([id, correctness]) => ({
-        id,
-        correctness,
-        day,
-      })),
-    );
-
-    const masteries = getMasteries(results, day);
-
-    checkSession({
-      day,
-      index,
-      masteries,
-      session,
-      results: sessionResults,
-    });
-  });
-
-  doFinal?.(scheduler);
+) => {
+  const scheduler = new LearnScheduler(tasks);
+  scheduler.restoreFromSaveData(results);
+  return scheduler.nextSession(count, day).map((task) => task.id);
 };
 
+const perfect = (id: string, days = [0, 1, 3, 7]) =>
+  days.map((day) => ({ id, day, correctness: 1 }));
+
 describe('LearnScheduler', () => {
-  const taskDescriptions = Array.from({ length: 100 }).map((_, i) => `${i}`);
-
-  const learningTimes1 = Array.from({ length: 10 }).map((_, i) => i);
-
-  const doSession = ({ session }: DoSessionParams) =>
-    Object.fromEntries(
-      session.map((taskDescription) => [taskDescription, 0.5]),
-    );
-
-  const doSession2 = ({ session, index }: DoSessionParams) =>
-    Object.fromEntries(
-      session.map((taskDescription) => [
-        taskDescription,
-        index < 2 ? 0 : index < 4 ? 0.5 : 1,
-      ]),
-    );
-
-  describe('creates valid sessions', () => {
-    it('returns the requested number of distinct known taskDescriptions', () => {
-      const scheduler = createScheduler(taskDescriptions);
-
-      const session = nextSessionIds(scheduler, 10, 0);
-
-      expect(session).toHaveLength(10);
-      expect(new Set(session).size).toBe(session.length);
-      expect(
-        session.every((taskDescription) =>
-          taskDescriptions.includes(taskDescription),
-        ),
-      ).toBe(true);
-    });
-
-    it('returns an empty session when no taskDescriptions are requested', () => {
-      const scheduler = createScheduler(taskDescriptions);
-
-      expect(nextSessionIds(scheduler, 0, 0)).toEqual([]);
-    });
+  it('limits introductions and excludes repetitions on the same calendar day', () => {
+    const tasks = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
+    const scheduler = new LearnScheduler(tasks);
+    expect(scheduler.nextSession(4, 0).map((task) => task.id)).toEqual([
+      'a',
+      'b',
+    ]);
+    scheduler.recordResults({ a: 1, b: 1 }, 0.1);
+    expect(scheduler.nextSession(4, 0.9)).toEqual([]);
+    expect(scheduler.nextSession(4, 1).map((task) => task.id)).toEqual([
+      'a',
+      'b',
+    ]);
+    expect(scheduler.nextSession(0, 1)).toEqual([]);
+    expect(scheduler.nextSession(1.9, 1)).toHaveLength(1);
+    expect(new LearnScheduler(tasks).nextSession(2.1, 0)).toHaveLength(2);
   });
 
-  describe('repeats learned taskDescriptions', () => {
-    it('keeps a mastered taskDescription available for later repetition', () => {
-      const scheduler = createScheduler(['taskDescription']);
-
-      const firstSession = nextSessionIds(scheduler, 1, 0);
-      scheduler.recordResults({ taskDescription: 1 }, 0);
-
-      expect(firstSession).toEqual(['taskDescription']);
-      expect(nextSessionIds(scheduler, 1, 1)).toEqual(['taskDescription']);
-      expect(nextSessionIds(scheduler, 1, 10)).toEqual(['taskDescription']);
-    });
-
-    it('uses a failed repetition to make the taskDescription available again', () => {
-      const scheduler = createScheduler(['taskDescription']);
-
-      expect(nextSessionIds(scheduler, 1, 0)).toEqual(['taskDescription']);
-      scheduler.recordResults({ taskDescription: 0 }, 0);
-
-      expect(nextSessionIds(scheduler, 1, 1)).toContain('taskDescription');
-    });
+  it('prioritizes due learning over due learnt tasks over introductions', () => {
+    const tasks = ['a', 'b', 'c'].map((id) => ({ id }));
+    const results = [...perfect('a'), { id: 'b', day: 27, correctness: 1 }];
+    expect(sessionIds(tasks, results, 3, 29)).toEqual(['b', 'a', 'c']);
+    expect(sessionIds(tasks, results, 1, 29)).toEqual(['b']);
   });
 
-  describe.skip('limits number of learning in progress taskDescriptions', () => {
-    it.each([
-      { learningTimes: learningTimes1, doSession },
-      { learningTimes: learningTimes1, doSession: doSession2 },
-    ])('case $#', ({ learningTimes, doSession }) =>
-      LearnSchedulerTestWrapper({
-        learningTimes,
-        taskDescriptions,
-        taskDescriptionsPerSession: 10,
-        doSession,
-        checkSession: ({ masteries }) => {
-          expect(Object.values(masteries).length).toEqual(100);
-          expect(
-            Object.values(masteries).filter(
-              (value) =>
-                value > learningInProgressMasteryMin &&
-                value < learningInProgressMasteryMax,
-            ).length,
-          ).toBeLessThan(10);
-        },
-      }),
-    );
+  it('orders equally urgent learning tasks by effective relevance then complexity', () => {
+    const tasks = [
+      { id: 'a', relevance: 2, complexity: 1 },
+      { id: 'b', relevance: 1, complexity: 2 },
+      { id: 'c', relevance: 1, complexity: 1 },
+      { id: 'd' },
+    ];
+    const results = tasks.map(({ id }) => ({ id, day: 0, correctness: 1 }));
+    expect(sessionIds(tasks, results, 4, 1)).toEqual(['c', 'b', 'a', 'd']);
   });
 
-  describe('assures constant repetition of learning in progress taskDescriptions', () => {
-    it.each([
-      { learningTimes: learningTimes1, doSession },
-      { learningTimes: learningTimes1, doSession: doSession2 },
-    ])('case $#', ({ learningTimes, doSession }) => {
-      let checkForNextSession: string[] = [];
-      LearnSchedulerTestWrapper({
-        learningTimes,
-        taskDescriptions,
-        taskDescriptionsPerSession: 10,
-        doSession,
-        checkSession: ({ masteries, session }) => {
-          expect(
-            checkForNextSession.every((taskDescription) =>
-              session.includes(taskDescription),
-            ),
-          );
-          checkForNextSession = session.filter(
-            (taskDescription) =>
-              masteries[taskDescription] >
-                intensiveLearningInProgressMasteryMin &&
-              masteries[taskDescription] <
-                intensiveLearningInProgressMasteryMax,
-          );
-        },
-      });
-    });
+  it('uses inherited repetitions for same-day exclusion and the learning limit', () => {
+    const tasks = [{ id: 'a' }, { id: 'b', parents: ['a'] }, { id: 'c' }];
+    expect(
+      sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 0.8),
+    ).toEqual([]);
+    expect(
+      sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 1.2),
+    ).toEqual(['a', 'b']);
   });
 
-  describe('avoids unnecessary repetitions', () => {
-    it.each([
-      { learningTimes: learningTimes1, doSession },
-      { learningTimes: learningTimes1, doSession: doSession2 },
-    ])('case $#', ({ learningTimes, doSession }) => {
-      let lastRepetition: Record<string, { day: number; mastery: number }> = {};
-      LearnSchedulerTestWrapper({
-        learningTimes,
-        taskDescriptions,
-        taskDescriptionsPerSession: 10,
-        doSession,
-        checkSession: ({ day, masteries, session }) => {
-          expect(
-            session.every(
-              (taskDescription) =>
-                !(
-                  masteries[taskDescription] > learningInProgressMasteryMax &&
-                  lastRepetition[taskDescription].mastery >
-                    learningInProgressMasteryMax
-                ) ||
-                day - lastRepetition[taskDescription].day >
-                  minTimeForRepetition,
-            ),
-          );
+  it('unblocks introductions after dropout but preserves their history', () => {
+    const tasks = [{ id: 'z' }, { id: 'b' }];
+    expect(
+      sessionIds(tasks, [{ id: 'z', day: 0, correctness: 1 }], 1, 1),
+    ).toEqual(['z']);
+    expect(
+      sessionIds(tasks, [{ id: 'z', day: 0, correctness: 1 }], 1, 30),
+    ).toEqual(['b']);
+  });
 
-          lastRepetition = {
-            ...lastRepetition,
-            ...Object.fromEntries(
-              session.map((taskDescription) => [
-                taskDescription,
-                { day, mastery: masteries[taskDescription] },
-              ]),
-            ),
-          };
-        },
-      });
-    });
+  it('orders introductions globally by relevance and within categories by complexity', () => {
+    const tasks = [
+      { id: 'a', relevance: 1, complexity: 1, categories: ['x'] },
+      { id: 'b', relevance: 1, complexity: 2, categories: ['x'] },
+      { id: 'c', relevance: 2, complexity: 1, categories: ['y'] },
+      { id: 'd', relevance: 1, complexity: 2, categories: ['y'] },
+    ];
+    expect(sessionIds(tasks, [], 10, 0)).toEqual(['a', 'd']);
+    expect(
+      sessionIds(tasks, [...perfect('a'), ...perfect('d')], 10, 8),
+    ).toEqual(['b', 'a', 'd']);
+    expect(
+      sessionIds(
+        tasks,
+        [...perfect('a'), ...perfect('b'), ...perfect('d')],
+        10,
+        8,
+      ),
+    ).toEqual(['c', 'd', 'a', 'b']);
+  });
+
+  it('gives subject prerequisites precedence over relevance and complexity', () => {
+    const tasks = [
+      {
+        id: 'base',
+        subjects: ['x'],
+        relevance: 9,
+        complexity: 9,
+        categories: ['c'],
+      },
+      {
+        id: 'same',
+        subjects: ['x'],
+        relevance: 9,
+        complexity: 9,
+        categories: ['c'],
+      },
+      {
+        id: 'combined',
+        subjects: ['x', 'y'],
+        relevance: 1,
+        complexity: 1,
+        categories: ['c'],
+      },
+      { id: 'other', subjects: ['z'], relevance: 2 },
+    ];
+    expect(sessionIds(tasks, [], 10, 0)).toEqual(['base', 'same']);
+    expect(sessionIds(tasks, perfect('base'), 10, 8)).toEqual(['same', 'base']);
+    expect(
+      sessionIds(tasks, [...perfect('base'), ...perfect('same')], 10, 8),
+    ).toEqual(['combined', 'base', 'same']);
+  });
+
+  it('prefers the strongest reciprocal relationship among equally ranked introductions', () => {
+    const tasks = [
+      { id: 'anchor', equalTo: ['z'], confusedWith: ['y'], categories: ['x'] },
+      { id: 'a', categories: ['x'] },
+      { id: 'y' },
+      { id: 'z' },
+    ];
+    expect(
+      sessionIds(tasks, [{ id: 'anchor', day: 0, correctness: 1 }], 8, 1),
+    ).toEqual(['anchor', 'z', 'y', 'a']);
+  });
+
+  it('applies the category relevance exception to related fill candidates', () => {
+    const tasks = [
+      { id: 'anchor', equalTo: ['z'], confusedWith: ['b'] },
+      { id: 'a', relevance: 1, categories: ['x'] },
+      { id: 'b', relevance: 2, categories: ['x'] },
+      { id: 'z', relevance: 2, categories: ['x'] },
+    ];
+    const results = [
+      ...perfect('a', [0, 1, 3, 7.9]),
+      { id: 'anchor', day: 7, correctness: 1 },
+      { id: 'b', day: 7.9, correctness: 1 },
+      { id: 'z', day: 7.9, correctness: 1 },
+    ];
+    expect(sessionIds(tasks, results, 4, 8.1)).toEqual([
+      'anchor',
+      'b',
+      'a',
+      'z',
+    ]);
+  });
+
+  it('recomputes relatedness after each introduction', () => {
+    const tasks = [
+      { id: 'a', equalTo: ['z'] },
+      { id: 'b' },
+      { id: 'y', confusedWith: ['z'] },
+      { id: 'z' },
+    ];
+    expect(sessionIds(tasks, [], 8, 0)).toEqual(['a', 'z', 'y', 'b']);
+  });
+
+  it('never uses relatedness to bypass introduction prerequisites', () => {
+    const tasks = [
+      { id: 'anchor', equalTo: ['combined'] },
+      { id: 'base', subjects: ['x'] },
+      { id: 'combined', subjects: ['x', 'y'] },
+    ];
+    expect(
+      sessionIds(tasks, [{ id: 'anchor', day: 0, correctness: 1 }], 6, 1),
+    ).toEqual(['anchor', 'base']);
+  });
+
+  it('fills only with introduced non-due items and prefers related items', () => {
+    const tasks = [{ id: 'anchor', equalTo: ['z'] }, { id: 'a' }, { id: 'z' }];
+    const results = [
+      { id: 'anchor', day: 0, correctness: 1 },
+      { id: 'a', day: 0.9, correctness: 1 },
+      { id: 'z', day: 0.95, correctness: 1 },
+    ];
+    expect(sessionIds(tasks, results, 3, 1)).toEqual(['anchor', 'z', 'a']);
+  });
+
+  it('prefers nearly due items over lower-recall items when filling', () => {
+    const tasks = [{ id: 'anchor' }, { id: 'learning' }, { id: 'learnt' }];
+    const results = [
+      ...perfect('learnt'),
+      { id: 'anchor', day: 24, correctness: 1 },
+      { id: 'learning', day: 24.9, correctness: 1 },
+    ];
+    expect(sessionIds(tasks, results, 3, 25.1)).toEqual([
+      'anchor',
+      'learning',
+      'learnt',
+    ]);
+  });
+
+  it('schedules due repetitions at the specified perfect-answer intervals', () => {
+    const scheduler = new LearnScheduler([{ id: 'a' }, { id: 'b' }]);
+    for (const day of [0, 1, 3, 7, 29, 79]) {
+      expect(scheduler.nextSession(1, day).map((task) => task.id)).toEqual([
+        'a',
+      ]);
+      scheduler.recordResults({ a: 1 }, day);
+      expect(scheduler.nextSession(1, day)).toEqual(
+        day < 7 ? [] : [{ id: 'b' }],
+      );
+    }
+  });
+
+  it('is deterministic irrespective of input order and does not mutate saved results', () => {
+    const tasks = [{ id: 'c' }, { id: 'a' }, { id: 'b' }];
+    const results = [
+      { id: 'a', day: 1, correctness: 1 },
+      { id: 'a', day: 0, correctness: 1 },
+    ];
+    const original = results.slice();
+    const first = sessionIds(tasks, results, 4, 2);
+    expect(sessionIds([...tasks].reverse(), results, 4, 2)).toEqual(first);
+    expect(sessionIds(tasks, results, 4, 2)).toEqual(first);
+    expect(results).toEqual(original);
+  });
+
+  it('exposes replayed statistics through the public getters after restoring results', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2 * 24 * 60 * 60 * 1000));
+      const scheduler = new LearnScheduler([
+        { id: 'parent' },
+        { id: 'child', parents: ['parent'] },
+      ]);
+      const results = [{ id: 'child', day: 1, correctness: 0.8 }];
+      scheduler.restoreFromSaveData(results);
+      expect(scheduler.getSaveData()).toEqual(results);
+      expect(scheduler.lastRepetition).toEqual({ parent: 1, child: 1 });
+      expect(scheduler.lastCorrectness).toEqual({ parent: 0.8, child: 0.8 });
+      expect(scheduler.lastMastery).toEqual({ parent: 0.9, child: 0.9 });
+      expect(scheduler.mastery.parent).toBeCloseTo(scheduler.mastery.child);
+      expect(scheduler.mastery.parent).toBeGreaterThan(0);
+      expect(scheduler.mastery.parent).toBeLessThan(0.9);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

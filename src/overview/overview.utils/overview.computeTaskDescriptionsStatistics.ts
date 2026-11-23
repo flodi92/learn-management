@@ -1,4 +1,4 @@
-import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler2/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
+import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
 import { TaskDescription, TimedResult } from '../../model';
 import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
 import {

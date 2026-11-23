@@ -2,12 +2,10 @@ import { SaveData, TaskDescription, TimedResult } from '../model';
 import { getToday } from '../utils';
 import { assembleNextSession } from './learnScheduler.utils/assembleNextSession';
 import { computeTaskDescriptionStatisticsAt } from './learnScheduler.utils/computeTaskDescriptionStatisticsAt';
-import { computeCharacteristics } from './learnScheduler.utils/learnScheduler.utils';
 
 export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
   private _results: TimedResult[] = [];
   private _idTaskDescriptionMapping: Record<string, TD>;
-  private _characteristics;
 
   constructor(taskDescriptions: TD[]) {
     this._idTaskDescriptionMapping = Object.fromEntries(
@@ -15,7 +13,6 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
         (taskDescription) => [taskDescription.id, taskDescription] as const,
       ),
     );
-    this._characteristics = computeCharacteristics(this.taskDescriptions);
   }
 
   public nextSession(count: number, day: number = getToday()): TD[] {
@@ -24,7 +21,6 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
       day,
       idTaskDescriptionMapping: this._idTaskDescriptionMapping,
       results: this._results,
-      characteristics: this._characteristics,
     });
   }
 
