@@ -29,7 +29,7 @@ export const determineLearningStateFromStatisticsItem = ({
   }
   if (
     lastRepetition !== undefined &&
-    lastCorrectness &&
+    lastCorrectness !== undefined &&
     lastCorrectness <= 0.5
   ) {
     return 'forRepeat';
