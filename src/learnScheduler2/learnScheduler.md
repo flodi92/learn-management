@@ -37,7 +37,7 @@ The targets follow the spaced repetition model described in the section below: t
 
 ### Spaced repetition model
 
-The model and the terminology are taken from Tabibian et al., "Enhancing human learning via spaced repetition optimization", PNAS 116(10), 2019 (algorithm MEMORIZE). This section contains everything of it that is needed to understand the scheduler, the article itself is not required. The article calls the repeated things items, here they are TaskDescription instances.
+The model and the terminology are taken from Tabibian et al., "Enhancing human learning via spaced repetition optimization", PNAS 116(10), 2019 (algorithm MEMORIZE), https://pmc.ncbi.nlm.nih.gov/articles/PMC6410796/pdf/pnas.201815156.pdf. This section contains everything of it that is needed to understand the scheduler, the article itself is not required. The article calls the repeated things items, here they are TaskDescription instances.
 
 - **Review events**: each repetition is a test. The learner either recalls the item (r = 1) or forgets it (r = 0). Here the correctness between 0 and 1 replaces that binary outcome.
 - **Forgetting curve**: the probability to recall an item at time t is `m(t) = exp(-n * (t - tr))` with the time of the last repetition `tr` and the forgetting rate `n`. It starts at 1 at the repetition and decays exponentially. The inverse of the forgetting rate is called memory strength or half-life. The scheduler uses the half-life `S` (`n = ln(2) / S`), so `m(t) = 2^(-(t - tr) / S)`.
