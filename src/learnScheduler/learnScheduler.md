@@ -80,6 +80,7 @@ To ensure that the learner can focus on a number of learning in progress TaskDes
 - The limit is global (over all categories) and proportional to the session size: at most `max(1, ceil(learningInProgressFraction * count))` TaskDescription instances may be learning in progress. Therefore all of them can be repeated within one session.
 - A new TaskDescription is only introduced while the number of learning in progress instances, including those introduced earlier in the same session, is below the limit.
 - Learnt instances do not count, they leave the learning in progress phase.
+- The limit only restricts the introductions of step 4. If slots of the session remain after all other candidates were chosen, further instances are introduced beyond the limit (see precedence between targets), so that the session has the requested size whenever enough instances are eligible for introduction.
 
 2. Assure constant repetition of learning in progress TaskDescription instances
 
@@ -137,8 +138,9 @@ Exception: A TaskDescription that is related to a scheduled TaskDescription does
 1. The conditions 6, 7 and 8 and the limit of 1 decide which TaskDescription instances may be introduced at all (hard conditions).
 2. If not all candidates fit into a session, the slots are given to: due learning in progress instances (2), then due learnt instances (4), then newly introduced instances (1, 6 to 8). Within each group the lowest recall probability, respectively the lowest effective relevance and effective complexity comes first.
 3. Target 5 reorders only otherwise equal candidates and fills remaining slots.
-4. If still slots remain and nothing is due or eligible, the TaskDescription instances with the lowest recall probability are repeated to fill the session (target 3 gives way). If there are no candidates at all, fewer TaskDescription instances than requested are returned.
-5. The selection is deterministic. Equal priorities are resolved by id. Unlike MEMORIZE (see spaced repetition model) it does not sample repetition times randomly.
+4. If still slots remain and nothing is due or eligible within the limit of target 1, the TaskDescription instances with the lowest recall probability are repeated to fill the session (target 3 gives way).
+5. If still slots remain, further TaskDescription instances eligible for introduction are introduced beyond the limit of target 1 (target 1 gives way, the conditions 6 to 8 still hold). If there are no candidates at all, fewer TaskDescription instances than requested are returned.
+6. The selection is deterministic. Equal priorities are resolved by id. Unlike MEMORIZE (see spaced repetition model) it does not sample repetition times randomly.
 
 ## Derived statistics to base the scheduling on
 
@@ -291,7 +293,7 @@ Apply the rules of the learning state with `dropOutRecallProbability`, `learntSt
 
 **Step 3: due learnt instances.** Candidates are all instances in state `forRepeat`. Order: recall probability ascending. Take them while slots are left.
 
-**Step 4: introductions.** Only while slots are left and the room for learning in progress instances is greater than 0. The room is `max(1, ceil(learningInProgressFraction * count))` minus the number of instances in state `learning` (due or not, repeated today or not). Every introduced instance reduces the room by 1. Candidates are the instances in state `notLearned` that fulfil all of the following conditions, evaluated on the learning states at `day` (instances chosen in this session do not count as learnt):
+**Step 4: introductions.** Only while slots are left and the room for learning in progress instances is greater than 0. The room is `max(1, ceil(learningInProgressFraction * count))` minus the number of instances in state `learning` (due or not, repeated today or not). Every introduced instance reduces the room by 1. Step 6 introduces further candidates ignoring the room. Candidates are the instances in state `notLearned` that fulfil all of the following conditions, evaluated on the learning states at `day` (instances chosen in this session do not count as learnt):
 
 - Target 6: if it has an effective relevance, every instance with a smaller effective relevance is learnt.
 - Target 7: every instance whose subjects are a non-empty proper subset of its subjects is learnt.
@@ -301,11 +303,14 @@ Order of candidates: effective relevance ascending, effective complexity ascendi
 
 **Step 5: fill.** If slots are left, fill them with introduced instances that are not chosen yet, are in state `learning` or `learned` (not due, otherwise they were chosen in step 2 and 3) and are not repeated today. Order: relatedness preference first, then nearly due before others, then recall probability ascending. An instance is nearly due if its recall probability on `day + relatedLookAheadDays` would be lower than its target recall probability. One at a time, the preference is recalculated after each pick.
 
+**Step 6: further introductions.** If slots are left, the remaining candidates of step 4 (the conditions of targets 6 to 8 are unchanged) are introduced in the same order, one at a time, without the limit of learning in progress instances. This is needed because the room of step 4 is at most `ceil(learningInProgressFraction * count)`, which would otherwise leave slots of the session empty, e.g. in the first session.
+
 **Relatedness preference (target 5).** A candidate has the preference if its relatedness strength to the set of already chosen instances is greater than 0 and the exception does not apply. A higher strength is preferred. The exception applies if the candidate has a relevance and categories and its relevance is greater than the smallest relevance found in the categories it belongs to (the smallest of the per category minimums, over all instances of that category). The preference only reorders otherwise equal candidates in step 4 and orders the fill in step 5, it never admits an instance that does not fulfil the conditions of the steps above.
 
 **Properties that must hold** (basis for tests):
 
-- Learning in progress instances never exceed the limit through introductions.
+- Introductions in step 4 never exceed the limit of learning in progress instances, only step 6 may exceed it and only to fill otherwise empty slots.
+- The session has `count` instances whenever enough instances are available (not repeated today and, if not introduced yet, eligible for introduction).
 - No instance appears twice or is repeated on a day it has already been repeated.
 - An instance with a smaller effective relevance is learnt before an instance with a greater one is introduced.
 - Perfect answers at the moment they become due need 4 repetitions to be learnt (see example above); a never repeated learning in progress instance drops out and does not block the limit.

@@ -16,18 +16,22 @@ const perfect = (id: string, days = [0, 1, 3, 7]) =>
   days.map((day) => ({ id, day, correctness: 1 }));
 
 describe('LearnScheduler', () => {
-  it('limits introductions and excludes repetitions on the same calendar day', () => {
+  it('fills the session with introductions beyond the learning limit and excludes repetitions on the same calendar day', () => {
     const tasks = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
     const scheduler = new LearnScheduler(tasks);
     expect(scheduler.nextSession(4, 0).map((task) => task.id)).toEqual([
       'a',
       'b',
+      'c',
+      'd',
     ]);
-    scheduler.recordResults({ a: 1, b: 1 }, 0.1);
-    expect(scheduler.nextSession(4, 0.9)).toEqual([]);
+    scheduler.recordResults({ a: 1, b: 1, c: 1, d: 1 }, 0.1);
+    expect(scheduler.nextSession(4, 0.9).map((task) => task.id)).toEqual(['e']);
     expect(scheduler.nextSession(4, 1).map((task) => task.id)).toEqual([
       'a',
       'b',
+      'c',
+      'd',
     ]);
     expect(scheduler.nextSession(0, 1)).toEqual([]);
     expect(scheduler.nextSession(1.9, 1)).toHaveLength(1);
@@ -56,10 +60,15 @@ describe('LearnScheduler', () => {
     const tasks = [{ id: 'a' }, { id: 'b', parents: ['a'] }, { id: 'c' }];
     expect(
       sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 0.8),
-    ).toEqual([]);
+    ).toEqual(['c']);
     expect(
       sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 1.2),
-    ).toEqual(['a', 'b']);
+    ).toEqual(['a', 'b', 'c']);
+  });
+
+  it('prefers repeating introduced tasks over introductions beyond the learning limit', () => {
+    const tasks = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
+    expect(sessionIds(tasks, perfect('a'), 4, 8)).toEqual(['b', 'c', 'a', 'd']);
   });
 
   it('unblocks introductions after dropout but preserves their history', () => {
@@ -204,15 +213,13 @@ describe('LearnScheduler', () => {
   });
 
   it('schedules due repetitions at the specified perfect-answer intervals', () => {
-    const scheduler = new LearnScheduler([{ id: 'a' }, { id: 'b' }]);
+    const scheduler = new LearnScheduler([{ id: 'a' }]);
     for (const day of [0, 1, 3, 7, 29, 79]) {
       expect(scheduler.nextSession(1, day).map((task) => task.id)).toEqual([
         'a',
       ]);
       scheduler.recordResults({ a: 1 }, day);
-      expect(scheduler.nextSession(1, day)).toEqual(
-        day < 7 ? [] : [{ id: 'b' }],
-      );
+      expect(scheduler.nextSession(1, day)).toEqual([]);
     }
   });
 

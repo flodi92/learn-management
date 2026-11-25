@@ -152,18 +152,21 @@ export const assembleNextSession = <TD extends TaskDescription>({
       );
     });
   });
-  while (selected.length < limit && room > 0 && introductions.length > 0) {
-    introductions.sort(
-      (a, b) =>
-        compareCharacteristics(a, b) ||
-        preference(b) - preference(a) ||
-        compareIds(a.id, b.id),
-    );
-    const candidate = introductions.shift();
-    if (candidate === undefined) break;
-    add(candidate);
-    room--;
-  }
+  const introduce = (hasRoom: () => boolean) => {
+    while (selected.length < limit && hasRoom() && introductions.length > 0) {
+      introductions.sort(
+        (a, b) =>
+          compareCharacteristics(a, b) ||
+          preference(b) - preference(a) ||
+          compareIds(a.id, b.id),
+      );
+      const candidate = introductions.shift();
+      if (candidate === undefined) break;
+      add(candidate);
+      room--;
+    }
+  };
+  introduce(() => room > 0);
 
   const nearlyDue = (taskDescription: TD) => {
     const item = statistics[taskDescription.id];
@@ -193,5 +196,6 @@ export const assembleNextSession = <TD extends TaskDescription>({
     if (candidate === undefined) break;
     add(candidate);
   }
+  introduce(() => true);
   return selected;
 };
