@@ -24,6 +24,7 @@ export interface TaskDescription {
 export interface Result {
   id: string; // id of a TaskDescription that has been examined
   correctness: number; // between 0 and 1, 0 means incorrect, 1 means correct, all intermediates possible
+  wasConfusedWith?: string[]; // ids of TaskDescription instances linked by confusedWith that the learner confused this TaskDescription with
 }
 
 export type SaveData = TimedResult[];
@@ -331,6 +332,10 @@ The method nextSession requests a subset of the given TaskDescription instances 
 ### recordResults
 
 The method recordResults is invoked once a session is done. The parameter results maps each TaskDescription to the result of examining that task. The result can be understood as level of correctness. It is a number between 0 and 1.
+
+### recordResult
+
+The method recordResult records a single `Result` for the given day (default: today), including its optional `wasConfusedWith`. Results of unknown TaskDescription ids are ignored, a correctness outside 0 to 1 throws. `recordResults` records each of its entries this way. The scheduler only stores `wasConfusedWith` with the result (it is part of SaveData); it does not influence the scheduling.
 
 ### get mastery
 

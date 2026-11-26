@@ -5,14 +5,13 @@ import { TaskPresenter } from '../../../../userInterface/taskPresenter';
 import { isNotUndefined } from '../../../../utils';
 import { RegExpTaskDescription } from '../regExp.tasks/regExp.model';
 import { maximumNumberOfShownExamples } from '../regExp.constants';
-import { getExampleAlternative } from './regExp.taskPresenter.utils';
-
-type Example = {
-  text: string;
-  alternative: string;
-  isPositive: boolean;
-  answer?: 'positive' | 'negative';
-};
+import { Confusion, Example } from './regExp.taskPresenter.model';
+import {
+  determineConfusions,
+  getConfusionMessage,
+  getExampleAlternative,
+  isAnsweredCorrectly,
+} from './regExp.taskPresenter.utils';
 
 const shuffle = <T>(items: T[]): T[] => {
   const copy = [...items];
@@ -53,13 +52,11 @@ const buildExamples = (taskDescription: RegExpTaskDescription): Example[] => {
   return shuffle(selected);
 };
 
-const isAnsweredCorrectly = (example: Example): boolean =>
-  (example.answer === 'positive') === example.isPositive;
-
 export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
   private taskDescriptions: RegExpTaskDescription[] = [];
   private currentTaskDescriptionIndex = 0;
   private examples: Example[] = [];
+  private confusions: Confusion[] = [];
   private cursor = 0;
   private checked = false;
   private summary = { correct: 0, incorrect: 0 };
@@ -67,6 +64,9 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
   private _onAnswered?: (result: Result) => void;
   private _onFinished?: () => void;
 
+  constructor(private allTaskDescriptions: RegExpTaskDescription[]) {
+    super();
+  }
   set onAnswered(handler: (result: Result) => void) {
     this._onAnswered = handler;
   }
@@ -95,6 +95,7 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
 
   private loadTaskDescription() {
     this.examples = buildExamples(this.currentTaskDescription);
+    this.confusions = [];
     this.cursor = 0;
     this.checked = false;
   }
@@ -135,6 +136,13 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
         allCorrect
           ? chalk.green('All correct.')
           : chalk.red('Some answers were wrong.'),
+      );
+      this.confusions.forEach((confusion) =>
+        console.log(
+          chalk.yellow(
+            getConfusionMessage(this.currentTaskDescription, confusion),
+          ),
+        ),
       );
       console.log(chalk.dim('Press Enter to continue.'));
     }
@@ -199,6 +207,11 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
           return;
         }
         this.checked = true;
+        this.confusions = determineConfusions({
+          taskDescription: this.currentTaskDescription,
+          examples: this.examples,
+          allTaskDescriptions: this.allTaskDescriptions,
+        });
         this.render();
         this.updateSummary();
       } else {
@@ -215,9 +228,13 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
     } else {
       this.summary.incorrect += 1;
     }
+    const wasConfusedWith = this.confusions.map(
+      ({ linkedTaskDescription }) => linkedTaskDescription.id,
+    );
     this._onAnswered?.({
       id: this.currentTaskDescription.id,
       correctness: isCorrect ? 1 : 0,
+      ...(wasConfusedWith.length > 0 && { wasConfusedWith }),
     });
   }
 

@@ -55,6 +55,7 @@ export interface SaveDataBase {
 export interface Result {
   id: string;
   correctness: number;
+  wasConfusedWith?: string[];
 }
 
 export interface TimedResult extends Result {

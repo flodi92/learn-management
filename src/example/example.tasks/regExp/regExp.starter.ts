@@ -10,7 +10,7 @@ export class RegExpStarter extends Starter<RegExpTaskDescription> {
     let getLabelFromId!: (id: string) => string;
 
     super(
-      new RegExpTaskPresenter(),
+      new RegExpTaskPresenter(taskDescriptions),
       taskDescriptions,
       new SQLiteDataBase(),
       new ConsoleOverview((id) => getLabelFromId(id)),

@@ -41,8 +41,8 @@ export class Starter<TD extends TaskDescription> {
     await finished;
   }
 
-  private onAnswered({ id, correctness }: Result) {
-    this.scheduler.recordResults({ [id]: correctness });
+  private onAnswered(result: Result) {
+    this.scheduler.recordResult(result);
     this.saveData();
   }
 

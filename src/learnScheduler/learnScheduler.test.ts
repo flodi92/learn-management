@@ -257,4 +257,22 @@ describe('LearnScheduler', () => {
       vi.useRealTimers();
     }
   });
+
+  it('records a result together with the ids of the task descriptions it was confused with', () => {
+    const scheduler = new LearnScheduler([
+      { id: 'a', confusedWith: ['b'] },
+      { id: 'b' },
+    ]);
+    scheduler.recordResult(
+      { id: 'a', correctness: 0, wasConfusedWith: ['b'] },
+      3,
+    );
+    scheduler.recordResult({ id: 'b', correctness: 1 }, 3);
+    scheduler.recordResult({ id: 'unknown', correctness: 1 }, 3);
+    expect(scheduler.getSaveData()).toEqual([
+      { id: 'a', day: 3, correctness: 0, wasConfusedWith: ['b'] },
+      { id: 'b', day: 3, correctness: 1 },
+    ]);
+    expect(() => scheduler.recordResult({ id: 'a', correctness: 2 })).toThrow();
+  });
 });

@@ -1,4 +1,4 @@
-import { SaveData, TaskDescription, TimedResult } from '../model';
+import { Result, SaveData, TaskDescription, TimedResult } from '../model';
 import { getToday } from '../utils';
 import { assembleNextSession } from './learnScheduler.utils/assembleNextSession';
 import { computeTaskDescriptionStatisticsAt } from './learnScheduler.utils/computeTaskDescriptionStatisticsAt';
@@ -28,22 +28,27 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
     });
   }
 
+  public recordResult(result: Result, day: number = getToday()) {
+    const { id, correctness } = result;
+    if (!this.taskDescriptionIds.includes(id)) {
+      return;
+    }
+
+    if (correctness < 0 || correctness > 1) {
+      throw new Error(
+        `correctness for taskDescription ${id} must be between 0 and 1 inclusive`,
+      );
+    }
+
+    this._results.push({ ...result, day });
+  }
+
   public recordResults(
     results: Record<string, number>,
     day: number = getToday(),
   ) {
     for (const [id, correctness] of Object.entries(results)) {
-      if (!this.taskDescriptionIds.includes(id)) {
-        continue;
-      }
-
-      if (correctness < 0 || correctness > 1) {
-        throw new Error(
-          `correctness for taskDescription ${id} must be between 0 and 1 inclusive`,
-        );
-      }
-
-      this._results.push({ id, day, correctness });
+      this.recordResult({ id, correctness }, day);
     }
   }
 
