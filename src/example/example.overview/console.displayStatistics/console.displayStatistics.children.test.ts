@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { OverviewStatistics } from '../../../overview/overview.model';
-import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
+import { OverviewStatisticsTree } from '../../../overview/overview.utils/overview.toRecursiveStatistics.model';
+import { toRecursiveStatistics } from '../../../overview/overview.utils/overview.toRecursiveStatistics';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
 import { numberOfInitiallyShownChildren } from '../console.constants';
 import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
@@ -10,10 +10,10 @@ import { sortChildren } from '../console.displayStatisticsItem.utils/console.sor
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
 // Children are named "taskDescription 01", "taskDescription 02", ... and sorted by their decreasing mastery
-const createStatistics = (
+const createStatisticsTree = (
   numberOfChildren: number,
-): OverviewRecursiveUndeterminedStatistics<OverviewStatistics> => ({
-  groupType: 'taskDescription',
+): OverviewStatisticsTree => ({
+  defaultGroupType: 'taskDescription',
   statistics: {
     avgLastRepetitionBeforeDays: 1,
     selected: 0,
@@ -62,7 +62,7 @@ describe('ConsoleDisplayStatistics with many children', () => {
       formatStatistics,
       getStatisticsColor,
       sortChildren,
-    ).display(createStatistics(numberOfChildren));
+    ).display(toRecursiveStatistics(createStatisticsTree(numberOfChildren)));
 
   beforeEach(() => {
     output = [];
@@ -124,12 +124,11 @@ describe('ConsoleDisplayStatistics with many children', () => {
   });
 
   it('adds the children of an expanded child when going down from its last shown child', () => {
-    const statistics: OverviewRecursiveUndeterminedStatistics<OverviewStatistics> =
-      {
-        groupType: 'category',
-        statistics: createStatistics(1).statistics,
-        children: { parent: createStatistics(20) },
-      };
+    const statistics = toRecursiveStatistics({
+      defaultGroupType: 'category',
+      statistics: createStatisticsTree(1).statistics,
+      children: { parent: createStatisticsTree(20) },
+    });
     new ConsoleDisplayStatistics(
       formatStatistics,
       getStatisticsColor,

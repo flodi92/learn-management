@@ -38,12 +38,8 @@ class StatisticsComputation<
     ])[] = [],
   ) {}
 
-  public get groupType(): GroupTypeOrTaskDescription<GroupType> {
+  public get defaultGroupType(): GroupTypeOrTaskDescription<GroupType> {
     return this.groupTypes.length ? this.groupTypes[0] : 'taskDescription';
-  }
-
-  private get childrensGroupTypes() {
-    return this.groupTypes.slice(1);
   }
 
   public get statistics(): AggregatedStatistics {
@@ -56,31 +52,40 @@ class StatisticsComputation<
     );
   }
 
-  private _children?: Record<
-    string | number,
-    OverviewRecursiveUndeterminedStatistics<
-      TaskDescriptionStatistics | AggregatedStatistics,
-      GroupTypeOrTaskDescription<GroupType>
-    >
-  >;
+  public get possibleGroupTypes() {
+    return [...this.groupTypes];
+  }
 
-  get children(): Record<
+  private cachedChildren = new Map<
+    GroupTypeOrTaskDescription<GroupType>,
+    Record<
+      string | number,
+      OverviewRecursiveUndeterminedStatistics<
+        TaskDescriptionStatistics | AggregatedStatistics,
+        GroupTypeOrTaskDescription<GroupType>
+      >
+    >
+  >();
+
+  public getChildren(
+    groupType: GroupTypeOrTaskDescription<GroupType>,
+  ): Record<
     string | number,
     OverviewRecursiveUndeterminedStatistics<
       TaskDescriptionStatistics | AggregatedStatistics,
       GroupTypeOrTaskDescription<GroupType>
     >
   > {
-    if (this._children === undefined) {
-      this._children = this.computeChildren();
+    let children = this.cachedChildren.get(groupType);
+    if (!children) {
+      children = this.computeChildren(groupType);
+      this.cachedChildren.set(groupType, children);
     }
-
-    return this._children;
+    return children;
   }
 
-  private computeChildren() {
-    const { groupType, childrensGroupTypes, taskDescriptionStatisticsTuples } =
-      this;
+  private computeChildren(groupType = this.defaultGroupType) {
+    const { taskDescriptionStatisticsTuples } = this;
 
     if (groupType === 'taskDescription') {
       return Object.fromEntries(
@@ -91,11 +96,20 @@ class StatisticsComputation<
               {
                 groupType: 'taskDescription',
                 statistics: progressItem,
+                getChildren: () => undefined,
               },
             ] as const,
         ),
       );
     }
+
+    const groupIndex = this.groupTypes.indexOf(groupType);
+    if (groupIndex === -1) {
+      throw new Error(`Unknown group type "${groupType}"`);
+    }
+    const childrensGroupTypes = this.groupTypes.filter(
+      (_, index) => index !== groupIndex,
+    );
 
     const groupedTuples = taskDescriptionStatisticsTuples.reduce(
       (acc, tuple) => {
@@ -138,27 +152,22 @@ class StatisticsComputation<
       return this.taskDescriptionStatisticsTuples.map(([id]) => id);
     }
 
-    const [[expectedGroupType, group], ...restPath] = path;
+    const [[groupType, group], ...restPath] = path;
 
-    const children: Record<
-      string | number,
-      OverviewRecursiveUndeterminedStatistics<
-        TaskDescriptionStatistics | AggregatedStatistics,
-        GroupTypeOrTaskDescription<GroupType>
-      >
-    > = this.children;
-
-    if (this.groupType !== expectedGroupType) {
-      throw new Error(
-        `Expected group type "${this.groupType}" but got "${expectedGroupType}"`,
-      );
+    if (groupType === 'taskDescription') {
+      if (restPath.length > 0) {
+        throw new Error('A taskDescription has no children');
+      }
+      return [String(group)];
     }
 
-    if (children[group] === undefined) {
-      throw new Error(`No child "${group}" for group type "${this.groupType}"`);
+    const child = this.getChildren(groupType)[group];
+
+    if (child === undefined) {
+      throw new Error(`No child "${group}" for group type "${groupType}"`);
     }
 
-    return children[group].getChildrenIds!(restPath);
+    return child.getChildrenIds!(restPath);
   }
 }
 

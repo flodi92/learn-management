@@ -52,6 +52,7 @@ export class OverviewDisplaySelectableComputedStatistics {
   private toggleSelection(path: OverviewSelectionPath) {
     const pathStr = getSelectionKey(path);
     const selected = this.groupSelection[pathStr];
+    delete this.groupSelection[pathStr];
 
     if (isTaskDescriptionSelectionPath(path)) {
       this.groupSelection[pathStr] = selected === true ? undefined : true;
@@ -64,70 +65,24 @@ export class OverviewDisplaySelectableComputedStatistics {
   }
 
   private updateTaskDescriptionSelection() {
-    const entries = (
+    this.taskDescriptionSelection = (
       Object.entries(this.groupSelection) as [
         OverviewSelectionKey,
         boolean | undefined,
       ][]
-    ).map(
-      ([pathStr, selected]) =>
-        [JSON.parse(pathStr) as OverviewSelectionPath, selected] as const,
-    );
+    ).reduce((acc, [pathStr, selected]) => {
+      const path = JSON.parse(pathStr) as OverviewSelectionPath;
 
-    const [taskDescriptionSelection, pureGroupSelection] = entries.reduce(
-      (acc, entry): [typeof entries, typeof entries] => {
-        const [taskDescriptionSelection, pureGroupSelection] = acc;
-        const [path] = entry;
-        const [lastGroupType] = path[path.length - 1];
-
-        return lastGroupType === 'taskDescription'
-          ? [[...taskDescriptionSelection, entry], pureGroupSelection]
-          : [taskDescriptionSelection, [...pureGroupSelection, entry]];
-      },
-      [[], []] as [typeof entries, typeof entries],
-    );
-
-    const sortedPureGroupSelection = pureGroupSelection.sort(
-      ([pathA], [pathB]) => pathA.length - pathB.length,
-    );
-
-    this.taskDescriptionSelection = sortedPureGroupSelection.reduce(
-      (acc, [path, selected]) => {
-        const childrenIds = this.statistics.getChildrenIds!(path);
-
-        childrenIds.forEach((id) => {
-          if (selected === true) {
-            acc[id] = true;
-          }
+      if (isTaskDescriptionSelectionPath(path)) {
+        acc[path[path.length - 1][1]] = selected ? true : undefined;
+      } else if (selected !== undefined) {
+        this.statistics.getChildrenIds!(path).forEach((id) => {
+          acc[id] = selected ? true : undefined;
         });
+      }
 
-        return acc;
-      },
-      {} as OverviewTaskDescriptionSelection,
-    );
-
-    this.taskDescriptionSelection = taskDescriptionSelection.reduce(
-      (acc, [path, selected]) => {
-        const [, lastId] = path[path.length - 1];
-        acc[lastId] = selected ? true : undefined;
-        return acc;
-      },
-      this.taskDescriptionSelection,
-    );
-
-    this.taskDescriptionSelection = sortedPureGroupSelection
-      .reverse()
-      .reduce((acc, [path, selected]) => {
-        const childrenIds = this.statistics.getChildrenIds!(path);
-
-        childrenIds.forEach((id) => {
-          if (selected === false) {
-            acc[id] = undefined;
-          }
-        });
-
-        return acc;
-      }, this.taskDescriptionSelection);
+      return acc;
+    }, {} as OverviewTaskDescriptionSelection);
   }
 }
 

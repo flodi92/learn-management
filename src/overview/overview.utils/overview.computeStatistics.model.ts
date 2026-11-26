@@ -42,11 +42,16 @@ export interface OverviewRecursiveUndeterminedStatistics<
   GroupType extends string = string,
 > {
   statistics: Statistics;
-  groupType?: GroupType;
+  defaultGroupType?: GroupType;
   parentGroups?: readonly (readonly [GroupType, string | number])[];
-  children?: Record<
-    string | number,
-    OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>
-  >;
+  possibleGroupTypes?: GroupType[];
+  getChildren: (
+    groupType: GroupType,
+  ) =>
+    | Record<
+        string | number,
+        OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>
+      >
+    | undefined;
   getChildrenIds?(path: [GroupType, string | number][]): string[];
 }

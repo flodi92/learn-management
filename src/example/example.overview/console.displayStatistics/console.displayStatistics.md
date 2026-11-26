@@ -2,8 +2,10 @@
 
 The class `ConsoleDisplayStatistics` displays a recursive
 `OverviewRecursiveUndeterminedStatistics<Statistics, GroupType>` value on the
-console. `GroupType` describes the string values used by `groupType` and the
-first value in each `parentGroups` tuple.
+console. `GroupType` describes the string values used by `defaultGroupType`,
+`possibleGroupTypes` and the first value in each `parentGroups` tuple.
+Children are only read through `getChildren(groupType)` for the currently chosen
+group type of a node, never through a `children` attribute.
 The display tree does not know what a statistics item contains. The caller
 provides arrow functions for formatting an item, coloring an item, sorting
 children, and toggling a group selection. The caller also provides an observable
@@ -16,15 +18,21 @@ format. Every aggregated line starts with a selection indicator and the number o
 other layers show their statistics in the line of the child that represents
 them.
 
-Each layer contains a `${childType} statistics` line followed by one line per
-child. Children are indented one level deeper than that heading. A child line
+Each layer contains a `${groupType} statistics` heading line followed by one line
+per child. The heading shows the currently chosen group type of that layer,
+which is `defaultGroupType` initially. It is focusable (yellow `>`); left and
+right toggle the chosen group type through the selectable group types, which
+are `possibleGroupTypes` plus `defaultGroupType` if that is missing there (as
+for `taskDescription`). The choice is kept per node. Focus and expansion are
+identified by a path of `[groupType, key]` pairs, so equal keys of different
+group types do not clash. Children are indented one level deeper than that heading. A child line
 contains the label (or id) and the formatted statistics of the child, so the
 child statistics are visible without expanding it. A child `label` is shown
 instead of its id and is not repeated in the statistics.
 
 The focused child can be changed with the up and down arrow keys and is
 indicated by a yellow `>`. The right arrow expands the focused child, shows its
-`${childType} statistics` line and children, and moves the focus to the first
+`${groupType} statistics` line and children, and moves the focus to the first
 child. This can be repeated for deeper layers; pressing right on a child
 without children has no effect. The left arrow moves the focus to the parent
 child (the child expanded to show the focused child) and collapses its
@@ -34,6 +42,8 @@ the selection of the focused group or subject. A group cycles through explicitly
 selected (`true`), explicitly unselected (`false`), and unspecified
 (`undefined`). A subject only toggles between selected (`true`) and unspecified
 (`undefined`), it never becomes explicitly unselected.
+The most recent toggle wins over earlier ones for the subjects they have in
+common, independent of the group types of the parent groups.
 
 Subject lines start with a three-character selection indicator that uses the
 subject selection observable: a selected subject is marked `[+]`, while an
@@ -46,8 +56,9 @@ All lines that appear when expanding are indented one level deeper than the
 line that triggered the expansion. The layers are therefore indicated by an
 increasing number of indentation. When an expanded child is focused, pressing
 down moves the focus to that child's first child. There is only one focus for
-all layers. The root statistics and `${childType} statistics` lines cannot be
-focused.
+all layers. The root statistics line cannot be focused. Space has no effect on a
+heading. Toggling a subject passes `[['taskDescription', id]]`, toggling a group
+passes its full path.
 
 ### Number of shown children
 
@@ -79,8 +90,9 @@ Everything is shown with the opacity `inactiveOpacity` defined in
 - the focused child line;
 - child lines with the focused line somewhere below them (the parents of the
   focused child); and
-- the root statistics line and the `${childType} statistics` line of every
-  node with the focused line as a child or further below.
+- the root statistics line and the `${groupType} statistics` line of every
+  node with the focused line as a child or further below, and the focused
+  heading itself.
 
 All siblings of the focused child and its parents, as well as lines below the
 focused child, remain dimmed. A terminal cannot display partial opacity, so the

@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { OverviewRecursiveStatistics } from '../../../overview/overview.model';
 import { statisticsExample } from '../../../overview/overview.utils/overview.computeStatistics.exampleData';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
 import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
@@ -199,9 +200,111 @@ describe('ConsoleDisplayStatistics', () => {
 
   it('keeps the focus within the bounds', () => {
     press('up');
+    press('up');
+    expect(view()[1]).toMatch(/^> category statistics/);
+    press('down');
     expect(view()[2]).toMatch(/^ {2}> Mathematics: /);
     for (let i = 0; i < 10; i++) press('down');
     expect(view()[5]).toMatch(/^ {2}> Chemistry: /);
+  });
+});
+
+const aggregated = {
+  avgLastRepetitionBeforeDays: 1,
+  selected: 0,
+  selectionState: 'implicitNoSelection',
+  notLearned: 1,
+  learning: 0,
+  learned: 0,
+  forRepeat: 0,
+} as const;
+
+const leaf = (): OverviewRecursiveStatistics => ({
+  statistics: aggregated,
+  getChildren: () => undefined,
+});
+
+const mathStatistics: OverviewRecursiveStatistics = {
+  statistics: aggregated,
+  defaultGroupType: 'relevance',
+  possibleGroupTypes: ['relevance'],
+  getChildren: (groupType) =>
+    groupType === 'relevance' ? { 1: leaf() } : undefined,
+};
+
+const groupedStatistics: OverviewRecursiveStatistics = {
+  statistics: aggregated,
+  defaultGroupType: 'category',
+  possibleGroupTypes: ['category', 'relevance'],
+  getChildren: (
+    groupType,
+  ): Record<string, OverviewRecursiveStatistics> | undefined =>
+    groupType === 'category'
+      ? { Math: mathStatistics }
+      : groupType === 'relevance'
+        ? { 5: leaf() }
+        : undefined,
+};
+
+describe('ConsoleDisplayStatistics group types', () => {
+  const press = (name: string) => {
+    output = [];
+    process.stdin.emit('keypress', undefined, { name });
+  };
+  let output: string[];
+  const view = () => output.slice(output.indexOf('') + 1).map(stripAnsi);
+  const toggleSelection = vi.fn();
+
+  beforeEach(() => {
+    output = [];
+    toggleSelection.mockClear();
+    vi.spyOn(console, 'clear').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation((line = '') => {
+      output.push(String(line));
+    });
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      getStatisticsColor,
+      sortChildren,
+      toggleSelection,
+      () => ({}),
+    ).display(groupedStatistics);
+  });
+
+  afterEach(() => {
+    process.stdin.emit('keypress', 'return', { name: 'return' });
+    vi.restoreAllMocks();
+  });
+
+  it('toggles the group type of the focused heading with left and right', () => {
+    press('up');
+    press('right');
+    expect(view()[1]).toMatch(/^> relevance statistics/);
+    expect(view()[2]).toMatch(/^ {4}5:/);
+    press('right');
+    expect(view()[1]).toMatch(/^> category statistics/);
+    press('left');
+    expect(view()[1]).toMatch(/^> relevance statistics/);
+  });
+
+  it('passes the full path to the selection', () => {
+    press('right');
+    press('up');
+    expect(view()[3]).toMatch(/^ {4}> relevance statistics/);
+    press('right');
+    expect(view()[3]).toMatch(/^ {4}> relevance statistics/);
+    press('down');
+    press('space');
+    expect(toggleSelection).toHaveBeenLastCalledWith([
+      ['category', 'Math'],
+      ['relevance', '1'],
+    ]);
+  });
+
+  it('does not toggle anything with space on a heading', () => {
+    press('up');
+    press('space');
+    expect(toggleSelection).not.toHaveBeenCalled();
   });
 });
 

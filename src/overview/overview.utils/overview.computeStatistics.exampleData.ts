@@ -1,7 +1,8 @@
-import { OverviewRecursiveStatistics } from '../overview.model';
+import { OverviewStatisticsTree } from './overview.toRecursiveStatistics.model';
+import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
 
-export const statisticsExample: OverviewRecursiveStatistics = {
-  groupType: 'category',
+const statisticsExampleTree: OverviewStatisticsTree = {
+  defaultGroupType: 'category',
   statistics: {
     avgLastRepetitionBeforeDays: 19,
     selected: 0,
@@ -13,7 +14,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
   },
   children: {
     Mathematics: {
-      groupType: 'relevance',
+      defaultGroupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 10.5,
         selected: 0,
@@ -25,7 +26,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 2.5,
             selected: 0,
@@ -59,7 +60,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 22.5,
             selected: 0,
@@ -93,7 +94,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 6.5,
             selected: 0,
@@ -129,7 +130,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     Chemistry: {
-      groupType: 'relevance',
+      defaultGroupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 7.17,
         selected: 0,
@@ -141,7 +142,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 6,
             selected: 0,
@@ -175,7 +176,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 7.5,
             selected: 0,
@@ -209,7 +210,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             selected: 0,
@@ -245,7 +246,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     Physics: {
-      groupType: 'relevance',
+      defaultGroupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 23.33,
         selected: 0,
@@ -257,7 +258,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 7,
             selected: 0,
@@ -291,7 +292,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 8,
             selected: 0,
@@ -325,7 +326,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 55,
             selected: 0,
@@ -361,7 +362,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
     },
     History: {
-      groupType: 'relevance',
+      defaultGroupType: 'relevance',
       statistics: {
         avgLastRepetitionBeforeDays: 35,
         selected: 0,
@@ -373,7 +374,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
       },
       children: {
         1: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 85,
             selected: 0,
@@ -407,7 +408,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         2: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 17,
             selected: 0,
@@ -441,7 +442,7 @@ export const statisticsExample: OverviewRecursiveStatistics = {
           },
         },
         3: {
-          groupType: 'taskDescription',
+          defaultGroupType: 'taskDescription',
           statistics: {
             avgLastRepetitionBeforeDays: 3,
             selected: 0,
@@ -478,3 +479,5 @@ export const statisticsExample: OverviewRecursiveStatistics = {
     },
   },
 };
+
+export const statisticsExample = toRecursiveStatistics(statisticsExampleTree);

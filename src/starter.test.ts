@@ -66,7 +66,10 @@ describe('Starter', () => {
         learning: 0,
         learned: 0,
       });
-      const children = statistics.children?.category.children?.[1].children;
+      const children = statistics
+        .getChildren('category')
+        ?.category.getChildren('relevance')?.[1]
+        .getChildren('taskDescription');
       expect(children?.a.statistics).toMatchObject({
         learningState: 'forRepeat',
         numberOfRepetitions: 4,

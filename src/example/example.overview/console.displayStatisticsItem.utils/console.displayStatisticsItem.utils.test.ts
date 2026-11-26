@@ -174,11 +174,13 @@ describe('sortChildren', () => {
       learned: counts[2],
       forRepeat: counts[3],
     },
+    getChildren: () => undefined,
   });
   const taskDescriptionChild = (
     mastery: number,
   ): OverviewRecursiveStatistics => ({
     statistics: { ...taskDescription, mastery },
+    getChildren: () => undefined,
   });
   const sortedKeys = (children: Record<string, OverviewRecursiveStatistics>) =>
     sortChildren(Object.entries(children)).map(([key]) => key);

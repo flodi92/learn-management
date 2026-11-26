@@ -15,15 +15,22 @@ import {
   selectionStateIndicators,
 } from '../console.constants';
 import {
+  Focus,
   Line,
   StatisticsColorer,
   StatisticsFormatter,
+  StatisticsPath,
   StatisticsSorter,
 } from './console.displayStatistics.model';
 import {
-  getChildren,
+  focusId,
   getDisplayName,
+  getLineFocus,
+  getNextGroupType,
   getNode,
+  getSelectableGroupTypes,
+  getSortedChildren,
+  getTaskDescriptionOrGroupSelectionPath,
   indentation,
   isHighlighted,
   pathId,
@@ -31,12 +38,18 @@ import {
 
 type TaskDescriptionSelection = () => OverviewTaskDescriptionSelection;
 
+type Node<Statistics extends object> = OverviewRecursiveUndeterminedStatistics<
+  Statistics,
+  OverviewGroupTypeOrTaskDescription
+>;
+
 export class ConsoleDisplayStatistics<Statistics extends object> {
-  private root?: OverviewRecursiveUndeterminedStatistics<Statistics>;
+  private root?: Node<Statistics>;
+  private groupTypes = new Map<string, OverviewGroupTypeOrTaskDescription>();
   private expanded = new Set<string>();
   private shownChildren = new Map<string, number>();
   private lines: Line<Statistics>[] = [];
-  private focus?: string[];
+  private focus?: Focus;
   private resolveDisplay?: () => void;
   private readonly showSelectionIndicators: boolean;
   private readonly taskDescriptionSelection: TaskDescriptionSelection;
@@ -54,39 +67,48 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     this.taskDescriptionSelection = taskDescriptionSelection ?? (() => ({}));
   }
 
-  public display(
-    statistics: OverviewRecursiveUndeterminedStatistics<Statistics>,
-  ): Promise<void> {
+  public display(statistics: Node<Statistics>): Promise<void> {
     return new Promise<void>((resolve) => {
       this.resolveDisplay = resolve;
       this.root = statistics;
       this.expanded.clear();
       this.shownChildren.clear();
+      this.groupTypes.clear();
       this.focus = undefined;
       this.update();
       this.listen();
     });
   }
 
+  private getGroupType(node: Node<Statistics>, path: StatisticsPath) {
+    return (
+      this.groupTypes.get(pathId(path)) ??
+      node.defaultGroupType ??
+      getSelectableGroupTypes(node)[0]
+    );
+  }
+
   private buildLines(
-    node: OverviewRecursiveUndeterminedStatistics<Statistics>,
-    path: string[],
+    node: Node<Statistics>,
+    path: StatisticsPath,
     depth: number,
   ): Line<Statistics>[] {
-    const children = getChildren(node, this.sortChildren);
-    if (!children) return [];
+    if (getSelectableGroupTypes(node).length === 0) return [];
 
+    const groupType = this.getGroupType(node, path);
+    const entries = getSortedChildren(node, groupType, this.sortChildren);
     const lines: Line<Statistics>[] = [
       {
         depth,
         nodePath: path,
-        text: headingColor(`${children.childType} statistics`),
+        text: headingColor(`${groupType} statistics`),
+        headingOf: path,
       },
     ];
     const shownCount =
       this.shownChildren.get(pathId(path)) ?? numberOfInitiallyShownChildren;
-    for (const [key, child] of children.entries.slice(0, shownCount)) {
-      const childPath = [...path, key];
+    for (const [key, child] of entries.slice(0, shownCount)) {
+      const childPath: StatisticsPath = [...path, [groupType, key]];
       lines.push({
         depth: depth + 1,
         nodePath: childPath,
@@ -98,7 +120,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
         lines.push(...this.buildLines(child, childPath, depth + 2));
       }
     }
-    if (children.entries.length > shownCount) {
+    if (entries.length > shownCount) {
       lines.push({
         depth: depth + 1,
         nodePath: path,
@@ -109,8 +131,8 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     return lines;
   }
 
-  private get focusablePaths(): string[][] {
-    return this.lines.flatMap((line) => (line.path ? [line.path] : []));
+  private get focusables(): Focus[] {
+    return this.lines.flatMap((line) => getLineFocus(line) ?? []);
   }
 
   private rebuildLines() {
@@ -128,12 +150,13 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   private update() {
     if (!this.root) return;
     this.rebuildLines();
-    const focusable = this.focusablePaths;
+    const focusables = this.focusables;
     if (
       !this.focus ||
-      !focusable.some((path) => pathId(path) === pathId(this.focus!))
+      !focusables.some((focus) => focusId(focus) === focusId(this.focus!))
     ) {
-      this.focus = focusable[0];
+      this.focus =
+        focusables.find((focus) => !focus.isHeading) ?? focusables[0];
     }
     this.render();
   }
@@ -141,9 +164,15 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   private render() {
     console.clear();
     console.log(helpColor('↑/↓: move the focus'));
-    console.log(helpColor('→: expand the focused entry and jump into it'));
     console.log(
-      helpColor('←: jump to the parent entry and collapse its expansion'),
+      helpColor(
+        '→: expand the focused entry and jump into it (on a statistics line: next group type)',
+      ),
+    );
+    console.log(
+      helpColor(
+        '←: jump to the parent entry and collapse its expansion (on a statistics line: previous group type)',
+      ),
     );
     if (this.showSelectionIndicators) {
       console.log(
@@ -155,9 +184,12 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     console.log(helpColor('enter: quit or accept current selection'));
     console.log();
 
-    const focusId = this.focus && pathId(this.focus);
     for (const line of this.lines) {
-      const isFocused = !!line.path && pathId(line.path) === focusId;
+      const lineFocus = getLineFocus(line);
+      const isFocused =
+        !!lineFocus &&
+        !!this.focus &&
+        focusId(lineFocus) === focusId(this.focus);
       const pointer = isFocused ? focusPointerColor('> ') : '  ';
       const selectionIndicator =
         this.getTaskDescriptionSelectionIndicator(line);
@@ -179,28 +211,33 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
     if (!this.showSelectionIndicators || !line.path || !line.statistics) {
       return '';
     }
-    const node = getNode(this.root!, line.path);
-    if (!node || node.parentGroups) return '';
-    const isSelected =
-      this.taskDescriptionSelection()[line.path[line.path.length - 1]] === true;
+    const [groupType, id] = line.path[line.path.length - 1];
+    if (groupType !== 'taskDescription') return '';
+    const isSelected = this.taskDescriptionSelection()[id] === true;
     return selectionStateIndicators[
       isSelected ? 'explicitSelectionUnselections' : 'implicitNoSelection'
     ].text;
   }
 
+  private focusIndex() {
+    const id = this.focus && focusId(this.focus);
+    return this.focusables.findIndex((focus) => focusId(focus) === id);
+  }
+
   private showMoreChildrenBelowFocus(): boolean {
     if (!this.focus) return false;
-    const focusId = pathId(this.focus);
-    const start = this.lines.findIndex(
-      (line) => line.path && pathId(line.path) === focusId,
-    );
+    const id = focusId(this.focus);
+    const start = this.lines.findIndex((line) => {
+      const lineFocus = getLineFocus(line);
+      return !!lineFocus && focusId(lineFocus) === id;
+    });
     for (const line of this.lines.slice(start + 1)) {
-      if (line.path) return false;
+      if (getLineFocus(line)) return false;
       if (line.hiddenChildrenOf) {
-        const id = pathId(line.hiddenChildrenOf);
+        const hiddenId = pathId(line.hiddenChildrenOf);
         this.shownChildren.set(
-          id,
-          (this.shownChildren.get(id) ?? numberOfInitiallyShownChildren) +
+          hiddenId,
+          (this.shownChildren.get(hiddenId) ?? numberOfInitiallyShownChildren) +
             numberOfInitiallyShownChildren,
         );
         this.rebuildLines();
@@ -212,45 +249,67 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
 
   private moveFocus(delta: number) {
     if (delta > 0) this.showMoreChildrenBelowFocus();
-    const focusable = this.focusablePaths;
-    if (!this.focus || focusable.length === 0) return;
-    const focusId = pathId(this.focus);
-    const index = focusable.findIndex((path) => pathId(path) === focusId);
-    const next = Math.min(focusable.length - 1, Math.max(0, index + delta));
-    this.focus = focusable[next];
+    const focusables = this.focusables;
+    if (!this.focus || focusables.length === 0) return;
+    const next = Math.min(
+      focusables.length - 1,
+      Math.max(0, this.focusIndex() + delta),
+    );
+    this.focus = focusables[next];
     this.render();
+  }
+
+  private changeGroupType(delta: number) {
+    if (!this.root || !this.focus) return;
+    const node = getNode(this.root, this.focus.path);
+    if (!node) return;
+    const groupTypes = getSelectableGroupTypes(node);
+    this.groupTypes.set(
+      pathId(this.focus.path),
+      getNextGroupType(
+        groupTypes,
+        this.getGroupType(node, this.focus.path),
+        delta,
+      ),
+    );
+    this.update();
   }
 
   private expandFocus() {
     if (!this.root || !this.focus) return;
-    const node = getNode(this.root, this.focus);
-    const firstChild = node && getChildren(node, this.sortChildren)?.entries[0];
+    if (this.focus.isHeading) {
+      this.changeGroupType(1);
+      return;
+    }
+    const node = getNode(this.root, this.focus.path);
+    if (!node || getSelectableGroupTypes(node).length === 0) return;
+    const groupType = this.getGroupType(node, this.focus.path);
+    const firstChild = getSortedChildren(node, groupType, this.sortChildren)[0];
     if (!firstChild) return;
-    this.expanded.add(pathId(this.focus));
-    this.focus = [...this.focus, firstChild[0]];
+    this.expanded.add(pathId(this.focus.path));
+    this.focus = {
+      path: [...this.focus.path, [groupType, firstChild[0]]],
+      isHeading: false,
+    };
     this.update();
   }
 
   private collapseToParent() {
-    if (!this.focus || this.focus.length < 2) return;
-    this.focus = this.focus.slice(0, -1);
-    this.expanded.delete(pathId(this.focus));
+    if (!this.focus) return;
+    if (this.focus.isHeading) {
+      this.changeGroupType(-1);
+      return;
+    }
+    if (this.focus.path.length < 2) return;
+    this.focus = { path: this.focus.path.slice(0, -1), isHeading: false };
+    this.expanded.delete(pathId(this.focus.path));
     this.update();
   }
 
   private toggleFocusedSelection() {
-    if (!this.focus) return;
-    const node = getNode(this.root!, this.focus);
-    if (!node) return;
-    const parentGroups: readonly (readonly [string, string | number])[] =
-      node.parentGroups ?? [
-        ['taskDescription', this.focus[this.focus.length - 1]],
-      ];
+    if (!this.focus || this.focus.isHeading) return;
     this.toggleSelection(
-      parentGroups.map(
-        ([type, key]) =>
-          [type, key] as [OverviewGroupTypeOrTaskDescription, string | number],
-      ),
+      getTaskDescriptionOrGroupSelectionPath(this.focus.path),
     );
     this.update();
   }
@@ -304,7 +363,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
 }
 
 export const consoleDisplayStatistics = async <Statistics extends object>(
-  statistics: OverviewRecursiveUndeterminedStatistics<Statistics>,
+  statistics: Node<Statistics>,
   formatStatistics: StatisticsFormatter<Statistics>,
   getStatisticsColor: StatisticsColorer<Statistics>,
   sortChildren: StatisticsSorter<Statistics>,
