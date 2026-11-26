@@ -10,6 +10,7 @@
     "node": true,
     "npm run start-overview": true,
     "npm run start-regExp": true,
+    "npm run start-regExpOld": true,
     "git status": true,
     "git diff": true,
     "git --no-pager diff": true,

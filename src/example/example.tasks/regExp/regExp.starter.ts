@@ -1,9 +1,9 @@
-import { regExpTaskDescriptions } from './regExp.taskDescriptions/regExp.taskDescriptions';
 import { Starter } from '../../../starter';
-import { RegExpTaskDescription } from './regExp.model';
 import { ConsoleOverview } from '../../example.overview/console.overview';
 import { RegExpTaskPresenter } from './regExp.taskPresenter/regExp.taskPresenter';
 import { SQLiteDataBase } from '../../example.dataBase/sqlite.dataBase';
+import { taskDescriptions } from './regExp.tasks/regExp.taskDescriptions';
+import { RegExpTaskDescription } from './regExp.tasks/regExp.model';
 
 export class RegExpStarter extends Starter<RegExpTaskDescription> {
   constructor() {
@@ -11,7 +11,7 @@ export class RegExpStarter extends Starter<RegExpTaskDescription> {
 
     super(
       new RegExpTaskPresenter(),
-      regExpTaskDescriptions,
+      taskDescriptions,
       new SQLiteDataBase(),
       new ConsoleOverview((id) => getLabelFromId(id)),
     );

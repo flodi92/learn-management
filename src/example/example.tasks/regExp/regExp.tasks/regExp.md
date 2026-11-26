@@ -11,7 +11,7 @@ Prompt example: `Check regExp.taskDescriptions.ts for consistency.`
    - no entry of `negativeExamples` is matched by `expression`
    - every task description has at least one positive and at least one negative example
    - every task description has at least four examples in total, i.e. the number of `positiveExamples` plus the number of `negativeExamples` is 4 or more; the examples do not have to be split evenly between both kinds, and on failure add examples that illustrate the expression until the total is reached
-   - run it with `npx vitest run src/example/example.tasks/regExp2/regExp.tasks/regExp.taskDescriptions.test.ts`
+   - run it with `npx vitest run src/example/example.tasks/regExp/regExp.tasks/regExp.taskDescriptions.test.ts`
    - on failure the test reports all offending examples of a task description at once; decide per task description whether the expression or the examples are wrong, e.g. alternation has the lowest precedence, so `/^x|y$/` means `^x` or `y$`, not `^(x|y)$`
 2. `confusedWith` references existing task descriptions – [regExp.taskDescriptions.test.ts](./regExp.taskDescriptions.test.ts)
    - `confusedWith` lists expressions a learner could mistake for the task description's own expression, so each of them must itself be the `expression` of another task description; otherwise the confusion could never be practiced

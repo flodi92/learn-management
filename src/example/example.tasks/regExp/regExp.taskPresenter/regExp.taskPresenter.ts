@@ -1,18 +1,15 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { RegExpTaskDescription } from '../regExp.model';
 import { Result } from '../../../../model';
 import { TaskPresenter } from '../../../../userInterface/taskPresenter';
-import { maximumNumberOfShownExamples } from '../regExp.constants';
-import {
-  getExampleAlternative,
-  getExampleValue,
-} from '../regExp.utils/regExp.utils';
 import { isNotUndefined } from '../../../../utils';
+import { RegExpTaskDescription } from '../regExp.tasks/regExp.model';
+import { maximumNumberOfShownExamples } from '../regExp.constants';
+import { getExampleAlternative } from './regExp.taskPresenter.utils';
 
 type Example = {
   text: string;
-  alternative?: string;
+  alternative: string;
   isPositive: boolean;
   answer?: 'positive' | 'negative';
 };
@@ -29,14 +26,14 @@ const shuffle = <T>(items: T[]): T[] => {
 const buildExamples = (taskDescription: RegExpTaskDescription): Example[] => {
   const positives = shuffle(
     (taskDescription.positiveExamples ?? []).map((example) => ({
-      text: getExampleValue(example),
+      text: example,
       alternative: getExampleAlternative(example),
       isPositive: true,
     })),
   );
   const negatives = shuffle(
     (taskDescription.negativeExamples ?? []).map((example) => ({
-      text: getExampleValue(example),
+      text: example,
       alternative: getExampleAlternative(example),
       isPositive: false,
     })),
@@ -120,11 +117,7 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
       const pointer =
         !this.checked && idx === this.cursor ? chalk.yellow('> ') : '  ';
       const label = example.answer ? ` (${example.answer})` : '';
-      const shown =
-        example.alternative !== undefined
-          ? chalk.magenta(`<${example.alternative}>`)
-          : example.text;
-      const line = `${pointer}${shown}${label}`;
+      const line = `${pointer}${example.alternative}${label}`;
 
       console.log(
         this.checked
