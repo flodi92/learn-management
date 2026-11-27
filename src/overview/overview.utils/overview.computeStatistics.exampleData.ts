@@ -5,7 +5,7 @@ import { convertDayToTimestamp } from '../../utils';
 const statisticsExampleTree: OverviewStatisticsTree = {
   defaultGroupType: 'category',
   statistics: {
-    avgLastRepetitionBefore: convertDayToTimestamp(19),
+    lastRepetitionBefore: convertDayToTimestamp(1),
     selected: 0,
     selectionState: 'implicitNoSelection',
     notLearned: 6,
@@ -17,7 +17,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Mathematics: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBefore: convertDayToTimestamp(10.5),
+        lastRepetitionBefore: convertDayToTimestamp(1),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 1,
@@ -29,7 +29,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(2.5),
+            lastRepetitionBefore: convertDayToTimestamp(2),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -91,7 +91,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(22.5),
+            lastRepetitionBefore: convertDayToTimestamp(5),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -127,7 +127,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(6.5),
+            lastRepetitionBefore: convertDayToTimestamp(1),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -165,7 +165,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Chemistry: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBefore: convertDayToTimestamp(7.17),
+        lastRepetitionBefore: convertDayToTimestamp(1),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 2,
@@ -177,7 +177,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(6),
+            lastRepetitionBefore: convertDayToTimestamp(2),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -213,7 +213,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(7.5),
+            lastRepetitionBefore: convertDayToTimestamp(6),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -249,7 +249,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(8),
+            lastRepetitionBefore: convertDayToTimestamp(1),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -287,7 +287,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Physics: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBefore: convertDayToTimestamp(23.33),
+        lastRepetitionBefore: convertDayToTimestamp(2),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 1,
@@ -299,7 +299,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(7),
+            lastRepetitionBefore: convertDayToTimestamp(6),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -335,7 +335,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(8),
+            lastRepetitionBefore: convertDayToTimestamp(2),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -371,7 +371,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(55),
+            lastRepetitionBefore: convertDayToTimestamp(20),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -409,7 +409,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     History: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBefore: convertDayToTimestamp(35),
+        lastRepetitionBefore: convertDayToTimestamp(1),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 2,
@@ -421,7 +421,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(85),
+            lastRepetitionBefore: convertDayToTimestamp(20),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -457,7 +457,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(17),
+            lastRepetitionBefore: convertDayToTimestamp(4),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -493,7 +493,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBefore: convertDayToTimestamp(3),
+            lastRepetitionBefore: convertDayToTimestamp(1),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 2,

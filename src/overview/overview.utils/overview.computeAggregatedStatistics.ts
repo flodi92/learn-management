@@ -34,11 +34,15 @@ export const computeAggregatedStatistics = (
     selectedIds.includes(item.id),
   ).length;
 
+  const trainedBefore = statisticsItems
+    .map((item) => item.lastRepetitionBefore)
+    .filter(Number.isFinite);
+  const lastRepetitionBefore = trainedBefore.length
+    ? Math.min(...trainedBefore)
+    : undefined;
+
   return {
-    avgLastRepetitionBefore: statisticsItems.reduce(
-      (acc, item) => acc + item.lastRepetitionBefore,
-      0,
-    ),
+    lastRepetitionBefore,
     selected,
     selectionState: determineSelectionState(
       statisticsItems.length,

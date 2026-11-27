@@ -45,4 +45,29 @@ describe('computeAggregatedStatistics', () => {
     expect(statistics.selected).toBe(1);
     expect(statistics.selectionState).toBe('implicitSelection');
   });
+
+  it('takes the minimum last repetition of the trained items', () => {
+    const trained = [
+      { ...createItem('a'), lastRepetitionBefore: convertDayToTimestamp(5) },
+      { ...createItem('b'), lastRepetitionBefore: Infinity },
+      { ...createItem('c'), lastRepetitionBefore: convertDayToTimestamp(2) },
+    ];
+    expect(
+      computeAggregatedStatistics(trained, [], undefined).lastRepetitionBefore,
+    ).toBe(convertDayToTimestamp(2));
+  });
+
+  it.each([[[]], [[{ lastRepetitionBefore: Infinity }]]])(
+    'leaves the last repetition undefined if no item has been trained',
+    (untrained) => {
+      const untrainedItems = untrained.map((item) => ({
+        ...createItem('a'),
+        ...item,
+      }));
+      expect(
+        computeAggregatedStatistics(untrainedItems, [], undefined)
+          .lastRepetitionBefore,
+      ).toBeUndefined();
+    },
+  );
 });

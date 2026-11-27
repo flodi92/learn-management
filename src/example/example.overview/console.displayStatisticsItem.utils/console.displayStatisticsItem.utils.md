@@ -40,9 +40,12 @@ colon colored by `getStatisticsColor`.
   background highlight is kept.
 - The short form contains the numbers of `notLearned`, `learning`, `learned`
   and `forRepeat`, followed by
-  `⌀ ${convertMillisecondsToHumanReadable(avgLastRepetitionBefore)} before`. Each number has the color of
-  its learning state and the state names are omitted. An infinite average is
-  shown as `never trained` instead of an infinite duration.
+  `${convertMillisecondsToHumanReadable(lastRepetitionBefore)} before`. The
+  `lastRepetitionBefore` of aggregated statistics is the minimum of all
+  taskDescriptions that have been trained before. If none has been trained, it
+  is `undefined` and `neverTrained` (`never trained`, defined in
+  `console.constants.ts`) is shown instead. Each number has the color of its
+  learning state and the state names are omitted.
 - In the focused form, every number is preceded by its learning state in
   separate words, for example `not learned: 153`. All data is separated by
   commas. Labels and all other text without a color of its own are displayed

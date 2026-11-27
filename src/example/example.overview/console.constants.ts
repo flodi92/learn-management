@@ -28,6 +28,9 @@ export const selectionStateIndicators: Record<
   explicitUnselection: { text: '[-]', isHighlighted: true },
 };
 
+// Shown instead of the last repetition if no taskDescription has been trained.
+export const neverTrained = 'never trained';
+
 // An examination counts as correct from this correctness on.
 export const correctExaminationThreshold = 0.5;
 export const correctExaminationColor = chalk.green;

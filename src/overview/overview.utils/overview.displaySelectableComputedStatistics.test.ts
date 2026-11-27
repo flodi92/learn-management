@@ -16,7 +16,7 @@ import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
 import { convertDayToTimestamp } from '../../utils';
 
 const taskDescriptionStatistics: OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBefore: convertDayToTimestamp(1),
+  lastRepetitionBefore: convertDayToTimestamp(1),
   selected: 0,
   selectionState: 'implicitNoSelection',
   notLearned: 0,

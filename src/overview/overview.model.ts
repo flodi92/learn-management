@@ -32,7 +32,7 @@ export type SelectionState =
   | 'explicitUnselection';
 
 export type OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBefore: number;
+  lastRepetitionBefore?: number;
   selected: number;
   selectionState: SelectionState;
 } & Record<LearningState, number>;

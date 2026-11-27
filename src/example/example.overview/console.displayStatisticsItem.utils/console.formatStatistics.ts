@@ -12,6 +12,7 @@ import {
   correctExaminationThreshold,
   incorrectExaminationColor,
   learningStateColors,
+  neverTrained,
   selectedColor,
   selectionHighlightColor,
   selectionStateIndicators,
@@ -50,8 +51,6 @@ const formatLabeledValue = (
   return `${camelCaseToWords(key)}: ${color ? color(text) : text}`;
 };
 
-const neverTrained = 'never trained';
-
 const formatSelectionState = (
   selectionState: SelectionState,
   isFocused: boolean,
@@ -70,15 +69,16 @@ const formatAggregatedStatistics = (
       ? formatLabeledValue(state, statistics[state], learningStateColors[state])
       : learningStateColors[state](String(statistics[state])),
   );
-  const average = Number.isFinite(statistics.avgLastRepetitionBefore)
-    ? `⌀ ${convertMillisecondsToHumanReadable(statistics.avgLastRepetitionBefore)} before`
-    : neverTrained;
+  const lastRepetition =
+    statistics.lastRepetitionBefore === undefined
+      ? neverTrained
+      : `${convertMillisecondsToHumanReadable(statistics.lastRepetitionBefore)} before`;
   const separator = isFocused ? ', ' : ' ';
   const selected = selectedColor(String(statistics.selected));
   const formatted = [
     isFocused ? `${selectedColor('selected: ')}${selected}` : selected,
     ...counts,
-    average,
+    lastRepetition,
   ].join(separator);
   return `${formatSelectionState(statistics.selectionState, isFocused)} ${formatted}`;
 };

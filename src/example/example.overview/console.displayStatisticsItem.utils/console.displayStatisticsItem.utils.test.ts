@@ -30,7 +30,7 @@ beforeAll(() => {
 });
 
 const aggregated: OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBefore: convertDayToTimestamp(19),
+  lastRepetitionBefore: convertDayToTimestamp(19),
   selected: 3,
   selectionState: 'implicitSelection',
   notLearned: 6,
@@ -98,28 +98,27 @@ describe('formatStatistics', () => {
 
   const selected = (): string => selectedColor('3');
 
-  it('shows only the colored numbers of aggregated statistics, the average last', () => {
+  it('shows only the colored numbers of aggregated statistics, the last repetition last', () => {
     expect(formatStatistics(aggregated, false)).toBe(
-      `${unfocusedSelection('[*]')} ${selected()} ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} ⌀ 19 days before`,
+      `${unfocusedSelection('[*]')} ${selected()} ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} 19 days before`,
     );
   });
 
   it('adds the labels to aggregated statistics when focused, leaving them uncolored', () => {
     expect(formatStatistics(aggregated, true)).toBe(
-      `[*] ${selectedColor('selected: ')}${selected()}, not learned: ${notLearned('6')}, learning: ${learning('5')}, learned: ${learned('9')}, for repeat: ${forRepeat('4')}, ⌀ 19 days before`,
+      `[*] ${selectedColor('selected: ')}${selected()}, not learned: ${notLearned('6')}, learning: ${learning('5')}, learned: ${learned('9')}, for repeat: ${forRepeat('4')}, 19 days before`,
     );
   });
 
-  it('shows "never trained" instead of an infinite average', () => {
-    const neverTrained = {
+  it('shows "never trained" if there is no last repetition', () => {
+    const untrained = {
       ...aggregated,
-      avgLastRepetitionBefore: Infinity,
+      lastRepetitionBefore: undefined,
     };
-    expect(formatStatistics(neverTrained, false)).toBe(
+    expect(formatStatistics(untrained, false)).toBe(
       `${unfocusedSelection('[*]')} ${selected()} ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
     );
-    expect(formatStatistics(neverTrained, true)).toMatch(/, never trained$/);
-    expect(formatStatistics(neverTrained, true)).not.toContain('Infinity');
+    expect(formatStatistics(untrained, true)).toMatch(/, never trained$/);
   });
 
   it.each([
@@ -274,7 +273,7 @@ describe('sortChildren', () => {
     counts: [number, number, number, number],
   ): OverviewRecursiveStatistics => ({
     statistics: {
-      avgLastRepetitionBefore: convertDayToTimestamp(0),
+      lastRepetitionBefore: convertDayToTimestamp(0),
       selected: 0,
       selectionState: 'implicitNoSelection',
       notLearned: counts[0],

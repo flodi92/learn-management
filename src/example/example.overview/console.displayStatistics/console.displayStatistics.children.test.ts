@@ -19,7 +19,7 @@ const createStatisticsTree = (
 ): OverviewStatisticsTree => ({
   defaultGroupType: 'taskDescription',
   statistics: {
-    avgLastRepetitionBefore: convertDayToTimestamp(1),
+    lastRepetitionBefore: convertDayToTimestamp(1),
     selected: 0,
     selectionState: 'implicitNoSelection',
     notLearned: numberOfChildren,
