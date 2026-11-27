@@ -47,7 +47,12 @@ export type OverviewRecursiveStatistics =
   >;
 
 export type OverviewGroupType =
-  'relevance' | 'category' | 'learningState' | 'selectionState';
+  | 'relevance'
+  | 'category'
+  | 'subject'
+  | 'complexity'
+  | 'learningState'
+  | 'selectionState';
 
 export type OverviewGroupTypeOrTaskDescription =
   GroupTypeOrTaskDescription<OverviewGroupType>;

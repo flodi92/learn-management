@@ -13,13 +13,19 @@ export const getOverviewGroups: GetGroups<
   switch (groupType) {
     case 'category':
       return taskDescription.categories ?? [];
+    case 'subject':
+      return taskDescription.subjects ?? [];
+    case 'complexity':
+      return [taskDescription.complexity ?? 1];
+    case 'relevance':
+      return [taskDescription.relevance ?? 1];
     case 'learningState':
       return [learningState];
     case 'selectionState':
       return [
         selectedIds.includes(taskDescription.id) ? 'selected' : 'notSelected',
       ];
-    default:
-      return [taskDescription.relevance ?? 1];
+    case 'taskDescription':
+      return [taskDescription.id];
   }
 };
