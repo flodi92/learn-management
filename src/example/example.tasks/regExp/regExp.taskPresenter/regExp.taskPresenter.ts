@@ -1,110 +1,46 @@
 import chalk from 'chalk';
 import readline from 'node:readline';
-import { Result } from '../../../../model';
 import { TaskPresenter } from '../../../../userInterface/taskPresenter';
-import { isNotUndefined } from '../../../../utils';
 import { RegExpTaskDescription } from '../regExp.tasks/regExp.model';
-import { maximumNumberOfShownExamples } from '../regExp.constants';
 import { Confusion, Example } from './regExp.taskPresenter.model';
 import {
+  buildExamples,
   determineConfusions,
   getConfusionMessage,
   getExampleAlternative,
   isAnsweredCorrectly,
 } from './regExp.taskPresenter.utils';
 
-const shuffle = <T>(items: T[]): T[] => {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-};
-
-const buildExamples = (taskDescription: RegExpTaskDescription): Example[] => {
-  const positives = shuffle(
-    (taskDescription.positiveExamples ?? []).map((example) => ({
-      text: example,
-      alternative: getExampleAlternative(example),
-      isPositive: true,
-    })),
-  );
-  const negatives = shuffle(
-    (taskDescription.negativeExamples ?? []).map((example) => ({
-      text: example,
-      alternative: getExampleAlternative(example),
-      isPositive: false,
-    })),
-  );
-
-  // Reserve one of each kind (if available), then fill the rest randomly.
-  const selected = [positives.shift(), negatives.shift()].filter(
-    isNotUndefined,
-  );
-  const rest = shuffle([...positives, ...negatives]);
-  selected.push(
-    ...rest.slice(
-      0,
-      Math.max(0, maximumNumberOfShownExamples - selected.length),
-    ),
-  );
-  return shuffle(selected);
-};
-
 export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
-  private taskDescriptions: RegExpTaskDescription[] = [];
-  private currentTaskDescriptionIndex = 0;
   private examples: Example[] = [];
   private confusions: Confusion[] = [];
   private cursor = 0;
   private checked = false;
-  private summary = { correct: 0, incorrect: 0 };
 
-  private _onAnswered?: (result: Result) => void;
-  private _onFinished?: () => void;
-
-  constructor(private allTaskDescriptions: RegExpTaskDescription[]) {
-    super();
-  }
-  set onAnswered(handler: (result: Result) => void) {
-    this._onAnswered = handler;
-  }
-
-  set onFinished(handler: () => void) {
-    this._onFinished = handler;
+  constructor(allTaskDescriptions: RegExpTaskDescription[]) {
+    super(allTaskDescriptions);
   }
 
   start(taskDescriptions: RegExpTaskDescription[]) {
-    this.taskDescriptions = taskDescriptions;
-    this.currentTaskDescriptionIndex = 0;
-    this.summary = { correct: 0, incorrect: 0 };
-
-    if (this.taskDescriptions.length === 0) {
-      console.log('No taskDescriptions available.');
+    super.start(taskDescriptions);
+    if (taskDescriptions.length === 0) {
       return;
     }
-    this.loadTaskDescription();
-    this.render();
     this.listen();
   }
 
-  private get currentTaskDescription(): RegExpTaskDescription {
-    return this.taskDescriptions[this.currentTaskDescriptionIndex];
-  }
-
-  private loadTaskDescription() {
+  protected loadTaskDescription() {
     this.examples = buildExamples(this.currentTaskDescription);
     this.confusions = [];
     this.cursor = 0;
     this.checked = false;
   }
 
-  private render() {
+  protected render() {
     console.clear();
     console.log(
       chalk.bold(
-        `TaskDescription ${this.currentTaskDescriptionIndex + 1}/${this.taskDescriptions.length}: `,
+        `TaskDescription ${this.currentTaskDescriptionIndex + 1}/${this.presentedTaskDescriptions.length}: `,
       ) + chalk.cyan(this.currentTaskDescription.expression.toString()),
     );
     console.log(
@@ -221,40 +157,23 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
     }
   }
 
-  private updateSummary() {
-    const isCorrect = this.examples.every(isAnsweredCorrectly);
-    if (isCorrect) {
-      this.summary.correct += 1;
-    } else {
-      this.summary.incorrect += 1;
-    }
-    const wasConfusedWith = this.confusions.map(
+  protected isCurrentTaskDescriptionAnsweredCorrectly() {
+    return this.examples.every(isAnsweredCorrectly);
+  }
+
+  protected currentTaskDescriptionWasConfusedWith() {
+    return this.confusions.map(
       ({ linkedTaskDescription }) => linkedTaskDescription.id,
     );
-    this._onAnswered?.({
-      id: this.currentTaskDescription.id,
-      correctness: isCorrect ? 1 : 0,
-      ...(wasConfusedWith.length > 0 && { wasConfusedWith }),
-    });
   }
 
-  private nextTaskDescription() {
-    this.currentTaskDescriptionIndex += 1;
-    if (this.currentTaskDescriptionIndex >= this.taskDescriptions.length) {
-      this.finish();
-      return;
-    }
-    this.loadTaskDescription();
-    this.render();
-  }
-
-  private finish() {
+  protected finish() {
     console.clear();
     console.log(chalk.bold('Summary'));
     console.log(chalk.green(`Correct: ${this.summary.correct}`));
     console.log(chalk.red(`Incorrect: ${this.summary.incorrect}`));
     this.stopListening();
-    this._onFinished?.();
+    this.onFinished?.();
   }
 
   private exit() {

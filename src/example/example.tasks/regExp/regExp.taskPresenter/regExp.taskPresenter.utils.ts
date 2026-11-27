@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import { isNotUndefined } from '../../../../utils';
+import { maximumNumberOfShownExamples } from '../regExp.constants';
 import {
   emptyStringName,
   specialCharacterNames,
@@ -60,4 +62,45 @@ export const getConfusionMessage = (
     ? ['positive', 'negative']
     : ['negative', 'positive'];
   return `${example.alternative} is ${currentKind} for ${taskDescription.expression} but ${linkedKind} for ${linkedTaskDescription.expression}`;
+};
+
+const shuffle = <T>(items: T[]): T[] => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+export const buildExamples = (
+  taskDescription: RegExpTaskDescription,
+): Example[] => {
+  const positives = shuffle(
+    (taskDescription.positiveExamples ?? []).map((example) => ({
+      text: example,
+      alternative: getExampleAlternative(example),
+      isPositive: true,
+    })),
+  );
+  const negatives = shuffle(
+    (taskDescription.negativeExamples ?? []).map((example) => ({
+      text: example,
+      alternative: getExampleAlternative(example),
+      isPositive: false,
+    })),
+  );
+
+  // Reserve one of each kind (if available), then fill the rest randomly.
+  const selected = [positives.shift(), negatives.shift()].filter(
+    isNotUndefined,
+  );
+  const rest = shuffle([...positives, ...negatives]);
+  selected.push(
+    ...rest.slice(
+      0,
+      Math.max(0, maximumNumberOfShownExamples - selected.length),
+    ),
+  );
+  return shuffle(selected);
 };
