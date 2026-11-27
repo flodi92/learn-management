@@ -53,8 +53,8 @@ class StatisticsComputation<
     );
   }
 
-  public get possibleGroupTypes() {
-    return [...this.groupTypes, ...this.optionalGroupTypes];
+  public get possibleGroupTypes(): GroupTypeOrTaskDescription<GroupType>[] {
+    return [...this.groupTypes, ...this.optionalGroupTypes, 'taskDescription'];
   }
 
   private cachedChildren = new Map<

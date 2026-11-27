@@ -41,6 +41,7 @@ describe('computeStatistics with optional group types', () => {
       'category',
       'relevance',
       'learningState',
+      'taskDescription',
     ]);
   });
 
@@ -65,6 +66,7 @@ describe('computeStatistics with optional group types', () => {
     expect(byCategory.possibleGroupTypes).toEqual([
       'relevance',
       'learningState',
+      'taskDescription',
     ]);
 
     const byLearningState = root.getChildren('learningState')!.learning;
@@ -72,6 +74,7 @@ describe('computeStatistics with optional group types', () => {
     expect(byLearningState.possibleGroupTypes).toEqual([
       'category',
       'relevance',
+      'taskDescription',
     ]);
   });
 
@@ -82,7 +85,10 @@ describe('computeStatistics with optional group types', () => {
       .getChildren('category')!
       .b.getChildren('relevance')![1];
     expect(lastLayer.defaultGroupType).toBe('taskDescription');
-    expect(lastLayer.possibleGroupTypes).toEqual(['learningState']);
+    expect(lastLayer.possibleGroupTypes).toEqual([
+      'learningState',
+      'taskDescription',
+    ]);
     expect(Object.keys(lastLayer.getChildren('learningState')!)).toEqual([
       'learning',
       'notLearned',
