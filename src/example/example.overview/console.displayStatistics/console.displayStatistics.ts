@@ -14,6 +14,7 @@ import {
   numberOfInitiallyShownChildren,
   selectionStateIndicators,
 } from '../console.constants';
+import { camelCaseToWords } from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import {
   Focus,
   Line,
@@ -103,7 +104,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
       {
         depth,
         nodePath: path,
-        text: headingColor(`${groupType} statistics`),
+        text: headingColor(`${camelCaseToWords(groupType)} statistics`),
         headingOf: path,
       },
     ];
