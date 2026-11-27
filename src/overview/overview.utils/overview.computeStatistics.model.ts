@@ -3,9 +3,14 @@ import { TaskDescription, TimedResult } from '../../model';
 export type GroupTypeOrTaskDescription<GroupType extends string> =
   GroupType | 'taskDescription';
 
-export type GetGroups<TD extends TaskDescription, GroupType extends string> = (
+export type GetGroups<
+  TD extends TaskDescription,
+  TaskDescriptionStatistics extends object,
+  GroupType extends string,
+> = (
   groupTypeOrTaskDescription: GroupTypeOrTaskDescription<GroupType>,
   taskDescription: TD,
+  statistics: TaskDescriptionStatistics,
 ) => string[] | number[];
 
 export type ComputeAggregatedStatistics<

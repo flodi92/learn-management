@@ -1,12 +1,12 @@
 import { TaskDescription, TimedResult } from '../model';
 import { getToday } from '../utils';
-import { RelevanceCategoryGroupType } from './overview.model';
+import { OverviewGroupType } from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
 import { computeTaskDescriptionsStatistics } from './overview.utils/overview.computeTaskDescriptionsStatistics';
 import { displaySelectableComputedStatistics } from './overview.utils/overview.displaySelectableComputedStatistics';
 import { DisplayComputedStatistics } from './overview.model';
-import { getGroupsForRelevanceAndCategory } from './overview.utils/overview.getGroupsForRelevanceAndCategory';
+import { getOverviewGroups } from './overview.utils/overview.getOverviewGroups';
 import { getSelectionKey } from './overview.utils/overview.getSelectionKey';
 
 export abstract class Overview<TD extends TaskDescription> {
@@ -28,8 +28,9 @@ export abstract class Overview<TD extends TaskDescription> {
           results,
           getToday(),
           this.getLabelFromId,
-          ['category', 'relevance'] satisfies RelevanceCategoryGroupType[],
-          getGroupsForRelevanceAndCategory,
+          ['category', 'relevance'] satisfies OverviewGroupType[],
+          ['learningState'] satisfies OverviewGroupType[],
+          getOverviewGroups,
           computeTaskDescriptionsStatistics,
           computeAggregatedStatistics,
           getSelectedIds,

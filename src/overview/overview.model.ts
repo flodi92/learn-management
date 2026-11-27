@@ -34,13 +34,13 @@ export type OverviewStatistics =
 export type OverviewRecursiveStatistics =
   OverviewRecursiveUndeterminedStatistics<
     OverviewStatistics,
-    GroupTypeOrTaskDescription<RelevanceCategoryGroupType>
+    GroupTypeOrTaskDescription<OverviewGroupType>
   >;
 
-export type RelevanceCategoryGroupType = 'relevance' | 'category';
+export type OverviewGroupType = 'relevance' | 'category' | 'learningState';
 
 export type OverviewGroupTypeOrTaskDescription =
-  GroupTypeOrTaskDescription<RelevanceCategoryGroupType>;
+  GroupTypeOrTaskDescription<OverviewGroupType>;
 
 export type OverviewSelectionPath = [
   OverviewGroupTypeOrTaskDescription,

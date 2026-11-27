@@ -23,7 +23,8 @@ class StatisticsComputation<
       TaskDescriptionStatistics
     >,
     private groupTypes: GroupType[],
-    private getGroups: GetGroups<TD, GroupType>,
+    private optionalGroupTypes: GroupType[],
+    private getGroups: GetGroups<TD, TaskDescriptionStatistics, GroupType>,
     private computeAggregatedStatistics: ComputeAggregatedStatistics<
       TaskDescriptionStatistics,
       AggregatedStatistics
@@ -53,7 +54,7 @@ class StatisticsComputation<
   }
 
   public get possibleGroupTypes() {
-    return [...this.groupTypes];
+    return [...this.groupTypes, ...this.optionalGroupTypes];
   }
 
   private cachedChildren = new Map<
@@ -103,18 +104,20 @@ class StatisticsComputation<
       );
     }
 
-    const groupIndex = this.groupTypes.indexOf(groupType);
-    if (groupIndex === -1) {
+    if (!this.possibleGroupTypes.includes(groupType)) {
       throw new Error(`Unknown group type "${groupType}"`);
     }
     const childrensGroupTypes = this.groupTypes.filter(
-      (_, index) => index !== groupIndex,
+      (type) => type !== groupType,
+    );
+    const childrensOptionalGroupTypes = this.optionalGroupTypes.filter(
+      (type) => type !== groupType,
     );
 
     const groupedTuples = taskDescriptionStatisticsTuples.reduce(
       (acc, tuple) => {
         const [id, taskDescription, progressItem] = tuple;
-        const groups = this.getGroups(groupType, taskDescription);
+        const groups = this.getGroups(groupType, taskDescription, progressItem);
 
         groups.forEach((group) => {
           if (!acc[group]) acc[group] = [];
@@ -135,6 +138,7 @@ class StatisticsComputation<
         new StatisticsComputation(
           tuples,
           childrensGroupTypes,
+          childrensOptionalGroupTypes,
           this.getGroups,
           this.computeAggregatedStatistics,
           this.getSelectedIds,
@@ -182,7 +186,8 @@ export const computeStatistics = <
   day: number,
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
-  getGroups: GetGroups<TD, GroupType>,
+  optionalGroupTypes: GroupType[],
+  getGroups: GetGroups<TD, TaskDescriptionStatistics, GroupType>,
   computeTaskDescriptionsStatistics: ComputeTaskDescriptionStatistics<
     TD,
     TaskDescriptionStatistics
@@ -208,6 +213,7 @@ export const computeStatistics = <
   return new StatisticsComputation(
     statistics,
     groupTypes,
+    optionalGroupTypes,
     getGroups,
     aggregateStatistics,
     getSelectedIds,
