@@ -37,7 +37,8 @@ export type OverviewRecursiveStatistics =
     GroupTypeOrTaskDescription<OverviewGroupType>
   >;
 
-export type OverviewGroupType = 'relevance' | 'category' | 'learningState';
+export type OverviewGroupType =
+  'relevance' | 'category' | 'learningState' | 'selectionState';
 
 export type OverviewGroupTypeOrTaskDescription =
   GroupTypeOrTaskDescription<OverviewGroupType>;

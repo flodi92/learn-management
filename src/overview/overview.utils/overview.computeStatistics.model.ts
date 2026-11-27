@@ -11,6 +11,7 @@ export type GetGroups<
   groupTypeOrTaskDescription: GroupTypeOrTaskDescription<GroupType>,
   taskDescription: TD,
   statistics: TaskDescriptionStatistics,
+  selectedIds: string[],
 ) => string[] | number[];
 
 export type ComputeAggregatedStatistics<

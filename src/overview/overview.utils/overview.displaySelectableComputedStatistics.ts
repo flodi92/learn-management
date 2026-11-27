@@ -50,6 +50,11 @@ export class OverviewDisplaySelectableComputedStatistics {
   }
 
   private toggleSelection(path: OverviewSelectionPath) {
+    if (path.some(([groupType]) => groupType === 'selectionState')) {
+      this.toggleSelectionOfCurrentMembers(path);
+      return;
+    }
+
     const pathStr = getSelectionKey(path);
     const selected = this.groupSelection[pathStr];
     delete this.groupSelection[pathStr];
@@ -60,6 +65,21 @@ export class OverviewDisplaySelectableComputedStatistics {
       this.groupSelection[pathStr] =
         selected === undefined ? true : selected === true ? false : undefined;
     }
+
+    this.updateTaskDescriptionSelection();
+  }
+
+  // The members of a selectionState group change with every selection, so a group selection could not be resolved again later.
+  // Instead the taskDescriptions that are members right now are (un)selected individually.
+  private toggleSelectionOfCurrentMembers(path: OverviewSelectionPath) {
+    const ids = this.statistics.getChildrenIds!(path);
+    const select = ids.some((id) => !this.taskDescriptionSelection[id]);
+
+    ids.forEach((id) => {
+      const pathStr = getSelectionKey([['taskDescription', id]]);
+      delete this.groupSelection[pathStr];
+      this.groupSelection[pathStr] = select ? true : undefined;
+    });
 
     this.updateTaskDescriptionSelection();
   }

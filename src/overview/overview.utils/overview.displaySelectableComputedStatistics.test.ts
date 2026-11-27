@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
   OverviewAggregatedStatisticsItem,
+  OverviewGroupType,
   OverviewRecursiveStatistics,
   OverviewSelectionPath,
 } from '../overview.model';
-import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
+import { TaskDescription } from '../../model';
+import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
+import { computeStatistics } from './overview.computeStatistics';
+import { computeTaskDescriptionsStatistics } from './overview.computeTaskDescriptionsStatistics';
 import { displaySelectableComputedStatistics } from './overview.displaySelectableComputedStatistics';
+import { getOverviewGroups } from './overview.getOverviewGroups';
+import { getSelectionKey } from './overview.getSelectionKey';
+import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
 
 const taskDescriptionStatistics: OverviewAggregatedStatisticsItem = {
   avgLastRepetitionBeforeDays: 1,
@@ -119,5 +126,81 @@ describe('OverviewDisplaySelectableComputedStatistics group toggling', () => {
     ];
     expect(await selectAfter([nested], [])).toEqual(['a', 'b']);
     expect(await selectAfter([category], [])).toEqual(['a', 'b']);
+  });
+});
+
+describe('OverviewDisplaySelectableComputedStatistics selectionState group toggling', () => {
+  const tasks: Record<string, TaskDescription> = {
+    a: { id: 'a', categories: ['x'] },
+    b: { id: 'b', categories: ['x'] },
+    c: { id: 'c', categories: ['y'] },
+  };
+
+  const groupTypes: OverviewGroupType[] = ['category'];
+  const optionalGroupTypes: OverviewGroupType[] = ['selectionState'];
+
+  const selectAfter = (
+    steps: OverviewSelectionPath[],
+    preselected: string[] = [],
+  ) =>
+    displaySelectableComputedStatistics(
+      async (_statistics, toggleSelection) =>
+        steps.forEach((path) => toggleSelection(path)),
+      (getSelectedIds, getGroupSelection) =>
+        computeStatistics(
+          tasks,
+          [],
+          0,
+          (id) => id,
+          groupTypes,
+          optionalGroupTypes,
+          getOverviewGroups,
+          computeTaskDescriptionsStatistics,
+          computeAggregatedStatistics,
+          getSelectedIds,
+          (parentGroups) => getGroupSelection()[getSelectionKey(parentGroups)],
+        ),
+      preselected,
+    );
+
+  const notSelected: OverviewSelectionPath = [
+    ['selectionState', 'notSelected'],
+  ];
+  const selected: OverviewSelectionPath = [['selectionState', 'selected']];
+
+  it('selects everything that is not selected yet', async () => {
+    expect(await selectAfter([notSelected], ['a'])).toEqual(['a', 'b', 'c']);
+  });
+
+  it('unselects everything that is selected', async () => {
+    expect(await selectAfter([selected], ['a', 'c'])).toEqual([]);
+  });
+
+  it('only affects the taskDescriptions of the parent groups', async () => {
+    expect(
+      await selectAfter(
+        [
+          [
+            ['category', 'x'],
+            ['selectionState', 'notSelected'],
+          ],
+        ],
+        ['c'],
+      ),
+    ).toEqual(['c', 'a', 'b']);
+  });
+
+  it('can keep toggling after the toggled group has disappeared', async () => {
+    expect(
+      await selectAfter(
+        [
+          notSelected,
+          [['taskDescription', 'b']],
+          [['category', 'y']],
+          [['category', 'y']],
+        ],
+        ['a'],
+      ),
+    ).toEqual(['a']);
   });
 });

@@ -29,7 +29,7 @@ export abstract class Overview<TD extends TaskDescription> {
           getToday(),
           this.getLabelFromId,
           ['category', 'relevance'] satisfies OverviewGroupType[],
-          ['learningState'] satisfies OverviewGroupType[],
+          ['learningState', 'selectionState'] satisfies OverviewGroupType[],
           getOverviewGroups,
           computeTaskDescriptionsStatistics,
           computeAggregatedStatistics,

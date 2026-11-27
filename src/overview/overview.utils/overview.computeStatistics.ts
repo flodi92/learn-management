@@ -68,6 +68,9 @@ class StatisticsComputation<
     >
   >();
 
+  // The groups of a group type can depend on the selection, so the cache is only valid for the selection it was filled with.
+  private cachedSelectionKey?: string;
+
   public getChildren(
     groupType: GroupTypeOrTaskDescription<GroupType>,
   ): Record<
@@ -77,6 +80,11 @@ class StatisticsComputation<
       GroupTypeOrTaskDescription<GroupType>
     >
   > {
+    const selectionKey = JSON.stringify([...this.getSelectedIds()].sort());
+    if (selectionKey !== this.cachedSelectionKey) {
+      this.cachedChildren.clear();
+      this.cachedSelectionKey = selectionKey;
+    }
     let children = this.cachedChildren.get(groupType);
     if (!children) {
       children = this.computeChildren(groupType);
@@ -114,10 +122,16 @@ class StatisticsComputation<
       (type) => type !== groupType,
     );
 
+    const selectedIds = this.getSelectedIds();
     const groupedTuples = taskDescriptionStatisticsTuples.reduce(
       (acc, tuple) => {
         const [id, taskDescription, progressItem] = tuple;
-        const groups = this.getGroups(groupType, taskDescription, progressItem);
+        const groups = this.getGroups(
+          groupType,
+          taskDescription,
+          progressItem,
+          selectedIds,
+        );
 
         groups.forEach((group) => {
           if (!acc[group]) acc[group] = [];

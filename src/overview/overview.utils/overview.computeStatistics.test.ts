@@ -17,18 +17,18 @@ const results: TimedResult[] = [
   { id: 'dropped', day: 0, correctness: 1 },
 ];
 
-const createStatistics = () =>
+const createStatistics = (getSelectedIds: () => string[] = () => []) =>
   computeStatistics(
     tasks,
     results,
     15,
     (id) => `Label ${id}`,
     ['category', 'relevance'] satisfies OverviewGroupType[],
-    ['learningState'] satisfies OverviewGroupType[],
+    ['learningState', 'selectionState'] satisfies OverviewGroupType[],
     getOverviewGroups,
     computeTaskDescriptionsStatistics,
     computeAggregatedStatistics,
-    () => [],
+    getSelectedIds,
     () => undefined,
   );
 
@@ -41,6 +41,7 @@ describe('computeStatistics with optional group types', () => {
       'category',
       'relevance',
       'learningState',
+      'selectionState',
       'taskDescription',
     ]);
   });
@@ -58,6 +59,52 @@ describe('computeStatistics with optional group types', () => {
     expect(groups.notLearned.statistics).toMatchObject({ notLearned: 1 });
   });
 
+  it('groups by whether the task descriptions are selected', () => {
+    const groups = createStatistics(() => ['learning']).getChildren(
+      'selectionState',
+    )!;
+
+    expect(Object.keys(groups).sort()).toEqual(['notSelected', 'selected']);
+    expect(groups.selected.statistics).toMatchObject({
+      selected: 1,
+      learning: 1,
+    });
+    expect(groups.notSelected.statistics).toMatchObject({
+      selected: 0,
+      forRepeat: 1,
+      notLearned: 1,
+    });
+  });
+
+  it('puts all task descriptions into one selectionState group if the selection is uniform', () => {
+    expect(
+      Object.keys(createStatistics().getChildren('selectionState')!),
+    ).toEqual(['notSelected']);
+    expect(
+      Object.keys(
+        createStatistics(() => Object.keys(tasks)).getChildren(
+          'selectionState',
+        )!,
+      ),
+    ).toEqual(['selected']);
+  });
+
+  it('regroups by the selection when the selection changes', () => {
+    let selectedIds: string[] = [];
+    const root = createStatistics(() => selectedIds);
+
+    expect(Object.keys(root.getChildren('selectionState')!)).toEqual([
+      'notSelected',
+    ]);
+
+    selectedIds = ['repeat'];
+    const groups = root.getChildren('selectionState')!;
+    expect(Object.keys(groups).sort()).toEqual(['notSelected', 'selected']);
+    expect(root.getChildrenIds!([['selectionState', 'selected']])).toEqual([
+      'repeat',
+    ]);
+  });
+
   it('removes only the chosen group type for the children', () => {
     const root = createStatistics();
 
@@ -66,6 +113,7 @@ describe('computeStatistics with optional group types', () => {
     expect(byCategory.possibleGroupTypes).toEqual([
       'relevance',
       'learningState',
+      'selectionState',
       'taskDescription',
     ]);
 
@@ -74,6 +122,7 @@ describe('computeStatistics with optional group types', () => {
     expect(byLearningState.possibleGroupTypes).toEqual([
       'category',
       'relevance',
+      'selectionState',
       'taskDescription',
     ]);
   });
@@ -87,6 +136,7 @@ describe('computeStatistics with optional group types', () => {
     expect(lastLayer.defaultGroupType).toBe('taskDescription');
     expect(lastLayer.possibleGroupTypes).toEqual([
       'learningState',
+      'selectionState',
       'taskDescription',
     ]);
     expect(Object.keys(lastLayer.getChildren('learningState')!)).toEqual([
