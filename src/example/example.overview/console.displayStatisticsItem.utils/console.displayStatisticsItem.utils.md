@@ -40,9 +40,9 @@ colon colored by `getStatisticsColor`.
   background highlight is kept.
 - The short form contains the numbers of `notLearned`, `learning`, `learned`
   and `forRepeat`, followed by
-  `⌀ ${avgLastRepetitionBeforeDays} days before`. Each number has the color of
+  `⌀ ${convertMillisecondsToHumanReadable(avgLastRepetitionBefore)} before`. Each number has the color of
   its learning state and the state names are omitted. An infinite average is
-  shown as `never trained` instead of `⌀ Infinity days before`.
+  shown as `never trained` instead of an infinite duration.
 - In the focused form, every number is preceded by its learning state in
   separate words, for example `not learned: 153`. All data is separated by
   commas. Labels and all other text without a color of its own are displayed
@@ -56,15 +56,15 @@ colon colored by `getStatisticsColor`.
 - The focused form contains
   `${learningState} (${Math.round(mastery * 100)}%)`, all colored by the
   learning state, followed by
-  `${numberOfRepetitions}x ${lastRepetitionBeforeDays} days before`. If
-  `lastRepetitionBeforeDays` is infinite, only `${numberOfRepetitions}x` is
+  `${numberOfRepetitions}x ${convertMillisecondsToHumanReadable(lastRepetitionBefore)} before`.
+  If `lastRepetitionBefore` is infinite, only `${numberOfRepetitions}x` is
   shown. Other values, such as `lastMastery` and `lastCorrectness`, are
   appended as `name: value`, with camel-case names transformed into separate
   words, for example `last mastery: 0.5`.
 - `examinations` is not part of the focused form. Instead
   `formatStatisticsDetails` returns one line per examination, the most recent
-  first: `${examinedBeforeDays} days before: correct` or
-  `${examinedBeforeDays} days before: incorrect`. A confusion is appended as
+  first: `${convertMillisecondsToHumanReadable(examinedBefore)} before: correct` or
+  `${convertMillisecondsToHumanReadable(examinedBefore)} before: incorrect`. A confusion is appended as
   `, was confused with ${wasConfusedWith.join(', ')}`. The labels of the
   confused taskDescriptions are already resolved like the label of every
   taskDescription (an id that has no taskDescription anymore stays an id). An

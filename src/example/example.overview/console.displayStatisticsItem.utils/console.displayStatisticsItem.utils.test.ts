@@ -22,13 +22,14 @@ import {
 } from './console.formatStatistics';
 import { getStatisticsColor } from './console.getStatisticsColor';
 import { sortChildren } from './console.sortChildren';
+import { convertDayToTimestamp } from '../../../utils';
 
 beforeAll(() => {
   chalk.level = 1;
 });
 
 const aggregated: OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBeforeDays: 19,
+  avgLastRepetitionBefore: convertDayToTimestamp(19),
   selected: 3,
   selectionState: 'implicitSelection',
   notLearned: 6,
@@ -41,7 +42,7 @@ const taskDescription: OverviewTaskDescriptionStatisticsItem = {
   id: 'Fractions',
   label: 'Fractions',
   mastery: 0.95,
-  lastRepetitionBeforeDays: 2,
+  lastRepetitionBefore: convertDayToTimestamp(2),
   numberOfRepetitions: 5,
   learningState: 'forRepeat',
   lastMastery: 0.5,
@@ -52,8 +53,8 @@ const taskDescription: OverviewTaskDescriptionStatisticsItem = {
 describe('camelCaseToWords', () => {
   it('separates the words of a camel case text', () => {
     expect(camelCaseToWords('notLearned')).toBe('not learned');
-    expect(camelCaseToWords('lastRepetitionBeforeDays')).toBe(
-      'last repetition before days',
+    expect(camelCaseToWords('lastRepetitionBefore')).toBe(
+      'last repetition before',
     );
     expect(camelCaseToWords('mastery')).toBe('mastery');
   });
@@ -87,7 +88,7 @@ describe('formatStatistics', () => {
   it('shows "never trained" instead of an infinite average', () => {
     const neverTrained = {
       ...aggregated,
-      avgLastRepetitionBeforeDays: Infinity,
+      avgLastRepetitionBefore: Infinity,
     };
     expect(formatStatistics(neverTrained, false)).toBe(
       `${unfocusedSelection('[*]')} ${selected()} ${notLearned('6')} ${learning('5')} ${learned('9')} ${forRepeat('4')} never trained`,
@@ -140,7 +141,7 @@ describe('formatStatistics', () => {
   it('does not show an infinite number of days of a taskDescription', () => {
     const neverRepeated = {
       ...taskDescription,
-      lastRepetitionBeforeDays: Infinity,
+      lastRepetitionBefore: Infinity,
       numberOfRepetitions: 0,
     };
     expect(formatStatistics(neverRepeated, true)).not.toContain('Infinity');
@@ -155,24 +156,24 @@ describe('formatStatisticsDetails', () => {
         ...taskDescription,
         examinations: [
           {
-            examinedBeforeDays: 0.8803214467588987,
+            examinedBefore: convertDayToTimestamp(0.8803214467588987),
             correctness: 1,
             wasConfusedWith: [],
           },
           {
-            examinedBeforeDays: 2,
+            examinedBefore: convertDayToTimestamp(2),
             correctness: 0,
             wasConfusedWith: ['/xyz$/'],
           },
           {
-            examinedBeforeDays: 3,
+            examinedBefore: convertDayToTimestamp(3),
             correctness: 0,
             wasConfusedWith: ['/xyz/', '/^xyz/'],
           },
         ],
       }),
     ).toEqual([
-      correctExaminationColor('0.8803214467588987 days before: correct'),
+      correctExaminationColor('1 day before: correct'),
       incorrectExaminationColor(
         '2 days before: incorrect, was confused with /xyz$/',
       ),
@@ -186,11 +187,19 @@ describe('formatStatisticsDetails', () => {
     const [correct, incorrect] = formatStatisticsDetails({
       ...taskDescription,
       examinations: [
-        { examinedBeforeDays: 1, correctness: 1, wasConfusedWith: [] },
-        { examinedBeforeDays: 2, correctness: 0, wasConfusedWith: [] },
+        {
+          examinedBefore: convertDayToTimestamp(1),
+          correctness: 1,
+          wasConfusedWith: [],
+        },
+        {
+          examinedBefore: convertDayToTimestamp(2),
+          correctness: 0,
+          wasConfusedWith: [],
+        },
       ],
     });
-    expect(correct).toBe(chalk.green('1 days before: correct'));
+    expect(correct).toBe(chalk.green('1 day before: correct'));
     expect(incorrect).toBe(chalk.red('2 days before: incorrect'));
   });
 
@@ -205,7 +214,11 @@ describe('formatStatisticsDetails', () => {
         {
           ...taskDescription,
           examinations: [
-            { examinedBeforeDays: 1, correctness: 1, wasConfusedWith: [] },
+            {
+              examinedBefore: convertDayToTimestamp(1),
+              correctness: 1,
+              wasConfusedWith: [],
+            },
           ],
         },
         true,
@@ -236,7 +249,7 @@ describe('sortChildren', () => {
     counts: [number, number, number, number],
   ): OverviewRecursiveStatistics => ({
     statistics: {
-      avgLastRepetitionBeforeDays: 0,
+      avgLastRepetitionBefore: convertDayToTimestamp(0),
       selected: 0,
       selectionState: 'implicitNoSelection',
       notLearned: counts[0],

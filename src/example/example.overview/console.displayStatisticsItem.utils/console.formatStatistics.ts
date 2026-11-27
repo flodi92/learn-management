@@ -6,6 +6,7 @@ import {
   OverviewTaskDescriptionStatisticsItem,
   SelectionState,
 } from '../../../overview/overview.model';
+import { convertMillisecondsToHumanReadable } from '../../../utils';
 import {
   correctExaminationColor,
   correctExaminationThreshold,
@@ -21,7 +22,7 @@ const summarizedTaskDescriptionKeys = new Set<string>([
   'id',
   'label',
   'mastery',
-  'lastRepetitionBeforeDays',
+  'lastRepetitionBefore',
   'numberOfRepetitions',
   'learningState',
   'examinations',
@@ -65,8 +66,8 @@ const formatAggregatedStatistics = (
       ? formatLabeledValue(state, statistics[state], learningStateColors[state])
       : learningStateColors[state](String(statistics[state])),
   );
-  const average = Number.isFinite(statistics.avgLastRepetitionBeforeDays)
-    ? `⌀ ${statistics.avgLastRepetitionBeforeDays} days before`
+  const average = Number.isFinite(statistics.avgLastRepetitionBefore)
+    ? `⌀ ${convertMillisecondsToHumanReadable(statistics.avgLastRepetitionBefore)} before`
     : neverTrained;
   const separator = isFocused ? ', ' : ' ';
   const selected = selectedColor(String(statistics.selected));
@@ -86,8 +87,8 @@ const formatTaskDescriptionStatistics = (
   const mastery = `${Math.round(statistics.mastery * 100)}%`;
   if (!isFocused) return color(mastery);
 
-  const repetitions = Number.isFinite(statistics.lastRepetitionBeforeDays)
-    ? `${statistics.numberOfRepetitions}x ${statistics.lastRepetitionBeforeDays} days before`
+  const repetitions = Number.isFinite(statistics.lastRepetitionBefore)
+    ? `${statistics.numberOfRepetitions}x ${convertMillisecondsToHumanReadable(statistics.lastRepetitionBefore)} before`
     : `${statistics.numberOfRepetitions}x`;
   const summary = [
     color(`${camelCaseToWords(statistics.learningState)} (${mastery})`),
@@ -108,7 +109,7 @@ export const formatStatistics = (
     : formatAggregatedStatistics(statistics, isFocused);
 
 const formatExamination = ({
-  examinedBeforeDays,
+  examinedBefore,
   correctness,
   wasConfusedWith,
 }: OverviewExamination): string => {
@@ -119,7 +120,7 @@ const formatExamination = ({
       : '';
   const color = isCorrect ? correctExaminationColor : incorrectExaminationColor;
   return color(
-    `${examinedBeforeDays} days before: ${isCorrect ? 'correct' : 'incorrect'}${confusion}`,
+    `${convertMillisecondsToHumanReadable(examinedBefore)} before: ${isCorrect ? 'correct' : 'incorrect'}${confusion}`,
   );
 };
 

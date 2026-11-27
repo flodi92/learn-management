@@ -59,7 +59,7 @@ export interface Result {
 }
 
 export interface TimedResult extends Result {
-  day: number;
+  timestamp: number;
 }
 
 export type SaveData = TimedResult[];

@@ -5,7 +5,7 @@ import {
 } from './overview.utils/overview.computeStatistics.model';
 
 export interface OverviewExamination {
-  examinedBeforeDays: number;
+  examinedBefore: number;
   correctness: number;
   // The labels of the taskDescriptions, not their ids.
   wasConfusedWith: string[];
@@ -17,7 +17,7 @@ export interface OverviewTaskDescriptionStatisticsItem extends Omit<
 > {
   id: string;
   label: string;
-  lastRepetitionBeforeDays: number;
+  lastRepetitionBefore: number;
   learningState: LearningState;
   // All examinations counted in numberOfRepetitions, the most recent first.
   examinations: OverviewExamination[];
@@ -32,7 +32,7 @@ export type SelectionState =
   | 'explicitUnselection';
 
 export type OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBeforeDays: number;
+  avgLastRepetitionBefore: number;
   selected: number;
   selectionState: SelectionState;
 } & Record<LearningState, number>;

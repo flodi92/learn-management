@@ -4,6 +4,7 @@ import { Overview } from './overview/overview';
 import { Starter } from './starter';
 import { TaskPresenter } from './userInterface/taskPresenter';
 import { millisecondsPerDay } from './utils.constants';
+import { convertDayToTimestamp } from './utils';
 
 describe('Starter', () => {
   it('suggests a session and displays statistics from the same scheduler history', async () => {
@@ -16,7 +17,7 @@ describe('Starter', () => {
       ];
       const saved = [0, 1, 3, 7].map((day) => ({
         id: 'a',
-        day,
+        timestamp: convertDayToTimestamp(day),
         correctness: 1,
       }));
       const saveDataBase = {
@@ -73,7 +74,7 @@ describe('Starter', () => {
       expect(children?.a.statistics).toMatchObject({
         learningState: 'forRepeat',
         numberOfRepetitions: 4,
-        lastRepetitionBeforeDays: 22,
+        lastRepetitionBefore: convertDayToTimestamp(22),
       });
       expect(children?.b.statistics).toMatchObject({
         learningState: 'notLearned',
@@ -81,7 +82,7 @@ describe('Starter', () => {
       });
       expect(saveDataBase.saveData).toHaveBeenCalledWith([
         ...saved,
-        { id: 'a', day: 29, correctness: 0.8 },
+        { id: 'a', timestamp: convertDayToTimestamp(29), correctness: 0.8 },
       ]);
     } finally {
       vi.useRealTimers();

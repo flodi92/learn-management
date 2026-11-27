@@ -8,10 +8,10 @@ describe('SQLiteDataBase', () => {
   it('saves and loads results with and without wasConfusedWith', () => {
     const dataBase = new SQLiteDataBase(':memory:');
     const saveData = [
-      { id: 'a', day: 1, correctness: 1 },
+      { id: 'a', timestamp: 1, correctness: 1 },
       {
         id: 'b',
-        day: 2,
+        timestamp: 2,
         correctness: 0,
         wasConfusedWith: ['c', 'd'],
       },
@@ -27,14 +27,14 @@ describe('SQLiteDataBase', () => {
       const path = join(directory, 'results.sqlite');
       const legacy = new Database(path);
       legacy.exec(
-        'CREATE TABLE results (id TEXT NOT NULL, correctness REAL NOT NULL, day INTEGER NOT NULL)',
+        'CREATE TABLE results (id TEXT NOT NULL, correctness REAL NOT NULL, timestamp INTEGER NOT NULL)',
       );
       legacy.exec("INSERT INTO results VALUES ('a', 1, 1)");
       legacy.close();
 
       const dataBase = new SQLiteDataBase(path);
       expect(dataBase.loadSaveData()).toStrictEqual([
-        { id: 'a', day: 1, correctness: 1 },
+        { id: 'a', timestamp: 1, correctness: 1 },
       ]);
       dataBase.close();
     } finally {

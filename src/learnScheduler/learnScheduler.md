@@ -145,7 +145,7 @@ Exception: A TaskDescription that is related to a scheduled TaskDescription does
 
 ## Derived statistics to base the scheduling on
 
-All statistics are computed for a specific day and a specific TaskDescription from SaveData. Only results with `result.day <= day` are taken into account, later ones are ignored. Days are numbers as in TimedResult.day (one day is the difference of 1, the time of day is a fraction). "Same day" always means the same integer part of the day (`Math.floor`).
+All statistics are computed for a specific timestamp and a specific TaskDescription from SaveData. Only results with `result.timestamp <= timestamp` are taken into account, later ones are ignored. Timestamps are milliseconds as in TimedResult.timestamp (like `Date.now()`). The computations themselves are based on days, so timestamps and time spans are converted with `convertTimestampToDay` first. "Same day" always means the same integer part of the day (`Math.floor`).
 
 ### repetitions
 
@@ -154,7 +154,7 @@ A TaskDescription is considered to have been repeated on a day when a TimedResul
 The repetitions of a TaskDescription are the list of these (day, correctness) pairs ordered by day. Several repetitions on the same day are allowed and are kept in the order in which they were recorded.
 
 - **number of repetitions**: the length of that list.
-- **last repetition**: the day of the last element, undefined without repetitions.
+- **last repetition**: the timestamp of the last element, undefined without repetitions.
 - **last correctness**: the correctness of the last element, undefined without repetitions.
 
 ### stability
@@ -327,7 +327,7 @@ LearnScheduler's constructor is invoked with an array of TaskDescription instanc
 
 ### nextSession
 
-The method nextSession requests a subset of the given TaskDescription instances to be learned in the next session which is based on the principles that are defined above. Count defines the number of TaskDescription instances to be put into that session. Time defines when that learning happens. A difference of one means one day.
+The method nextSession requests a subset of the given TaskDescription instances to be learned in the next session which is based on the principles that are defined above. Count defines the number of TaskDescription instances to be put into that session. Time is a timestamp in milliseconds (default: now) and defines when that learning happens.
 
 ### recordResults
 
@@ -335,7 +335,7 @@ The method recordResults is invoked once a session is done. The parameter result
 
 ### recordResult
 
-The method recordResult records a single `Result` for the given day (default: today), including its optional `wasConfusedWith`. Results of unknown TaskDescription ids are ignored, a correctness outside 0 to 1 throws. `recordResults` records each of its entries this way. The scheduler only stores `wasConfusedWith` with the result (it is part of SaveData); it does not influence the scheduling.
+The method recordResult records a single `Result` for the given timestamp in milliseconds (default: now), including its optional `wasConfusedWith`. Results of unknown TaskDescription ids are ignored, a correctness outside 0 to 1 throws. `recordResults` records each of its entries this way. The scheduler only stores `wasConfusedWith` with the result (it is part of SaveData); it does not influence the scheduling.
 
 ### get mastery
 

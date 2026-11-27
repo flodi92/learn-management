@@ -197,7 +197,7 @@ export const computeStatistics = <
 >(
   idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
-  day: number,
+  timestamp: number,
   getLabelFromId: (id: string) => string,
   groupTypes: GroupType[],
   optionalGroupTypes: GroupType[],
@@ -221,7 +221,7 @@ export const computeStatistics = <
   const statistics = computeTaskDescriptionsStatistics(
     idTaskDescriptionMapping,
     results,
-    day,
+    timestamp,
     getLabelFromId,
   );
   return new StatisticsComputation(

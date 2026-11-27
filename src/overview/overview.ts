@@ -1,5 +1,4 @@
 import { TaskDescription, TimedResult } from '../model';
-import { getToday } from '../utils';
 import { OverviewGroupType } from './overview.model';
 import { computeAggregatedStatistics } from './overview.utils/overview.computeAggregatedStatistics';
 import { computeStatistics } from './overview.utils/overview.computeStatistics';
@@ -26,7 +25,7 @@ export abstract class Overview<TD extends TaskDescription> {
         computeStatistics(
           idTaskDescriptionMapping,
           results,
-          getToday(),
+          Date.now(),
           this.getLabelFromId,
           ['category', 'relevance', 'subject'] satisfies OverviewGroupType[],
           [

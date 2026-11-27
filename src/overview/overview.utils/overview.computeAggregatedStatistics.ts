@@ -35,8 +35,8 @@ export const computeAggregatedStatistics = (
   ).length;
 
   return {
-    avgLastRepetitionBeforeDays: statisticsItems.reduce(
-      (acc, item) => acc + item.lastRepetitionBeforeDays,
+    avgLastRepetitionBefore: statisticsItems.reduce(
+      (acc, item) => acc + item.lastRepetitionBefore,
       0,
     ),
     selected,

@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
 import { computeAggregatedStatistics } from './overview.computeAggregatedStatistics';
+import { convertDayToTimestamp } from '../../utils';
 
 const createItem = (id: string): OverviewTaskDescriptionStatisticsItem => ({
   id,
   label: id,
   mastery: 0.5,
-  lastRepetitionBeforeDays: 1,
+  lastRepetitionBefore: convertDayToTimestamp(1),
   numberOfRepetitions: 1,
   learningState: 'learning',
   lastMastery: 0.5,

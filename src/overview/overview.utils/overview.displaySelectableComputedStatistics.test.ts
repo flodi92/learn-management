@@ -13,9 +13,10 @@ import { displaySelectableComputedStatistics } from './overview.displaySelectabl
 import { getOverviewGroups } from './overview.getOverviewGroups';
 import { getSelectionKey } from './overview.getSelectionKey';
 import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
+import { convertDayToTimestamp } from '../../utils';
 
 const taskDescriptionStatistics: OverviewAggregatedStatisticsItem = {
-  avgLastRepetitionBeforeDays: 1,
+  avgLastRepetitionBefore: convertDayToTimestamp(1),
   selected: 0,
   selectionState: 'implicitNoSelection',
   notLearned: 0,

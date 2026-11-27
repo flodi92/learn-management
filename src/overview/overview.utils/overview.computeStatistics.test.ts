@@ -4,6 +4,7 @@ import { computeAggregatedStatistics } from './overview.computeAggregatedStatist
 import { computeStatistics } from './overview.computeStatistics';
 import { computeTaskDescriptionsStatistics } from './overview.computeTaskDescriptionsStatistics';
 import { getOverviewGroups } from './overview.getOverviewGroups';
+import { convertDayToTimestamp } from '../../utils';
 
 const tasks: Record<string, TaskDescription> = {
   repeat: { id: 'repeat', categories: ['a'], relevance: 2 },
@@ -11,17 +12,21 @@ const tasks: Record<string, TaskDescription> = {
   dropped: { id: 'dropped', categories: ['b'] },
 };
 const results: TimedResult[] = [
-  ...[0, 1, 3, 7].map((day) => ({ id: 'repeat', day, correctness: 1 })),
-  { id: 'repeat', day: 8, correctness: 0 },
-  { id: 'learning', day: 14, correctness: 1 },
-  { id: 'dropped', day: 0, correctness: 1 },
+  ...[0, 1, 3, 7].map((day) => ({
+    id: 'repeat',
+    timestamp: convertDayToTimestamp(day),
+    correctness: 1,
+  })),
+  { id: 'repeat', timestamp: convertDayToTimestamp(8), correctness: 0 },
+  { id: 'learning', timestamp: convertDayToTimestamp(14), correctness: 1 },
+  { id: 'dropped', timestamp: convertDayToTimestamp(0), correctness: 1 },
 ];
 
 const createStatistics = (getSelectedIds: () => string[] = () => []) =>
   computeStatistics(
     tasks,
     results,
-    15,
+    convertDayToTimestamp(15),
     (id) => `Label ${id}`,
     ['category', 'relevance'] as OverviewGroupType[],
     ['learningState', 'selectionState'] as OverviewGroupType[],

@@ -7,6 +7,7 @@ import {
   minTimeForRepetition,
 } from './learnScheduler.constants';
 import { LearnScheduler } from './learnScheduler';
+import { convertDayToTimestamp } from '../utils';
 
 interface DoSessionParams {
   day: number;
@@ -31,7 +32,7 @@ const nextSessionIds = (
   day: number,
 ) =>
   scheduler
-    .nextSession(count, day)
+    .nextSession(count, convertDayToTimestamp(day))
     .map((taskDescription) => taskDescription.id);
 
 const LearnSchedulerTestWrapper = ({
@@ -52,7 +53,7 @@ const LearnSchedulerTestWrapper = ({
   doFinal?: (scheduler: LearnScheduler) => void;
 }) => {
   const scheduler = createScheduler(taskDescriptions);
-  const results: { id: string; day: number; correctness: number }[] = [];
+  const results: { id: string; timestamp: number; correctness: number }[] = [];
   learningTimes.forEach((day, index) => {
     const session = nextSessionIds(scheduler, taskDescriptionsPerSession, day);
     const sessionResults = doSession({
@@ -61,17 +62,17 @@ const LearnSchedulerTestWrapper = ({
       session,
     });
 
-    scheduler.recordResults(sessionResults, day);
+    scheduler.recordResults(sessionResults, convertDayToTimestamp(day));
 
     results.push(
       ...Object.entries(sessionResults).map(([id, correctness]) => ({
         id,
         correctness,
-        day,
+        timestamp: convertDayToTimestamp(day),
       })),
     );
 
-    const masteries = getMasteries(results, day);
+    const masteries = getMasteries(results, convertDayToTimestamp(day));
 
     checkSession({
       day,

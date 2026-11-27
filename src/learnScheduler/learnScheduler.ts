@@ -1,5 +1,4 @@
 import { Result, SaveData, TaskDescription, TimedResult } from '../model';
-import { getToday } from '../utils';
 import { assembleNextSession } from './learnScheduler.utils/assembleNextSession';
 import { computeTaskDescriptionStatisticsAt } from './learnScheduler.utils/computeTaskDescriptionStatisticsAt';
 import { computeCharacteristics } from './learnScheduler.utils/learnScheduler.utils';
@@ -18,17 +17,17 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
     this._characteristics = computeCharacteristics(this.taskDescriptions);
   }
 
-  public nextSession(count: number, day: number = getToday()): TD[] {
+  public nextSession(count: number, timestamp: number = Date.now()): TD[] {
     return assembleNextSession({
       count,
-      day,
+      timestamp,
       idTaskDescriptionMapping: this._idTaskDescriptionMapping,
       results: this._results,
       characteristics: this._characteristics,
     });
   }
 
-  public recordResult(result: Result, day: number = getToday()) {
+  public recordResult(result: Result, timestamp: number = Date.now()) {
     const { id, correctness } = result;
     if (!this.taskDescriptionIds.includes(id)) {
       return;
@@ -40,15 +39,15 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
       );
     }
 
-    this._results.push({ ...result, day });
+    this._results.push({ ...result, timestamp });
   }
 
   public recordResults(
     results: Record<string, number>,
-    day: number = getToday(),
+    timestamp: number = Date.now(),
   ) {
     for (const [id, correctness] of Object.entries(results)) {
-      this.recordResult({ id, correctness }, day);
+      this.recordResult({ id, correctness }, timestamp);
     }
   }
 
@@ -70,7 +69,7 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
 
   public get lastCorrectness(): Record<string, number | undefined> {
     const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-      getToday(),
+      Date.now(),
       this._idTaskDescriptionMapping,
       this._results,
     );
@@ -84,7 +83,7 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
 
   public get mastery(): Record<string, number> {
     const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-      getToday(),
+      Date.now(),
       this._idTaskDescriptionMapping,
       this._results,
     );
@@ -98,7 +97,7 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
 
   public get lastRepetition(): Record<string, number | undefined> {
     const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-      getToday(),
+      Date.now(),
       this._idTaskDescriptionMapping,
       this._results,
     );
@@ -112,7 +111,7 @@ export class LearnScheduler<TD extends TaskDescription = TaskDescription> {
 
   public get lastMastery(): Record<string, number | undefined> {
     const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-      getToday(),
+      Date.now(),
       this._idTaskDescriptionMapping,
       this._results,
     );

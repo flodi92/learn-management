@@ -5,6 +5,7 @@ import {
   learntTargetRecallProbability,
   relatedLookAheadDays,
 } from '../learnScheduler.constants';
+import { convertTimestampToDay } from '../../utils';
 import { LearnSchedulerCharacteristicsMapping } from '../learnScheduler.model';
 import { computeTaskDescriptionStatisticsAt } from './computeTaskDescriptionStatisticsAt';
 import {
@@ -17,7 +18,7 @@ import {
 
 interface AssembleNextSessionProps<TD extends TaskDescription> {
   count: number;
-  day: number;
+  timestamp: number;
   idTaskDescriptionMapping: Record<string, TD>;
   results: TimedResult[];
   characteristics?: LearnSchedulerCharacteristicsMapping;
@@ -25,7 +26,7 @@ interface AssembleNextSessionProps<TD extends TaskDescription> {
 
 export const assembleNextSession = <TD extends TaskDescription>({
   count,
-  day,
+  timestamp,
   idTaskDescriptionMapping,
   results,
   characteristics = computeCharacteristics(
@@ -37,7 +38,7 @@ export const assembleNextSession = <TD extends TaskDescription>({
 
   const taskDescriptions = Object.values(idTaskDescriptionMapping);
   const statistics = computeTaskDescriptionStatisticsAt(
-    day,
+    timestamp,
     idTaskDescriptionMapping,
     results,
   );
@@ -48,7 +49,8 @@ export const assembleNextSession = <TD extends TaskDescription>({
     return (
       !selectedIds.has(taskDescription.id) &&
       (lastRepetition === undefined ||
-        Math.floor(lastRepetition) !== Math.floor(day))
+        Math.floor(convertTimestampToDay(lastRepetition)) !==
+          Math.floor(convertTimestampToDay(timestamp)))
     );
   };
   const add = (taskDescription: TD) => {

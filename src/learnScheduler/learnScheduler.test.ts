@@ -1,5 +1,6 @@
 import { TaskDescription, TimedResult } from '../model';
 import { LearnScheduler } from './learnScheduler';
+import { convertDayToTimestamp } from '../utils';
 
 const sessionIds = (
   tasks: TaskDescription[],
@@ -9,38 +10,52 @@ const sessionIds = (
 ) => {
   const scheduler = new LearnScheduler(tasks);
   scheduler.restoreFromSaveData(results);
-  return scheduler.nextSession(count, day).map((task) => task.id);
+  return scheduler
+    .nextSession(count, convertDayToTimestamp(day))
+    .map((task) => task.id);
 };
 
 const perfect = (id: string, days = [0, 1, 3, 7]) =>
-  days.map((day) => ({ id, day, correctness: 1 }));
+  days.map((day) => ({
+    id,
+    timestamp: convertDayToTimestamp(day),
+    correctness: 1,
+  }));
 
 describe('LearnScheduler', () => {
   it('fills the session with introductions beyond the learning limit and excludes repetitions on the same calendar day', () => {
     const tasks = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
     const scheduler = new LearnScheduler(tasks);
-    expect(scheduler.nextSession(4, 0).map((task) => task.id)).toEqual([
-      'a',
-      'b',
-      'c',
-      'd',
-    ]);
-    scheduler.recordResults({ a: 1, b: 1, c: 1, d: 1 }, 0.1);
-    expect(scheduler.nextSession(4, 0.9).map((task) => task.id)).toEqual(['e']);
-    expect(scheduler.nextSession(4, 1).map((task) => task.id)).toEqual([
-      'a',
-      'b',
-      'c',
-      'd',
-    ]);
-    expect(scheduler.nextSession(0, 1)).toEqual([]);
-    expect(scheduler.nextSession(1.9, 1)).toHaveLength(1);
-    expect(new LearnScheduler(tasks).nextSession(2.1, 0)).toHaveLength(2);
+    expect(
+      scheduler.nextSession(4, convertDayToTimestamp(0)).map((task) => task.id),
+    ).toEqual(['a', 'b', 'c', 'd']);
+    scheduler.recordResults(
+      { a: 1, b: 1, c: 1, d: 1 },
+      convertDayToTimestamp(0.1),
+    );
+    expect(
+      scheduler
+        .nextSession(4, convertDayToTimestamp(0.9))
+        .map((task) => task.id),
+    ).toEqual(['e']);
+    expect(
+      scheduler.nextSession(4, convertDayToTimestamp(1)).map((task) => task.id),
+    ).toEqual(['a', 'b', 'c', 'd']);
+    expect(scheduler.nextSession(0, convertDayToTimestamp(1))).toEqual([]);
+    expect(scheduler.nextSession(1.9, convertDayToTimestamp(1))).toHaveLength(
+      1,
+    );
+    expect(
+      new LearnScheduler(tasks).nextSession(2.1, convertDayToTimestamp(0)),
+    ).toHaveLength(2);
   });
 
   it('prioritizes due learning over due learnt tasks over introductions', () => {
     const tasks = ['a', 'b', 'c'].map((id) => ({ id }));
-    const results = [...perfect('a'), { id: 'b', day: 27, correctness: 1 }];
+    const results = [
+      ...perfect('a'),
+      { id: 'b', timestamp: convertDayToTimestamp(27), correctness: 1 },
+    ];
     expect(sessionIds(tasks, results, 3, 29)).toEqual(['b', 'a', 'c']);
     expect(sessionIds(tasks, results, 1, 29)).toEqual(['b']);
   });
@@ -52,17 +67,31 @@ describe('LearnScheduler', () => {
       { id: 'c', relevance: 1, complexity: 1 },
       { id: 'd' },
     ];
-    const results = tasks.map(({ id }) => ({ id, day: 0, correctness: 1 }));
+    const results = tasks.map(({ id }) => ({
+      id,
+      timestamp: convertDayToTimestamp(0),
+      correctness: 1,
+    }));
     expect(sessionIds(tasks, results, 4, 1)).toEqual(['c', 'b', 'a', 'd']);
   });
 
   it('uses inherited repetitions for same-day exclusion and the learning limit', () => {
     const tasks = [{ id: 'a' }, { id: 'b', parents: ['a'] }, { id: 'c' }];
     expect(
-      sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 0.8),
+      sessionIds(
+        tasks,
+        [{ id: 'b', timestamp: convertDayToTimestamp(0.2), correctness: 1 }],
+        4,
+        0.8,
+      ),
     ).toEqual(['c']);
     expect(
-      sessionIds(tasks, [{ id: 'b', day: 0.2, correctness: 1 }], 4, 1.2),
+      sessionIds(
+        tasks,
+        [{ id: 'b', timestamp: convertDayToTimestamp(0.2), correctness: 1 }],
+        4,
+        1.2,
+      ),
     ).toEqual(['a', 'b', 'c']);
   });
 
@@ -74,10 +103,20 @@ describe('LearnScheduler', () => {
   it('unblocks introductions after dropout but preserves their history', () => {
     const tasks = [{ id: 'z' }, { id: 'b' }];
     expect(
-      sessionIds(tasks, [{ id: 'z', day: 0, correctness: 1 }], 1, 1),
+      sessionIds(
+        tasks,
+        [{ id: 'z', timestamp: convertDayToTimestamp(0), correctness: 1 }],
+        1,
+        1,
+      ),
     ).toEqual(['z']);
     expect(
-      sessionIds(tasks, [{ id: 'z', day: 0, correctness: 1 }], 1, 30),
+      sessionIds(
+        tasks,
+        [{ id: 'z', timestamp: convertDayToTimestamp(0), correctness: 1 }],
+        1,
+        30,
+      ),
     ).toEqual(['b']);
   });
 
@@ -142,7 +181,12 @@ describe('LearnScheduler', () => {
       { id: 'z' },
     ];
     expect(
-      sessionIds(tasks, [{ id: 'anchor', day: 0, correctness: 1 }], 8, 1),
+      sessionIds(
+        tasks,
+        [{ id: 'anchor', timestamp: convertDayToTimestamp(0), correctness: 1 }],
+        8,
+        1,
+      ),
     ).toEqual(['anchor', 'z', 'y', 'a']);
   });
 
@@ -155,9 +199,9 @@ describe('LearnScheduler', () => {
     ];
     const results = [
       ...perfect('a', [0, 1, 3, 7.9]),
-      { id: 'anchor', day: 7, correctness: 1 },
-      { id: 'b', day: 7.9, correctness: 1 },
-      { id: 'z', day: 7.9, correctness: 1 },
+      { id: 'anchor', timestamp: convertDayToTimestamp(7), correctness: 1 },
+      { id: 'b', timestamp: convertDayToTimestamp(7.9), correctness: 1 },
+      { id: 'z', timestamp: convertDayToTimestamp(7.9), correctness: 1 },
     ];
     expect(sessionIds(tasks, results, 4, 8.1)).toEqual([
       'anchor',
@@ -184,16 +228,21 @@ describe('LearnScheduler', () => {
       { id: 'combined', subjects: ['x', 'y'] },
     ];
     expect(
-      sessionIds(tasks, [{ id: 'anchor', day: 0, correctness: 1 }], 6, 1),
+      sessionIds(
+        tasks,
+        [{ id: 'anchor', timestamp: convertDayToTimestamp(0), correctness: 1 }],
+        6,
+        1,
+      ),
     ).toEqual(['anchor', 'base']);
   });
 
   it('fills only with introduced non-due items and prefers related items', () => {
     const tasks = [{ id: 'anchor', equalTo: ['z'] }, { id: 'a' }, { id: 'z' }];
     const results = [
-      { id: 'anchor', day: 0, correctness: 1 },
-      { id: 'a', day: 0.9, correctness: 1 },
-      { id: 'z', day: 0.95, correctness: 1 },
+      { id: 'anchor', timestamp: convertDayToTimestamp(0), correctness: 1 },
+      { id: 'a', timestamp: convertDayToTimestamp(0.9), correctness: 1 },
+      { id: 'z', timestamp: convertDayToTimestamp(0.95), correctness: 1 },
     ];
     expect(sessionIds(tasks, results, 3, 1)).toEqual(['anchor', 'z', 'a']);
   });
@@ -202,8 +251,12 @@ describe('LearnScheduler', () => {
     const tasks = [{ id: 'anchor' }, { id: 'learning' }, { id: 'learnt' }];
     const results = [
       ...perfect('learnt'),
-      { id: 'anchor', day: 24, correctness: 1 },
-      { id: 'learning', day: 24.9, correctness: 1 },
+      { id: 'anchor', timestamp: convertDayToTimestamp(24), correctness: 1 },
+      {
+        id: 'learning',
+        timestamp: convertDayToTimestamp(24.9),
+        correctness: 1,
+      },
     ];
     expect(sessionIds(tasks, results, 3, 25.1)).toEqual([
       'anchor',
@@ -215,19 +268,21 @@ describe('LearnScheduler', () => {
   it('schedules due repetitions at the specified perfect-answer intervals', () => {
     const scheduler = new LearnScheduler([{ id: 'a' }]);
     for (const day of [0, 1, 3, 7, 29, 79]) {
-      expect(scheduler.nextSession(1, day).map((task) => task.id)).toEqual([
-        'a',
-      ]);
-      scheduler.recordResults({ a: 1 }, day);
-      expect(scheduler.nextSession(1, day)).toEqual([]);
+      expect(
+        scheduler
+          .nextSession(1, convertDayToTimestamp(day))
+          .map((task) => task.id),
+      ).toEqual(['a']);
+      scheduler.recordResults({ a: 1 }, convertDayToTimestamp(day));
+      expect(scheduler.nextSession(1, convertDayToTimestamp(day))).toEqual([]);
     }
   });
 
   it('is deterministic irrespective of input order and does not mutate saved results', () => {
     const tasks = [{ id: 'c' }, { id: 'a' }, { id: 'b' }];
     const results = [
-      { id: 'a', day: 1, correctness: 1 },
-      { id: 'a', day: 0, correctness: 1 },
+      { id: 'a', timestamp: convertDayToTimestamp(1), correctness: 1 },
+      { id: 'a', timestamp: convertDayToTimestamp(0), correctness: 1 },
     ];
     const original = results.slice();
     const first = sessionIds(tasks, results, 4, 2);
@@ -244,10 +299,15 @@ describe('LearnScheduler', () => {
         { id: 'parent' },
         { id: 'child', parents: ['parent'] },
       ]);
-      const results = [{ id: 'child', day: 1, correctness: 0.8 }];
+      const results = [
+        { id: 'child', timestamp: convertDayToTimestamp(1), correctness: 0.8 },
+      ];
       scheduler.restoreFromSaveData(results);
       expect(scheduler.getSaveData()).toEqual(results);
-      expect(scheduler.lastRepetition).toEqual({ parent: 1, child: 1 });
+      expect(scheduler.lastRepetition).toEqual({
+        parent: convertDayToTimestamp(1),
+        child: convertDayToTimestamp(1),
+      });
       expect(scheduler.lastCorrectness).toEqual({ parent: 0.8, child: 0.8 });
       expect(scheduler.lastMastery).toEqual({ parent: 0.9, child: 0.9 });
       expect(scheduler.mastery.parent).toBeCloseTo(scheduler.mastery.child);
@@ -265,13 +325,24 @@ describe('LearnScheduler', () => {
     ]);
     scheduler.recordResult(
       { id: 'a', correctness: 0, wasConfusedWith: ['b'] },
-      3,
+      convertDayToTimestamp(3),
     );
-    scheduler.recordResult({ id: 'b', correctness: 1 }, 3);
-    scheduler.recordResult({ id: 'unknown', correctness: 1 }, 3);
+    scheduler.recordResult(
+      { id: 'b', correctness: 1 },
+      convertDayToTimestamp(3),
+    );
+    scheduler.recordResult(
+      { id: 'unknown', correctness: 1 },
+      convertDayToTimestamp(3),
+    );
     expect(scheduler.getSaveData()).toEqual([
-      { id: 'a', day: 3, correctness: 0, wasConfusedWith: ['b'] },
-      { id: 'b', day: 3, correctness: 1 },
+      {
+        id: 'a',
+        timestamp: convertDayToTimestamp(3),
+        correctness: 0,
+        wasConfusedWith: ['b'],
+      },
+      { id: 'b', timestamp: convertDayToTimestamp(3), correctness: 1 },
     ]);
     expect(() => scheduler.recordResult({ id: 'a', correctness: 2 })).toThrow();
   });

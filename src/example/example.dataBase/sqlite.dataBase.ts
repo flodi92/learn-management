@@ -14,7 +14,7 @@ export class SQLiteDataBase implements SaveDataBase {
       CREATE TABLE IF NOT EXISTS results (
         id TEXT NOT NULL,
         correctness REAL NOT NULL,
-        day INTEGER NOT NULL,
+        timestamp INTEGER NOT NULL,
         wasConfusedWith TEXT
       )
     `);
@@ -29,7 +29,7 @@ export class SQLiteDataBase implements SaveDataBase {
   loadSaveData(): SaveData {
     const rows = this.db
       .prepare(
-        'SELECT id, correctness, day, wasConfusedWith FROM results ORDER BY day, rowid',
+        'SELECT id, correctness, timestamp, wasConfusedWith FROM results ORDER BY timestamp, rowid',
       )
       .all() as unknown as ResultRow[];
     return rows.map(({ wasConfusedWith, ...result }) =>
@@ -41,16 +41,16 @@ export class SQLiteDataBase implements SaveDataBase {
 
   saveData(saveData: SaveData): void {
     const insert = this.db.prepare(
-      'INSERT INTO results (id, correctness, day, wasConfusedWith) VALUES (?, ?, ?, ?)',
+      'INSERT INTO results (id, correctness, timestamp, wasConfusedWith) VALUES (?, ?, ?, ?)',
     );
     this.db.exec('BEGIN');
     try {
       this.db.exec('DELETE FROM results');
-      for (const { id, correctness, day, wasConfusedWith } of saveData) {
+      for (const { id, correctness, timestamp, wasConfusedWith } of saveData) {
         insert.run(
           id,
           correctness,
-          day,
+          timestamp,
           wasConfusedWith === undefined
             ? null
             : JSON.stringify(wasConfusedWith),

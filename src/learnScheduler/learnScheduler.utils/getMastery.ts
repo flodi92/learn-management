@@ -1,4 +1,5 @@
 import { TimedResult } from '../../model';
+import { convertTimestampToDay } from '../../utils';
 import {
   dropOutRecallProbability,
   failedRecallProbability,
@@ -16,7 +17,7 @@ import { LearnSchedulerStatisticsItem } from '../learnScheduler.model';
 
 export const getMastery = (
   repetitions: TimedResult[],
-  day: number,
+  timestamp: number,
 ): LearnSchedulerStatisticsItem => {
   let stability = initialStabilityDays;
   let lastRepetition: number | undefined;
@@ -28,11 +29,15 @@ export const getMastery = (
     const before =
       lastRepetition === undefined || lastMastery === undefined
         ? 1
-        : lastMastery * 2 ** (-(repetition.day - lastRepetition) / stability);
+        : lastMastery *
+          2 **
+            (-convertTimestampToDay(repetition.timestamp - lastRepetition) /
+              stability);
     const spacing = 1 - before;
     const growth =
       lastRepetition !== undefined &&
-      Math.floor(lastRepetition) === Math.floor(repetition.day)
+      Math.floor(convertTimestampToDay(lastRepetition)) ===
+        Math.floor(convertTimestampToDay(repetition.timestamp))
         ? 1
         : 1 + stabilityGain * (spacingFloor + (1 - spacingFloor) * spacing);
     const factor =
@@ -43,7 +48,7 @@ export const getMastery = (
       Math.min(maxStabilityDays, stability * factor),
     );
     isLearnt ||= stability >= learntStabilityDays;
-    lastRepetition = repetition.day;
+    lastRepetition = repetition.timestamp;
     lastCorrectness = repetition.correctness;
     lastMastery =
       failedRecallProbability +
@@ -53,7 +58,8 @@ export const getMastery = (
   const mastery =
     lastRepetition === undefined || lastMastery === undefined
       ? 0
-      : lastMastery * 2 ** (-(day - lastRepetition) / stability);
+      : lastMastery *
+        2 ** (-convertTimestampToDay(timestamp - lastRepetition) / stability);
   const learningState =
     lastRepetition === undefined ||
     (!isLearnt && mastery < dropOutRecallProbability)

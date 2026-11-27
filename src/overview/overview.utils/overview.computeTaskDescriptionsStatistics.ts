@@ -13,7 +13,7 @@ import {
 export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
   idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
-  day: number,
+  timestamp: number,
   getLabelFromId: (id: string) => string,
 ): TaskDescriptionStatisticsTuples<
   TD,
@@ -24,14 +24,14 @@ export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
     idTaskDescriptionMapping[id] ? getLabelFromId(id) : id;
 
   return Array.from(
-    getRepetitions(day, idTaskDescriptionMapping, results),
+    getRepetitions(timestamp, idTaskDescriptionMapping, results),
     ([id, repetitions]) => {
-      const statisticsItem = getMastery(repetitions, day);
+      const statisticsItem = getMastery(repetitions, timestamp);
       const examinations = repetitions
         .map(
-          ({ day: examinedDay, correctness, wasConfusedWith }) =>
+          ({ timestamp: examinedTimestamp, correctness, wasConfusedWith }) =>
             ({
-              examinedBeforeDays: day - examinedDay,
+              examinedBefore: timestamp - examinedTimestamp,
               correctness,
               wasConfusedWith: (wasConfusedWith ?? []).map(getConfusedLabel),
             }) satisfies OverviewExamination,
@@ -45,10 +45,10 @@ export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
           id,
           label: getLabelFromId(id),
           mastery: statisticsItem.mastery,
-          lastRepetitionBeforeDays:
+          lastRepetitionBefore:
             statisticsItem.lastRepetition === undefined
               ? Infinity
-              : day - statisticsItem.lastRepetition,
+              : timestamp - statisticsItem.lastRepetition,
           numberOfRepetitions: statisticsItem.numberOfRepetitions,
           learningState: statisticsItem.learningState,
           lastMastery: statisticsItem.lastMastery,

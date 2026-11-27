@@ -9,6 +9,7 @@ import {
 } from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from '../console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from '../console.displayStatisticsItem.utils/console.sortChildren';
+import { convertDayToTimestamp } from '../../../utils';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
@@ -18,7 +19,7 @@ const createStatisticsTree = (
 ): OverviewStatisticsTree => ({
   defaultGroupType: 'taskDescription',
   statistics: {
-    avgLastRepetitionBeforeDays: 1,
+    avgLastRepetitionBefore: convertDayToTimestamp(1),
     selected: 0,
     selectionState: 'implicitNoSelection',
     notLearned: numberOfChildren,
@@ -36,7 +37,7 @@ const createStatisticsTree = (
             label,
             id: label,
             mastery: 1 - index / 100,
-            lastRepetitionBeforeDays: 1,
+            lastRepetitionBefore: convertDayToTimestamp(1),
             numberOfRepetitions: 1,
             examinations: [],
             learningState: 'learning',

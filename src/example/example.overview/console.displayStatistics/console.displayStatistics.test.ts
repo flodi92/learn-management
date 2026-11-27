@@ -9,6 +9,7 @@ import {
 } from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from '../console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from '../console.displayStatisticsItem.utils/console.sortChildren';
+import { convertDayToTimestamp } from '../../../utils';
 
 const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
 
@@ -48,10 +49,10 @@ describe('ConsoleDisplayStatistics', () => {
     expect(view()).toEqual([
       '      selected: 0, not learned: 6, learning: 5, learned: 9, for repeat: 4, ⌀ 19 days before',
       '  category statistics',
-      '  > Mathematics:     selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 10.5 days before',
-      '    Physics:     0 1 1 3 1 ⌀ 23.33 days before',
+      '  > Mathematics:     selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 11 days before',
+      '    Physics:     0 1 1 3 1 ⌀ 23 days before',
       '    History:     0 2 1 2 1 ⌀ 35 days before',
-      '    Chemistry:     0 2 2 1 1 ⌀ 7.17 days before',
+      '    Chemistry:     0 2 2 1 1 ⌀ 7 days before',
     ]);
   });
 
@@ -70,14 +71,14 @@ describe('ConsoleDisplayStatistics', () => {
   it('expands the focused child with the right arrow key and focuses its first child', () => {
     press('right');
     expect(view().slice(2)).toEqual([
-      '    Mathematics:     0 1 1 3 1 ⌀ 10.5 days before',
+      '    Mathematics:     0 1 1 3 1 ⌀ 11 days before',
       '      relevance statistics',
-      '      > 1:     selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
-      '        3:     0 1 0 1 0 ⌀ 6.5 days before',
-      '        2:     0 0 1 0 1 ⌀ 22.5 days before',
-      '    Physics:     0 1 1 3 1 ⌀ 23.33 days before',
+      '      > 1:     selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 3 days before',
+      '        3:     0 1 0 1 0 ⌀ 7 days before',
+      '        2:     0 0 1 0 1 ⌀ 23 days before',
+      '    Physics:     0 1 1 3 1 ⌀ 23 days before',
       '    History:     0 2 1 2 1 ⌀ 35 days before',
-      '    Chemistry:     0 2 2 1 1 ⌀ 7.17 days before',
+      '    Chemistry:     0 2 2 1 1 ⌀ 7 days before',
     ]);
   });
 
@@ -100,18 +101,16 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     press('down');
     expect(view()).toContain(
-      '      > 3:     selected: 0, not learned: 1, learning: 0, learned: 1, for repeat: 0, ⌀ 6.5 days before',
+      '      > 3:     selected: 0, not learned: 1, learning: 0, learned: 1, for repeat: 0, ⌀ 7 days before',
     );
-    expect(view()).toContain(
-      '    Mathematics:     0 1 1 3 1 ⌀ 10.5 days before',
-    );
+    expect(view()).toContain('    Mathematics:     0 1 1 3 1 ⌀ 11 days before');
   });
 
   it('shows the statistics of leaves without expanding them', () => {
     press('right');
     press('right');
     expect(view().slice(4, 8)).toEqual([
-      '        1:     0 0 0 2 0 ⌀ 2.5 days before',
+      '        1:     0 0 0 2 0 ⌀ 3 days before',
       '          taskDescription statistics',
       '          > Fractions: learned (95%) 5x 2 days before',
       '            Solving equations: 90%',
@@ -141,12 +140,12 @@ describe('ConsoleDisplayStatistics', () => {
       '          taskDescription statistics',
       '            Fractions: 95%',
       '            > 2 days before: correct',
-      '              6.5 days before: incorrect, was confused with Solving equations',
+      '              7 days before: incorrect, was confused with Solving equations',
       '              14 days before: correct',
       '              21 days before: correct',
       '              30 days before: incorrect',
       '            Solving equations: 90%',
-      '        3:     0 1 0 1 0 ⌀ 6.5 days before',
+      '        3:     0 1 0 1 0 ⌀ 7 days before',
     ]);
   });
 
@@ -163,7 +162,7 @@ describe('ConsoleDisplayStatistics', () => {
           .find((line) => line.includes(text))
           ?.match(/\u001b\[(\d+)m(?!.*\u001b\[\d+m.*days before)/)?.[1];
       expect(colorOf('2 days before: correct')).toBe('32');
-      expect(colorOf('6.5 days before: incorrect')).toBe('31');
+      expect(colorOf('7 days before: incorrect')).toBe('31');
     } finally {
       chalk.level = previousLevel;
     }
@@ -175,7 +174,7 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     press('down');
     expect(view()).toContain(
-      '            > 6.5 days before: incorrect, was confused with Solving equations',
+      '            > 7 days before: incorrect, was confused with Solving equations',
     );
     for (let i = 0; i < 3; i++) press('down');
     expect(view()).toContain('            > 30 days before: incorrect');
@@ -252,10 +251,10 @@ describe('ConsoleDisplayStatistics', () => {
     press('right');
     press('left');
     expect(view().slice(2, 6)).toEqual([
-      '    Mathematics:     0 1 1 3 1 ⌀ 10.5 days before',
+      '    Mathematics:     0 1 1 3 1 ⌀ 11 days before',
       '      relevance statistics',
-      '      > 1:     selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 2.5 days before',
-      '        3:     0 1 0 1 0 ⌀ 6.5 days before',
+      '      > 1:     selected: 0, not learned: 0, learning: 0, learned: 2, for repeat: 0, ⌀ 3 days before',
+      '        3:     0 1 0 1 0 ⌀ 7 days before',
     ]);
   });
 
@@ -265,7 +264,7 @@ describe('ConsoleDisplayStatistics', () => {
     press('down');
     expect(view()).toHaveLength(before.length);
     expect(view()).toContain(
-      '  > Physics:     selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 23.33 days before',
+      '  > Physics:     selected: 0, not learned: 1, learning: 1, learned: 3, for repeat: 1, ⌀ 23 days before',
     );
   });
 
@@ -281,7 +280,7 @@ describe('ConsoleDisplayStatistics', () => {
 });
 
 const aggregated = {
-  avgLastRepetitionBeforeDays: 1,
+  avgLastRepetitionBefore: convertDayToTimestamp(1),
   selected: 0,
   selectionState: 'implicitNoSelection',
   notLearned: 1,

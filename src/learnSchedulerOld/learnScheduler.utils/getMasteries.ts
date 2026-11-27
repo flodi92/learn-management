@@ -1,14 +1,15 @@
+import { convertTimestampToDay } from '../../utils';
 import { getMastery } from './getMastery';
 
 export const getMasteries = (
-  results: { id: string; day: number; correctness: number }[],
-  today: number,
+  results: { id: string; timestamp: number; correctness: number }[],
+  timestamp: number,
 ) => {
   const ids = Array.from(new Set(results.map((result) => result.id)));
 
   const resultsBeforeDays = results.map((result) => ({
     ...result,
-    beforeDays: today - result.day,
+    beforeDays: convertTimestampToDay(timestamp - result.timestamp),
   }));
 
   return Object.fromEntries(

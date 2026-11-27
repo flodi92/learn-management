@@ -1,8 +1,8 @@
 import { TaskDescription, TimedResult } from '../../model';
 
-// The repetitions of a taskDescription are ordered by day and include the results of all taskDescriptions it is a parent of.
+// The repetitions of a taskDescription are ordered by timestamp and include the results of all taskDescriptions it is a parent of.
 export const getRepetitions = (
-  day: number,
+  timestamp: number,
   idTaskDescriptionMapping: Record<string, TaskDescription>,
   results: TimedResult[],
 ): Map<string, TimedResult[]> => {
@@ -13,9 +13,9 @@ export const getRepetitions = (
     ]),
   );
   const orderedResults = results
-    .filter((result) => result.day <= day)
+    .filter((result) => result.timestamp <= timestamp)
     .slice()
-    .sort((a, b) => a.day - b.day);
+    .sort((a, b) => a.timestamp - b.timestamp);
 
   for (const result of orderedResults) {
     const visited = new Set<string>();

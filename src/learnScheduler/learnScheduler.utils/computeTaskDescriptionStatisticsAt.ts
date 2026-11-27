@@ -4,13 +4,13 @@ import { getMastery } from './getMastery';
 import { getRepetitions } from './getRepetitions';
 
 export const computeTaskDescriptionStatisticsAt = (
-  day: number,
+  timestamp: number,
   idTaskDescriptionMapping: Record<string, TaskDescription>,
   results: TimedResult[],
 ): LearnSchedulerStatistics =>
   Object.fromEntries(
     Array.from(
-      getRepetitions(day, idTaskDescriptionMapping, results),
-      ([id, taskRepetitions]) => [id, getMastery(taskRepetitions, day)],
+      getRepetitions(timestamp, idTaskDescriptionMapping, results),
+      ([id, taskRepetitions]) => [id, getMastery(taskRepetitions, timestamp)],
     ),
   );

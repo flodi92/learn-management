@@ -29,7 +29,7 @@ export type ComputeTaskDescriptionStatistics<
 > = (
   idTaskDescriptionMapping: Record<string, TD>,
   results: TimedResult[],
-  day: number,
+  timestamp: number,
   getLabelFromId: (id: string) => string,
 ) => TaskDescriptionStatisticsTuples<TD, TaskDescriptionStatistics>;
 

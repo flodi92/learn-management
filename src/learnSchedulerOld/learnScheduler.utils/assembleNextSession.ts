@@ -5,14 +5,14 @@ import { prioritizeTaskDescriptions } from './prioritizeTaskDescriptions';
 
 interface AssembleNextSessionProps<TD extends TaskDescription> {
   count: number;
-  day: number;
+  timestamp: number;
   idTaskDescriptionMapping: Record<string, TD>;
   results: TimedResult[];
 }
 
 export const assembleNextSession = <TD extends TaskDescription>({
   count,
-  day,
+  timestamp,
   idTaskDescriptionMapping,
   results,
 }: AssembleNextSessionProps<TD>): TD[] => {
@@ -21,7 +21,7 @@ export const assembleNextSession = <TD extends TaskDescription>({
   }
 
   const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-    day,
+    timestamp,
     idTaskDescriptionMapping,
     results,
   );

@@ -1,10 +1,11 @@
 import { OverviewStatisticsTree } from './overview.toRecursiveStatistics.model';
 import { toRecursiveStatistics } from './overview.toRecursiveStatistics';
+import { convertDayToTimestamp } from '../../utils';
 
 const statisticsExampleTree: OverviewStatisticsTree = {
   defaultGroupType: 'category',
   statistics: {
-    avgLastRepetitionBeforeDays: 19,
+    avgLastRepetitionBefore: convertDayToTimestamp(19),
     selected: 0,
     selectionState: 'implicitNoSelection',
     notLearned: 6,
@@ -16,7 +17,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Mathematics: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBeforeDays: 10.5,
+        avgLastRepetitionBefore: convertDayToTimestamp(10.5),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 1,
@@ -28,7 +29,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 2.5,
+            avgLastRepetitionBefore: convertDayToTimestamp(2.5),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -42,7 +43,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Solving equations',
                 label: 'Solving equations',
                 mastery: 0.9,
-                lastRepetitionBeforeDays: 3,
+                lastRepetitionBefore: convertDayToTimestamp(3),
                 numberOfRepetitions: 4,
                 learningState: 'learned',
                 examinations: [],
@@ -53,32 +54,32 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Fractions',
                 label: 'Fractions',
                 mastery: 0.95,
-                lastRepetitionBeforeDays: 2,
+                lastRepetitionBefore: convertDayToTimestamp(2),
                 numberOfRepetitions: 5,
                 learningState: 'learned',
                 examinations: [
                   {
-                    examinedBeforeDays: 2,
+                    examinedBefore: convertDayToTimestamp(2),
                     correctness: 1,
                     wasConfusedWith: [],
                   },
                   {
-                    examinedBeforeDays: 6.5,
+                    examinedBefore: convertDayToTimestamp(6.5),
                     correctness: 0,
                     wasConfusedWith: ['Solving equations'],
                   },
                   {
-                    examinedBeforeDays: 14,
+                    examinedBefore: convertDayToTimestamp(14),
                     correctness: 1,
                     wasConfusedWith: [],
                   },
                   {
-                    examinedBeforeDays: 21,
+                    examinedBefore: convertDayToTimestamp(21),
                     correctness: 1,
                     wasConfusedWith: [],
                   },
                   {
-                    examinedBeforeDays: 30,
+                    examinedBefore: convertDayToTimestamp(30),
                     correctness: 0,
                     wasConfusedWith: [],
                   },
@@ -90,7 +91,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 22.5,
+            avgLastRepetitionBefore: convertDayToTimestamp(22.5),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -104,7 +105,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Linear functions',
                 label: 'Linear functions',
                 mastery: 0.55,
-                lastRepetitionBeforeDays: 5,
+                lastRepetitionBefore: convertDayToTimestamp(5),
                 numberOfRepetitions: 2,
                 learningState: 'learning',
                 examinations: [],
@@ -115,7 +116,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Probability',
                 label: 'Probability',
                 mastery: 0.6,
-                lastRepetitionBeforeDays: 40,
+                lastRepetitionBefore: convertDayToTimestamp(40),
                 numberOfRepetitions: 3,
                 learningState: 'forRepeat',
                 examinations: [],
@@ -126,7 +127,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 6.5,
+            avgLastRepetitionBefore: convertDayToTimestamp(6.5),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -140,7 +141,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Geometry',
                 label: 'Geometry',
                 mastery: 0.85,
-                lastRepetitionBeforeDays: 12,
+                lastRepetitionBefore: convertDayToTimestamp(12),
                 numberOfRepetitions: 3,
                 learningState: 'learned',
                 examinations: [],
@@ -151,7 +152,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Statistics',
                 label: 'Statistics',
                 mastery: 0.1,
-                lastRepetitionBeforeDays: 1,
+                lastRepetitionBefore: convertDayToTimestamp(1),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
@@ -164,7 +165,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Chemistry: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBeforeDays: 7.17,
+        avgLastRepetitionBefore: convertDayToTimestamp(7.17),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 2,
@@ -176,7 +177,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 6,
+            avgLastRepetitionBefore: convertDayToTimestamp(6),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -190,7 +191,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Atomic structure',
                 label: 'Atomic structure',
                 mastery: 0.2,
-                lastRepetitionBeforeDays: 2,
+                lastRepetitionBefore: convertDayToTimestamp(2),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
@@ -201,7 +202,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Chemical reactions',
                 label: 'Chemical reactions',
                 mastery: 0.6,
-                lastRepetitionBeforeDays: 10,
+                lastRepetitionBefore: convertDayToTimestamp(10),
                 numberOfRepetitions: 3,
                 learningState: 'forRepeat',
                 examinations: [],
@@ -212,7 +213,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 7.5,
+            avgLastRepetitionBefore: convertDayToTimestamp(7.5),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -226,7 +227,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Periodic table',
                 label: 'Periodic table',
                 mastery: 0.45,
-                lastRepetitionBeforeDays: 6,
+                lastRepetitionBefore: convertDayToTimestamp(6),
                 numberOfRepetitions: 2,
                 learningState: 'learning',
                 examinations: [],
@@ -237,7 +238,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Bonding',
                 label: 'Bonding',
                 mastery: 0.8,
-                lastRepetitionBeforeDays: 9,
+                lastRepetitionBefore: convertDayToTimestamp(9),
                 numberOfRepetitions: 4,
                 learningState: 'learned',
                 examinations: [],
@@ -248,7 +249,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 8,
+            avgLastRepetitionBefore: convertDayToTimestamp(8),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -262,7 +263,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Acids and bases',
                 label: 'Acids and bases',
                 mastery: 0.1,
-                lastRepetitionBeforeDays: 1,
+                lastRepetitionBefore: convertDayToTimestamp(1),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
@@ -273,7 +274,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Organic chemistry',
                 label: 'Organic chemistry',
                 mastery: 0.5,
-                lastRepetitionBeforeDays: 15,
+                lastRepetitionBefore: convertDayToTimestamp(15),
                 numberOfRepetitions: 2,
                 learningState: 'learning',
                 examinations: [],
@@ -286,7 +287,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     Physics: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBeforeDays: 23.33,
+        avgLastRepetitionBefore: convertDayToTimestamp(23.33),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 1,
@@ -298,7 +299,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 7,
+            avgLastRepetitionBefore: convertDayToTimestamp(7),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -312,7 +313,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Forces and motion',
                 label: 'Forces and motion',
                 mastery: 0.8,
-                lastRepetitionBeforeDays: 6,
+                lastRepetitionBefore: convertDayToTimestamp(6),
                 numberOfRepetitions: 3,
                 learningState: 'learned',
                 examinations: [],
@@ -323,7 +324,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Energy',
                 label: 'Energy',
                 mastery: 0.95,
-                lastRepetitionBeforeDays: 8,
+                lastRepetitionBefore: convertDayToTimestamp(8),
                 numberOfRepetitions: 5,
                 learningState: 'learned',
                 examinations: [],
@@ -334,7 +335,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 8,
+            avgLastRepetitionBefore: convertDayToTimestamp(8),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 1,
@@ -348,7 +349,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Electricity',
                 label: 'Electricity',
                 mastery: 0.5,
-                lastRepetitionBeforeDays: 14,
+                lastRepetitionBefore: convertDayToTimestamp(14),
                 numberOfRepetitions: 2,
                 learningState: 'learning',
                 examinations: [],
@@ -359,7 +360,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Waves',
                 label: 'Waves',
                 mastery: 0.3,
-                lastRepetitionBeforeDays: 2,
+                lastRepetitionBefore: convertDayToTimestamp(2),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
@@ -370,7 +371,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 55,
+            avgLastRepetitionBefore: convertDayToTimestamp(55),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -384,7 +385,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Optics',
                 label: 'Optics',
                 mastery: 0.65,
-                lastRepetitionBeforeDays: 90,
+                lastRepetitionBefore: convertDayToTimestamp(90),
                 numberOfRepetitions: 4,
                 learningState: 'forRepeat',
                 examinations: [],
@@ -395,7 +396,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Thermodynamics',
                 label: 'Thermodynamics',
                 mastery: 0.88,
-                lastRepetitionBeforeDays: 20,
+                lastRepetitionBefore: convertDayToTimestamp(20),
                 numberOfRepetitions: 4,
                 learningState: 'learned',
                 examinations: [],
@@ -408,7 +409,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
     History: {
       defaultGroupType: 'relevance',
       statistics: {
-        avgLastRepetitionBeforeDays: 35,
+        avgLastRepetitionBefore: convertDayToTimestamp(35),
         selected: 0,
         selectionState: 'implicitNoSelection',
         notLearned: 2,
@@ -420,7 +421,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         1: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 85,
+            avgLastRepetitionBefore: convertDayToTimestamp(85),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -434,7 +435,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Roman Empire',
                 label: 'Roman Empire',
                 mastery: 0.92,
-                lastRepetitionBeforeDays: 20,
+                lastRepetitionBefore: convertDayToTimestamp(20),
                 numberOfRepetitions: 5,
                 learningState: 'learned',
                 examinations: [],
@@ -445,7 +446,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'World War II',
                 label: 'World War II',
                 mastery: 0.7,
-                lastRepetitionBeforeDays: 150,
+                lastRepetitionBefore: convertDayToTimestamp(150),
                 numberOfRepetitions: 4,
                 learningState: 'forRepeat',
                 examinations: [],
@@ -456,7 +457,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         2: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 17,
+            avgLastRepetitionBefore: convertDayToTimestamp(17),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 0,
@@ -470,7 +471,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Middle Ages',
                 label: 'Middle Ages',
                 mastery: 0.4,
-                lastRepetitionBeforeDays: 4,
+                lastRepetitionBefore: convertDayToTimestamp(4),
                 numberOfRepetitions: 2,
                 learningState: 'learning',
                 examinations: [],
@@ -481,7 +482,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Renaissance',
                 label: 'Renaissance',
                 mastery: 0.75,
-                lastRepetitionBeforeDays: 30,
+                lastRepetitionBefore: convertDayToTimestamp(30),
                 numberOfRepetitions: 3,
                 learningState: 'learned',
                 examinations: [],
@@ -492,7 +493,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
         3: {
           defaultGroupType: 'taskDescription',
           statistics: {
-            avgLastRepetitionBeforeDays: 3,
+            avgLastRepetitionBefore: convertDayToTimestamp(3),
             selected: 0,
             selectionState: 'implicitNoSelection',
             notLearned: 2,
@@ -506,7 +507,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'French Revolution',
                 label: 'French Revolution',
                 mastery: 0.15,
-                lastRepetitionBeforeDays: 1,
+                lastRepetitionBefore: convertDayToTimestamp(1),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
@@ -517,7 +518,7 @@ const statisticsExampleTree: OverviewStatisticsTree = {
                 id: 'Cold War',
                 label: 'Cold War',
                 mastery: 0.3,
-                lastRepetitionBeforeDays: 5,
+                lastRepetitionBefore: convertDayToTimestamp(5),
                 numberOfRepetitions: 1,
                 learningState: 'notLearned',
                 examinations: [],
