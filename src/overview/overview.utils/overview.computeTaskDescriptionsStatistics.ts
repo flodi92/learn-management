@@ -1,6 +1,10 @@
-import { computeTaskDescriptionStatisticsAt } from '../../learnScheduler/learnScheduler.utils/computeTaskDescriptionStatisticsAt';
+import { getMastery } from '../../learnScheduler/learnScheduler.utils/getMastery';
+import { getRepetitions } from '../../learnScheduler/learnScheduler.utils/getRepetitions';
 import { TaskDescription, TimedResult } from '../../model';
-import { OverviewTaskDescriptionStatisticsItem } from '../overview.model';
+import {
+  OverviewExamination,
+  OverviewTaskDescriptionStatisticsItem,
+} from '../overview.model';
 import {
   TaskDescriptionStatisticsTuple,
   TaskDescriptionStatisticsTuples,
@@ -15,15 +19,26 @@ export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
   TD,
   OverviewTaskDescriptionStatisticsItem
 > => {
-  const taskDescriptionStatistics = computeTaskDescriptionStatisticsAt(
-    day,
-    idTaskDescriptionMapping,
-    results,
-  );
+  // Results can refer to taskDescriptions that do not exist anymore, which have no label.
+  const getConfusedLabel = (id: string) =>
+    idTaskDescriptionMapping[id] ? getLabelFromId(id) : id;
 
-  return Object.entries(taskDescriptionStatistics).map(
-    ([id, statisticsItem]) =>
-      [
+  return Array.from(
+    getRepetitions(day, idTaskDescriptionMapping, results),
+    ([id, repetitions]) => {
+      const statisticsItem = getMastery(repetitions, day);
+      const examinations = repetitions
+        .map(
+          ({ day: examinedDay, correctness, wasConfusedWith }) =>
+            ({
+              examinedBeforeDays: day - examinedDay,
+              correctness,
+              wasConfusedWith: (wasConfusedWith ?? []).map(getConfusedLabel),
+            }) satisfies OverviewExamination,
+        )
+        .reverse();
+
+      return [
         id,
         idTaskDescriptionMapping[id],
         {
@@ -38,10 +53,12 @@ export const computeTaskDescriptionsStatistics = <TD extends TaskDescription>(
           learningState: statisticsItem.learningState,
           lastMastery: statisticsItem.lastMastery,
           lastCorrectness: statisticsItem.lastCorrectness,
+          examinations,
         },
       ] satisfies TaskDescriptionStatisticsTuple<
         TD,
         OverviewTaskDescriptionStatisticsItem
-      >,
+      >;
+    },
   );
 };

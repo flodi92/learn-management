@@ -28,6 +28,11 @@ export const selectionStateIndicators: Record<
   explicitUnselection: { text: '[-]', isHighlighted: true },
 };
 
+// An examination counts as correct from this correctness on.
+export const correctExaminationThreshold = 0.5;
+export const correctExaminationColor = chalk.green;
+export const incorrectExaminationColor = chalk.red;
+
 export const selectionHighlightColor = chalk.bgHex('#4a4827');
 export const selectedColor = chalk.italic;
 export const unfocusedSelectionColor = chalk.gray;

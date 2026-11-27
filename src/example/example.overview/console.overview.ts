@@ -7,7 +7,10 @@ import {
 } from '../../overview/overview.model';
 import { Overview } from '../../overview/overview';
 import { consoleDisplayStatistics } from './console.displayStatistics/console.displayStatistics';
-import { formatStatistics } from './console.displayStatisticsItem.utils/console.formatStatistics';
+import {
+  formatStatistics,
+  formatStatisticsDetails,
+} from './console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from './console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from './console.displayStatisticsItem.utils/console.sortChildren';
 import { TaskDescription } from '../../model';
@@ -57,6 +60,7 @@ export class ConsoleOverview<
     await consoleDisplayStatistics(
       statistics,
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
       toggleSelection,

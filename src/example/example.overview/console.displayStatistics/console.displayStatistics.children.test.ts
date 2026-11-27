@@ -3,7 +3,10 @@ import { OverviewStatisticsTree } from '../../../overview/overview.utils/overvie
 import { toRecursiveStatistics } from '../../../overview/overview.utils/overview.toRecursiveStatistics';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
 import { numberOfInitiallyShownChildren } from '../console.constants';
-import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
+import {
+  formatStatistics,
+  formatStatisticsDetails,
+} from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from '../console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from '../console.displayStatisticsItem.utils/console.sortChildren';
 
@@ -35,6 +38,7 @@ const createStatisticsTree = (
             mastery: 1 - index / 100,
             lastRepetitionBeforeDays: 1,
             numberOfRepetitions: 1,
+            examinations: [],
             learningState: 'learning',
           },
         },
@@ -60,6 +64,7 @@ describe('ConsoleDisplayStatistics with many children', () => {
   const start = (numberOfChildren: number) =>
     new ConsoleDisplayStatistics(
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
     ).display(toRecursiveStatistics(createStatisticsTree(numberOfChildren)));
@@ -131,6 +136,7 @@ describe('ConsoleDisplayStatistics with many children', () => {
     });
     new ConsoleDisplayStatistics(
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
     ).display(statistics);

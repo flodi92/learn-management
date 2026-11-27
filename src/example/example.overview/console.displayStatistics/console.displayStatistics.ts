@@ -18,6 +18,7 @@ import {
   Focus,
   Line,
   StatisticsColorer,
+  StatisticsDetailsFormatter,
   StatisticsFormatter,
   StatisticsPath,
   StatisticsSorter,
@@ -56,6 +57,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
 
   constructor(
     private readonly formatStatistics: StatisticsFormatter<Statistics>,
+    private readonly formatStatisticsDetails: StatisticsDetailsFormatter<Statistics>,
     private readonly getStatisticsColor: StatisticsColorer<Statistics>,
     private readonly sortChildren: StatisticsSorter<Statistics>,
     private readonly toggleSelection: (
@@ -117,7 +119,18 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
         statistics: child.statistics,
       });
       if (this.expanded.has(pathId(childPath))) {
-        lines.push(...this.buildLines(child, childPath, depth + 2));
+        lines.push(
+          ...this.formatStatisticsDetails(child.statistics).map(
+            (text, detailIndex) => ({
+              depth: depth + 2,
+              nodePath: childPath,
+              text,
+              detailOf: childPath,
+              detailIndex,
+            }),
+          ),
+          ...this.buildLines(child, childPath, depth + 2),
+        );
       }
     }
     if (entries.length > shownCount) {
@@ -281,16 +294,28 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
       this.changeGroupType(1);
       return;
     }
+    if (this.focus.detailIndex !== undefined) return;
     const node = getNode(this.root, this.focus.path);
-    if (!node || getSelectableGroupTypes(node).length === 0) return;
-    const groupType = this.getGroupType(node, this.focus.path);
-    const firstChild = getSortedChildren(node, groupType, this.sortChildren)[0];
-    if (!firstChild) return;
+    if (!node) return;
+    const groupType =
+      getSelectableGroupTypes(node).length > 0
+        ? this.getGroupType(node, this.focus.path)
+        : undefined;
+    const firstChild =
+      groupType === undefined
+        ? undefined
+        : getSortedChildren(node, groupType, this.sortChildren)[0];
+    const hasDetails = this.formatStatisticsDetails(node.statistics).length > 0;
+    if (!firstChild && !hasDetails) return;
     this.expanded.add(pathId(this.focus.path));
-    this.focus = {
-      path: [...this.focus.path, [groupType, firstChild[0]]],
-      isHeading: false,
-    };
+    if (hasDetails) {
+      this.focus = { path: this.focus.path, isHeading: false, detailIndex: 0 };
+    } else if (groupType !== undefined && firstChild) {
+      this.focus = {
+        path: [...this.focus.path, [groupType, firstChild[0]]],
+        isHeading: false,
+      };
+    }
     this.update();
   }
 
@@ -300,6 +325,12 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
       this.changeGroupType(-1);
       return;
     }
+    if (this.focus.detailIndex !== undefined) {
+      this.focus = { path: this.focus.path, isHeading: false };
+      this.expanded.delete(pathId(this.focus.path));
+      this.update();
+      return;
+    }
     if (this.focus.path.length < 2) return;
     this.focus = { path: this.focus.path.slice(0, -1), isHeading: false };
     this.expanded.delete(pathId(this.focus.path));
@@ -307,7 +338,12 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
   }
 
   private toggleFocusedSelection() {
-    if (!this.focus || this.focus.isHeading) return;
+    if (
+      !this.focus ||
+      this.focus.isHeading ||
+      this.focus.detailIndex !== undefined
+    )
+      return;
     this.toggleSelection(
       getTaskDescriptionOrGroupSelectionPath(this.focus.path),
     );
@@ -365,6 +401,7 @@ export class ConsoleDisplayStatistics<Statistics extends object> {
 export const consoleDisplayStatistics = async <Statistics extends object>(
   statistics: Node<Statistics>,
   formatStatistics: StatisticsFormatter<Statistics>,
+  formatStatisticsDetails: StatisticsDetailsFormatter<Statistics>,
   getStatisticsColor: StatisticsColorer<Statistics>,
   sortChildren: StatisticsSorter<Statistics>,
   toggleSelection: (path: OverviewSelectionPath) => void = () => {},
@@ -372,6 +409,7 @@ export const consoleDisplayStatistics = async <Statistics extends object>(
 ): Promise<void> => {
   const overview = new ConsoleDisplayStatistics(
     formatStatistics,
+    formatStatisticsDetails,
     getStatisticsColor,
     sortChildren,
     toggleSelection,

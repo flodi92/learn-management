@@ -7,8 +7,8 @@ console. `GroupType` describes the string values used by `defaultGroupType`,
 Children are only read through `getChildren(groupType)` for the currently chosen
 group type of a node, never through a `children` attribute.
 The display tree does not know what a statistics item contains. The caller
-provides arrow functions for formatting an item, coloring an item, sorting
-children, and toggling a group selection. The caller also provides an observable
+provides arrow functions for formatting an item, formatting the details of an
+item, coloring an item, sorting children, and toggling a group selection. The caller also provides an observable
 for the current subject selection. The display reads it while rendering; it
 does not store selection state itself.
 
@@ -34,7 +34,7 @@ The focused child can be changed with the up and down arrow keys and is
 indicated by a yellow `>`. The right arrow expands the focused child, shows its
 `${groupType} statistics` line and children, and moves the focus to the first
 child. This can be repeated for deeper layers; pressing right on a child
-without children has no effect. The left arrow moves the focus to the parent
+without children and without details has no effect. The left arrow moves the focus to the parent
 child (the child expanded to show the focused child) and collapses its
 expansion. In the first layer there is no parent, so pressing left has no
 effect. Up and down do not expand or collapse anything. Pressing space toggles
@@ -59,6 +59,19 @@ down moves the focus to that child's first child. There is only one focus for
 all layers. The root statistics line cannot be focused. Space has no effect on a
 heading. Toggling a subject passes `[['taskDescription', id]]`, toggling a group
 passes its full path.
+
+### Details of a child
+
+A child can have detail lines, which the details arrow function returns as
+text lines for the statistics of the child (for a taskDescription these are its
+examinations). They form a layer of their own without a heading. Pressing right
+on a child without children but with details shows its detail lines below the
+child line, indented like the children of an expanded child, and moves the focus
+to the first detail line. Detail lines can be focused with up and down like any
+child, but they can neither be expanded nor selected: right and space have no
+effect on them. The left arrow on a detail line closes the details and moves the
+focus back to the child, as for any other layer. A child with children shows its
+detail lines above its `${groupType} statistics` line.
 
 ### Number of shown children
 
@@ -89,7 +102,8 @@ Everything is shown with the opacity `inactiveOpacity` defined in
 
 - the focused child line;
 - child lines with the focused line somewhere below them (the parents of the
-  focused child); and
+  focused child);
+- all detail lines of a child that is focused or has a focused detail line; and
 - the root statistics line and the `${groupType} statistics` line of every
   node with the focused line as a child or further below, and the focused
   heading itself.

@@ -15,7 +15,7 @@ export const indentation = (depth: number) => '  '.repeat(depth);
 export const pathId = (path: StatisticsPath) => JSON.stringify(path);
 
 export const focusId = (focus: Focus) =>
-  JSON.stringify([focus.isHeading, focus.path]);
+  JSON.stringify([focus.isHeading, focus.path, focus.detailIndex]);
 
 export const getLineFocus = <Statistics extends object>(
   line: Line<Statistics>,
@@ -24,7 +24,13 @@ export const getLineFocus = <Statistics extends object>(
     ? { path: line.path, isHeading: false }
     : line.headingOf
       ? { path: line.headingOf, isHeading: true }
-      : undefined;
+      : line.detailOf
+        ? {
+            path: line.detailOf,
+            isHeading: false,
+            detailIndex: line.detailIndex,
+          }
+        : undefined;
 
 const startsWith = (path: StatisticsPath, prefix: StatisticsPath) =>
   prefix.every(

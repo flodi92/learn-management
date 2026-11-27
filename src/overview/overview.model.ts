@@ -4,6 +4,13 @@ import {
   OverviewRecursiveUndeterminedStatistics,
 } from './overview.utils/overview.computeStatistics.model';
 
+export interface OverviewExamination {
+  examinedBeforeDays: number;
+  correctness: number;
+  // The labels of the taskDescriptions, not their ids.
+  wasConfusedWith: string[];
+}
+
 export interface OverviewTaskDescriptionStatisticsItem extends Omit<
   TaskDescriptionStatisticsItem,
   'lastRepetition'
@@ -12,6 +19,8 @@ export interface OverviewTaskDescriptionStatisticsItem extends Omit<
   label: string;
   lastRepetitionBeforeDays: number;
   learningState: LearningState;
+  // All examinations counted in numberOfRepetitions, the most recent first.
+  examinations: OverviewExamination[];
 }
 
 export type SelectionState =

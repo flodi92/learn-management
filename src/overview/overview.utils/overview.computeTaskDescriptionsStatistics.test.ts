@@ -70,4 +70,43 @@ describe('computeTaskDescriptionsStatistics', () => {
         .learningState,
     ).toBe('forRepeat');
   });
+
+  it('lists the examinations counted as repetitions, the most recent first, with the confusions as labels', () => {
+    const tasks: Record<string, TaskDescription> = {
+      a: { id: 'a' },
+      b: { id: 'b' },
+      c: { id: 'c', parents: ['a'] },
+    };
+    const results: TimedResult[] = [
+      { id: 'a', day: 1, correctness: 1 },
+      { id: 'a', day: 5, correctness: 0, wasConfusedWith: ['b', 'removed'] },
+      { id: 'c', day: 7.5, correctness: 1 },
+      { id: 'a', day: 11, correctness: 1 },
+    ];
+    const items = Object.fromEntries(
+      computeTaskDescriptionsStatistics(
+        tasks,
+        results,
+        10,
+        (id) => `Label ${id}`,
+      ).map(([id, , statistics]) => [id, statistics]),
+    );
+
+    // The result of c is inherited by its parent a, the result after the day is ignored
+    expect(items.a.examinations).toEqual([
+      { examinedBeforeDays: 2.5, correctness: 1, wasConfusedWith: [] },
+      {
+        examinedBeforeDays: 5,
+        correctness: 0,
+        // The id of a taskDescription that does not exist anymore has no label
+        wasConfusedWith: ['Label b', 'removed'],
+      },
+      { examinedBeforeDays: 9, correctness: 1, wasConfusedWith: [] },
+    ]);
+    expect(items.a.examinations).toHaveLength(items.a.numberOfRepetitions);
+    expect(items.c.examinations).toEqual([
+      { examinedBeforeDays: 2.5, correctness: 1, wasConfusedWith: [] },
+    ]);
+    expect(items.b.examinations).toEqual([]);
+  });
 });

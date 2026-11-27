@@ -7,6 +7,8 @@ import {
   SelectionState,
 } from '../../../overview/overview.model';
 import {
+  correctExaminationColor,
+  incorrectExaminationColor,
   learningStateColors,
   selectedColor,
   selectionHighlightColor,
@@ -15,6 +17,7 @@ import {
 import {
   camelCaseToWords,
   formatStatistics,
+  formatStatisticsDetails,
   isOverviewTaskDescriptionStatisticsItem,
 } from './console.formatStatistics';
 import { getStatisticsColor } from './console.getStatisticsColor';
@@ -43,6 +46,7 @@ const taskDescription: OverviewTaskDescriptionStatisticsItem = {
   learningState: 'forRepeat',
   lastMastery: 0.5,
   lastCorrectness: undefined,
+  examinations: [],
 };
 
 describe('camelCaseToWords', () => {
@@ -141,6 +145,72 @@ describe('formatStatistics', () => {
     };
     expect(formatStatistics(neverRepeated, true)).not.toContain('Infinity');
     expect(formatStatistics(neverRepeated, true)).toContain('0x');
+  });
+});
+
+describe('formatStatisticsDetails', () => {
+  it('shows one line per examination of a taskDescription, correct ones green and incorrect ones red', () => {
+    expect(
+      formatStatisticsDetails({
+        ...taskDescription,
+        examinations: [
+          {
+            examinedBeforeDays: 0.8803214467588987,
+            correctness: 1,
+            wasConfusedWith: [],
+          },
+          {
+            examinedBeforeDays: 2,
+            correctness: 0,
+            wasConfusedWith: ['/xyz$/'],
+          },
+          {
+            examinedBeforeDays: 3,
+            correctness: 0,
+            wasConfusedWith: ['/xyz/', '/^xyz/'],
+          },
+        ],
+      }),
+    ).toEqual([
+      correctExaminationColor('0.8803214467588987 days before: correct'),
+      incorrectExaminationColor(
+        '2 days before: incorrect, was confused with /xyz$/',
+      ),
+      incorrectExaminationColor(
+        '3 days before: incorrect, was confused with /xyz/, /^xyz/',
+      ),
+    ]);
+  });
+
+  it('colors the examinations green and red', () => {
+    const [correct, incorrect] = formatStatisticsDetails({
+      ...taskDescription,
+      examinations: [
+        { examinedBeforeDays: 1, correctness: 1, wasConfusedWith: [] },
+        { examinedBeforeDays: 2, correctness: 0, wasConfusedWith: [] },
+      ],
+    });
+    expect(correct).toBe(chalk.green('1 days before: correct'));
+    expect(incorrect).toBe(chalk.red('2 days before: incorrect'));
+  });
+
+  it('shows no details for a taskDescription without examinations or aggregated statistics', () => {
+    expect(formatStatisticsDetails(taskDescription)).toEqual([]);
+    expect(formatStatisticsDetails(aggregated)).toEqual([]);
+  });
+
+  it('does not repeat the examinations in the focused statistics of a taskDescription', () => {
+    expect(
+      formatStatistics(
+        {
+          ...taskDescription,
+          examinations: [
+            { examinedBeforeDays: 1, correctness: 1, wasConfusedWith: [] },
+          ],
+        },
+        true,
+      ),
+    ).not.toContain('examinations');
   });
 });
 

@@ -6,6 +6,9 @@ This module supplies the overview-specific arrow functions used by
 - `formatStatistics` formats `OverviewStatistics`, using the short form for
   unfocused lines and the detailed form for the focused line. The root line is
   rendered in the detailed form.
+- `formatStatisticsDetails` returns the lines shown below an expanded
+  taskDescription (see `OverviewTaskDescriptionStatisticsItem`) and no lines
+  for aggregated statistics.
 - `getStatisticsColor` colors a subject by its learning state and aggregated
   statistics by their dominant learning state.
 - `compareStatistics` sorts subjects by decreasing mastery and aggregated
@@ -58,3 +61,16 @@ colon colored by `getStatisticsColor`.
   shown. Other values, such as `lastMastery` and `lastCorrectness`, are
   appended as `name: value`, with camel-case names transformed into separate
   words, for example `last mastery: 0.5`.
+- `examinations` is not part of the focused form. Instead
+  `formatStatisticsDetails` returns one line per examination, the most recent
+  first: `${examinedBeforeDays} days before: correct` or
+  `${examinedBeforeDays} days before: incorrect`. A confusion is appended as
+  `, was confused with ${wasConfusedWith.join(', ')}`. The labels of the
+  confused taskDescriptions are already resolved like the label of every
+  taskDescription (an id that has no taskDescription anymore stays an id). An
+  examination is correct from `correctExaminationThreshold` (defined in
+  `console.constants.ts`) on. The whole line is green
+  (`correctExaminationColor`) if it is correct and red
+  (`incorrectExaminationColor`) otherwise. The examinations are the ones
+  counted in `numberOfRepetitions`, so they also contain the examinations of
+  the taskDescriptions the taskDescription is a parent of.

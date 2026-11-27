@@ -1,11 +1,15 @@
 import { learningStates } from '../../../model';
 import {
   OverviewAggregatedStatisticsItem,
+  OverviewExamination,
   OverviewStatistics,
   OverviewTaskDescriptionStatisticsItem,
   SelectionState,
 } from '../../../overview/overview.model';
 import {
+  correctExaminationColor,
+  correctExaminationThreshold,
+  incorrectExaminationColor,
   learningStateColors,
   selectedColor,
   selectionHighlightColor,
@@ -20,6 +24,7 @@ const summarizedTaskDescriptionKeys = new Set<string>([
   'lastRepetitionBeforeDays',
   'numberOfRepetitions',
   'learningState',
+  'examinations',
 ]);
 
 // "forRepeat" -> "for repeat"
@@ -101,3 +106,27 @@ export const formatStatistics = (
   isOverviewTaskDescriptionStatisticsItem(statistics)
     ? formatTaskDescriptionStatistics(statistics, isFocused)
     : formatAggregatedStatistics(statistics, isFocused);
+
+const formatExamination = ({
+  examinedBeforeDays,
+  correctness,
+  wasConfusedWith,
+}: OverviewExamination): string => {
+  const isCorrect = correctness >= correctExaminationThreshold;
+  const confusion =
+    wasConfusedWith.length > 0
+      ? `, was confused with ${wasConfusedWith.join(', ')}`
+      : '';
+  const color = isCorrect ? correctExaminationColor : incorrectExaminationColor;
+  return color(
+    `${examinedBeforeDays} days before: ${isCorrect ? 'correct' : 'incorrect'}${confusion}`,
+  );
+};
+
+// One line per examination of a taskDescription, aggregated statistics have no details.
+export const formatStatisticsDetails = (
+  statistics: OverviewStatistics,
+): string[] =>
+  isOverviewTaskDescriptionStatisticsItem(statistics)
+    ? statistics.examinations.map(formatExamination)
+    : [];

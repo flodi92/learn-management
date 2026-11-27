@@ -11,6 +11,7 @@ const createItem = (id: string): OverviewTaskDescriptionStatisticsItem => ({
   learningState: 'learning',
   lastMastery: 0.5,
   lastCorrectness: 0.5,
+  examinations: [],
 });
 
 const items = ['a', 'b', 'c'].map(createItem);

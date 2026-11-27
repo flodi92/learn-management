@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { OverviewRecursiveStatistics } from '../../../overview/overview.model';
 import { statisticsExample } from '../../../overview/overview.utils/overview.computeStatistics.exampleData';
 import { ConsoleDisplayStatistics } from './console.displayStatistics';
-import { formatStatistics } from '../console.displayStatisticsItem.utils/console.formatStatistics';
+import {
+  formatStatistics,
+  formatStatisticsDetails,
+} from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import { getStatisticsColor } from '../console.displayStatisticsItem.utils/console.getStatisticsColor';
 import { sortChildren } from '../console.displayStatisticsItem.utils/console.sortChildren';
 
@@ -28,6 +31,7 @@ describe('ConsoleDisplayStatistics', () => {
     });
     new ConsoleDisplayStatistics(
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
       undefined,
@@ -114,54 +118,121 @@ describe('ConsoleDisplayStatistics', () => {
     ]);
   });
 
-  it('does nothing on the right arrow key for a child without children', () => {
+  it('does nothing on the right arrow key for a child without children and examinations', () => {
     press('right');
-    press('right');
-    const before = view();
     press('right');
     press('down');
-    expect(view()).toHaveLength(before.length);
+    // Space has no effect here, but renders the view again
+    press('space');
+    const before = view();
+    press('right');
+    press('space');
+    expect(view()).toEqual(before);
     expect(view()).toContain(
       '          > Solving equations: learned (90%) 4x 3 days before',
     );
   });
 
-  it('only the focused line and the lines above it have full opacity', () => {
+  it('lists the examinations of a taskDescription with the right arrow key and focuses the first one', () => {
+    press('right');
+    press('right');
+    press('right');
+    expect(view().slice(5, 14)).toEqual([
+      '          taskDescription statistics',
+      '            Fractions: 95%',
+      '            > 2 days before: correct',
+      '              6.5 days before: incorrect, was confused with Solving equations',
+      '              14 days before: correct',
+      '              21 days before: correct',
+      '              30 days before: incorrect',
+      '            Solving equations: 90%',
+      '        3:     0 1 0 1 0 ⌀ 6.5 days before',
+    ]);
+  });
+
+  it('colors correct examinations green and incorrect ones red', () => {
+    const previousLevel = chalk.level;
+    chalk.level = 1;
+    try {
+      press('right');
+      press('right');
+      press('right');
+      const lines = output.slice(output.indexOf('') + 1);
+      const colorOf = (text: string) =>
+        lines
+          .find((line) => line.includes(text))
+          ?.match(/\u001b\[(\d+)m(?!.*\u001b\[\d+m.*days before)/)?.[1];
+      expect(colorOf('2 days before: correct')).toBe('32');
+      expect(colorOf('6.5 days before: incorrect')).toBe('31');
+    } finally {
+      chalk.level = previousLevel;
+    }
+  });
+
+  it('moves the focus through the examinations and on to the next taskDescription with the down arrow key', () => {
+    press('right');
+    press('right');
+    press('right');
+    press('down');
+    expect(view()).toContain(
+      '            > 6.5 days before: incorrect, was confused with Solving equations',
+    );
+    for (let i = 0; i < 3; i++) press('down');
+    expect(view()).toContain('            > 30 days before: incorrect');
+    press('down');
+    expect(view()).toContain(
+      '          > Solving equations: learned (90%) 4x 3 days before',
+    );
+    press('up');
+    expect(view()).toContain('            > 30 days before: incorrect');
+  });
+
+  it('does nothing on the right arrow key for an examination', () => {
+    press('right');
+    press('right');
+    press('right');
+    press('space');
+    const before = view();
+    press('right');
+    press('space');
+    expect(view()).toEqual(before);
+  });
+
+  it('closes the examinations and jumps to the taskDescription with the left arrow key', () => {
+    press('right');
+    press('right');
+    press('right');
+    press('down');
+    press('left');
+    expect(view().join('\n')).not.toContain('days before: ');
+    expect(view()).toContain(
+      '          > Fractions: learned (95%) 5x 2 days before',
+    );
+    expect(view()).toContain('          taskDescription statistics');
+  });
+
+  it('shows the examinations of the focused taskDescription with full opacity', () => {
     const previousLevel = chalk.level;
     chalk.level = 1;
     try {
       const isDimmed = (line: string) =>
         /^\s*(?:\u001b\[33m> \u001b\[39m)?\u001b\[2m/.test(line);
-      const rawView = () => output.slice(output.indexOf('') + 1);
+      const dimmedExaminations = () =>
+        output
+          .slice(output.indexOf('') + 1)
+          .filter((line) => line.includes('days before: '))
+          .map(isDimmed);
 
       press('right');
-      // Mathematics has the focused child 1, whose siblings 3 and 2 are dimmed
-      expect(rawView().map(isDimmed)).toEqual([
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-      ]);
+      press('right');
+      press('right');
+      expect(dimmedExaminations()).toEqual([false, false, false, false, false]);
 
+      // Back on the taskDescription the examinations stay visible, but are dimmed when a sibling is focused
+      press('left');
       press('down');
-      expect(rawView().map(isDimmed)).toEqual([
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-      ]);
+      press('right');
+      expect(dimmedExaminations()).toEqual([]);
     } finally {
       chalk.level = previousLevel;
     }
@@ -264,6 +335,7 @@ describe('ConsoleDisplayStatistics group types', () => {
     });
     new ConsoleDisplayStatistics(
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
       toggleSelection,
@@ -326,6 +398,7 @@ describe('ConsoleDisplayStatistics selection with space', () => {
     const toggleSelection = vi.fn();
     new ConsoleDisplayStatistics(
       formatStatistics,
+      formatStatisticsDetails,
       getStatisticsColor,
       sortChildren,
       toggleSelection,
@@ -340,5 +413,26 @@ describe('ConsoleDisplayStatistics selection with space', () => {
     expect(toggleSelection).toHaveBeenCalledWith([
       ['taskDescription', 'Fractions'],
     ]);
+  });
+
+  it('does not select the examinations of a taskDescription', () => {
+    const toggleSelection = vi.fn();
+    new ConsoleDisplayStatistics(
+      formatStatistics,
+      formatStatisticsDetails,
+      getStatisticsColor,
+      sortChildren,
+      toggleSelection,
+      () => ({}),
+    ).display(statisticsExample);
+    press('right');
+    press('right');
+    press('right');
+    // The focus is on the first examination
+    press('space');
+    press('down');
+    press('space');
+
+    expect(toggleSelection).not.toHaveBeenCalled();
   });
 });
