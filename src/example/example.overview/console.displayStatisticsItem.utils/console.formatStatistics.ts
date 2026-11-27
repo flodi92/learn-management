@@ -28,9 +28,13 @@ const summarizedTaskDescriptionKeys = new Set<string>([
   'examinations',
 ]);
 
+export const isCamelCaseKey = (text: string) => /^[a-z][a-zA-Z\d]*$/.test(text);
+
 // "forRepeat" -> "for repeat"
 export const camelCaseToWords = (text: string): string =>
-  text.replace(/([a-z\d])([A-Z])/g, '$1 $2').toLowerCase();
+  isCamelCaseKey(text)
+    ? text.replace(/([a-z\d])([A-Z])/g, '$1 $2').toLowerCase()
+    : text;
 
 export const isOverviewTaskDescriptionStatisticsItem = (
   statistics: OverviewStatistics,

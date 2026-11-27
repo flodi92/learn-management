@@ -3,6 +3,7 @@ import {
   OverviewSelectionPath,
 } from '../../../overview/overview.model';
 import { OverviewRecursiveUndeterminedStatistics } from '../../../overview/overview.utils/overview.computeStatistics.model';
+import { camelCaseToWords } from '../console.displayStatisticsItem.utils/console.formatStatistics';
 import { Focus, Line, StatisticsPath } from './console.displayStatistics.model';
 
 type Node<Statistics extends object> = OverviewRecursiveUndeterminedStatistics<
@@ -60,8 +61,8 @@ const getLabel = (statistics: object): string | undefined => {
 
 export const getDisplayName = <Statistics extends object>(
   node: Node<Statistics>,
-  id: string | number,
-): string => getLabel(node.statistics) ?? String(id);
+  key: string | number,
+): string => getLabel(node.statistics) ?? camelCaseToWords(String(key));
 
 export const getNode = <Statistics extends object>(
   root: Node<Statistics>,

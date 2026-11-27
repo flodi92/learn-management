@@ -17,6 +17,7 @@ import {
 import {
   camelCaseToWords,
   formatStatistics,
+  isCamelCaseKey,
   formatStatisticsDetails,
   isOverviewTaskDescriptionStatisticsItem,
 } from './console.formatStatistics';
@@ -57,6 +58,30 @@ describe('camelCaseToWords', () => {
       'last repetition before',
     );
     expect(camelCaseToWords('mastery')).toBe('mastery');
+  });
+
+  it('keeps a text that is not a camel case key unchanged', () => {
+    expect(camelCaseToWords('Fractions')).toBe('Fractions');
+    expect(camelCaseToWords('Not Learned')).toBe('Not Learned');
+    expect(camelCaseToWords('not-learned')).toBe('not-learned');
+    expect(camelCaseToWords('1stRepetition')).toBe('1stRepetition');
+    expect(camelCaseToWords('')).toBe('');
+  });
+});
+
+describe('isCamelCaseKey', () => {
+  it('accepts keys starting with a lower case letter', () => {
+    expect(isCamelCaseKey('mastery')).toBe(true);
+    expect(isCamelCaseKey('lastRepetitionBefore')).toBe(true);
+    expect(isCamelCaseKey('level2Count')).toBe(true);
+  });
+
+  it('rejects everything else', () => {
+    expect(isCamelCaseKey('Fractions')).toBe(false);
+    expect(isCamelCaseKey('not learned')).toBe(false);
+    expect(isCamelCaseKey('not-learned')).toBe(false);
+    expect(isCamelCaseKey('1stRepetition')).toBe(false);
+    expect(isCamelCaseKey('')).toBe(false);
   });
 });
 
