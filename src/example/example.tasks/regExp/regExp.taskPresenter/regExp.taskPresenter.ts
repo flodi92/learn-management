@@ -40,7 +40,7 @@ export class RegExpTaskPresenter extends TaskPresenter<RegExpTaskDescription> {
     console.clear();
     console.log(
       chalk.bold(
-        `TaskDescription ${this.currentTaskDescriptionIndex + 1}/${this.presentedTaskDescriptions.length}: `,
+        `${this.isRepeating ? 'TaskDescription repeating' : 'TaskDescription'} ${this.currentTaskDescriptionIndex + 1}/${this.presentedTaskDescriptions.length}: `,
       ) + chalk.cyan(this.currentTaskDescription.expression.toString()),
     );
     console.log(

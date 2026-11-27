@@ -4,20 +4,31 @@ export abstract class TaskPresenter<TD extends TaskDescription> {
   protected presentedTaskDescriptions: TD[] = [];
   protected currentTaskDescriptionIndex = 0;
   protected summary = { correct: 0, incorrect: 0 };
+  protected isRepeating = false;
 
+  private incorrectlyAnsweredTaskDescriptions: TD[] = [];
   private _onAnswered?: (result: Result) => void;
   private _onFinished?: () => void;
 
   constructor(protected allTaskDescriptions: TD[]) {}
 
   public start(presentedTaskDescriptions: TD[]) {
-    this.presentedTaskDescriptions = presentedTaskDescriptions;
-    this.currentTaskDescriptionIndex = 0;
     this.summary = { correct: 0, incorrect: 0 };
-    if (this.presentedTaskDescriptions.length === 0) {
+    if (presentedTaskDescriptions.length === 0) {
+      this.presentedTaskDescriptions = [];
+      this.currentTaskDescriptionIndex = 0;
+      this.isRepeating = false;
       console.log('No taskDescriptions available.');
       return;
     }
+    this.startRun(presentedTaskDescriptions, false);
+  }
+
+  private startRun(taskDescriptions: TD[], isRepeating: boolean) {
+    this.presentedTaskDescriptions = taskDescriptions;
+    this.currentTaskDescriptionIndex = 0;
+    this.isRepeating = isRepeating;
+    this.incorrectlyAnsweredTaskDescriptions = [];
     this.loadTaskDescription();
     this.render();
   }
@@ -30,6 +41,10 @@ export abstract class TaskPresenter<TD extends TaskDescription> {
     if (
       this.currentTaskDescriptionIndex >= this.presentedTaskDescriptions.length
     ) {
+      if (this.incorrectlyAnsweredTaskDescriptions.length > 0) {
+        this.startRun(this.incorrectlyAnsweredTaskDescriptions, true);
+        return;
+      }
       this.finish();
       return;
     }
@@ -39,6 +54,14 @@ export abstract class TaskPresenter<TD extends TaskDescription> {
 
   protected updateSummary() {
     const isCorrect = this.isCurrentTaskDescriptionAnsweredCorrectly();
+    if (!isCorrect) {
+      this.incorrectlyAnsweredTaskDescriptions.push(
+        this.currentTaskDescription,
+      );
+    }
+    if (this.isRepeating) {
+      return;
+    }
     if (isCorrect) {
       this.summary.correct += 1;
     } else {
